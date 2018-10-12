@@ -1,0 +1,746 @@
+{
+    "rooms": ["hellsgate"],
+    "items": {
+        "key": {
+            "name": "Key",
+            "emote": ":key:",
+            "info": "The key unlocks chests and certain doors.",
+            "amount": 1,
+            "dungeonOnly": true
+        },
+        "dungeon_key": {
+            "name": "Dungeon Key",
+            "emote": ":key2:",
+            "info": "It's the dungeon key for moving down the floors.",
+            "amount": 1,
+            "dungeonOnly": true
+        },
+        "crystals": {
+            "name": "Crystals",
+            "emote": "<:crystals:460974340247257089>",
+            "internal": true
+        }
+    },
+    "hellsgate": {
+        "name": "Hell's Gate",
+        "id": "hellsgate",
+        "channel": "464238060243124245",
+        "color": "#e67e22",
+        "entrance": {
+            "name": "Dungeon Entrance",
+            "descriptions": [
+                { "text": "The entrance is a bunch of code cobbled together to make a half-working mass of \"Dungeon\". Hopefully it doesn't kill you, or the party." },
+                { "text": "\nThere is a tired **!traveler** that seemed to have learned that idea all too well, try talking to him." }
+            ],
+            "image_url": "https://dummyimage.com/800x400/241f1a/e82525.png&text=Room",
+            "northtext": "Move **!north** to enter the dungeon.",
+            "easttext": "",
+            "southtext": "",
+            "westtext": "",
+            "floor": 1,
+            "connections": {
+                "north": "room_1"
+            },
+            "traveler": {
+                "npc": true,
+                "command": true,
+                "name": "Traveler",
+                "descriptions": [
+                    { "waitBegin": 2000, "waitEnd": 1000, "text": "Hello ${leader}, be careful in there." },
+                    { "waitBegin": 2000, "waitEnd": 1000, "text": "There's a few deadly Ravagers that hurt me real bad." },
+                    { "waitBegin": 2000, "waitEnd": 1000, "text": "Hopefully you're all in top shape, right?" }
+                ],
+                "optionsDescription": { "waitBegin": 800, "waitEnd": 0, "text": "**!yes** or **!no**?" },
+                "options": [
+                    {"command": "yes", "emote": "✅"}, 
+                    {"command": "no", "emote": "❌"}
+                ],
+                "yes": {
+                    "command": true,
+                    "name": "Traveler",
+                    "descriptions": [
+                        { "waitBegin": 3000, "waitEnd": 2000, "text": "Good to know, hopefully you can walk out alive. Wish you luck!" }
+                    ],
+                    "lastCommand": true
+                },
+                "no": {
+                    "command": true,
+                    "name": "Traveler",
+                    "descriptions": [
+                        { "waitBegin": 3000, "waitEnd": 2000, "text": "Oh... well good luck anyhow. If you just want to bail out, just **!leave**. You won't get your **<:crystals:460974340247257089> Crystals** back, though." }
+                    ],
+                    "lastCommand": true
+                }
+            }
+        },
+        "room_1": {
+            "name": "Dungeon Room",
+            "descriptions": [
+                {"text": "You can feel the hot air hitting your face entering. Hot lava is seeping out of the rocks. You should watch your step." }
+            ],
+            "image_url": "https://dummyimage.com/800x400/241f1a/e82525.png&text=Dungeon+Room",
+            "northtext": "You can hear loud groans **!north** that don't sound human, ",
+            "easttext": "",
+            "southtext": "Go back with **!south**, ",
+            "westtext": "or investigate the chest down **!west**.",
+            "floor": 1,
+            "connections": {
+                "north": "ravager_room_1",
+                "south": "entrance",
+                "west": "locked_chest_room_1"
+            }
+        },
+        "locked_chest_room_1": {
+            "name": "A Locked Chest",
+            "descriptions": [
+                {"text": "You found a locked **!chest**! Wonder what lies inside it. Hopefully there is something valuable."}
+            ],
+            "image_url": "https://dummyimage.com/800x400/593521/f5c91b.png&text=Chest",
+            "northtext": "",
+            "easttext": "Leave the chest by typing **!east**.",
+            "southtext": "",
+            "westtext": "",
+            "floor": 1,
+            "connections": {
+                "east": "room_1"
+            },
+            "chest": {
+                "command": true,
+                "type": "chest",
+                "removeItem": ["key"],
+                "embed": {
+                    "formatting": "author_title_image_desc",
+                    "setAuthor": {"title": "${dungeon.room.name}", "image": "${profile_pic}"},
+                    "setTitle": "A Locked Chest",
+                    "setDescription": "This chest requires a **:key: Key** to open.\n**:closed_lock_with_key: Unlock** chest with the key.\n:lock_with_ink_pen: **Lockpick** chest, and risk breaking the lock.\n:x: **Exit** options for the chest.",
+                    "waitBegin": 0,
+                    "waitEnd": 0
+                },
+                "options": [
+                    {"command": "unlock", "emote": "🔐"}, 
+                    {"command": "lockpick", "emote": "🔏"},
+                    {"command": "exit", "emote": "❌"}
+                ],
+                "unlock": {
+                    "command": true,
+                    "internal": true,
+                    "type": "chest",
+                    "moveFrom": "locked_chest_room_1",
+                    "moveTo": "empty_chest_room_1",
+                    "required": ["key"],
+                    "objects": [
+                        [
+                            {
+                                "name": "crystals",
+                                "amount": [5, 10]
+                            }
+                        ],
+                        [
+                            {
+                                "name": "crystals",
+                                "amount": [18, 22]
+                            }                            
+                        ]
+                    ]
+                },
+                "lockpick": {
+                    "command": true,
+                    "internal": true,
+                    "type": "chest",
+                    "moveFrom": "locked_chest_room_1",
+                    "moveToFail": "broken_chest_room_1",
+                    "moveTo": "empty_chest_room_1"
+                },
+                "exit": {
+                    "command": true,
+                    "internal": true,
+                    "type": "chest",
+                    "moveTo": "locked_chest_room_1"
+                }
+            }
+        },
+        "empty_chest_room_1": {
+            "name": "An Empty Chest",
+            "descriptions": [
+                {"text": "You have already opened this chest."}
+            ],
+            "image_url": "https://dummyimage.com/800x400/593521/f5c91b.png&text=Chest+(Opened)",
+            "northtext": "",
+            "easttext": "Leave the chest by typing **!east**.",
+            "southtext": "",
+            "westtext": "",
+            "floor": 1,
+            "connections": {
+                "east": "room_1"
+            }
+        },
+        "broken_chest_room_1": {
+            "name": "A Broken Chest",
+            "descriptions": [
+                {"text": "This chest has failed to be lockpicked, and cannot be opened."}
+            ],
+            "image_url": "https://dummyimage.com/800x400/593521/f5c91b.png&text=Chest+(Broken)",
+            "northtext": "",
+            "easttext": "Leave the chest by typing **!east**.",
+            "southtext": "",
+            "westtext": "",
+            "floor": 1,
+            "connections": {
+                "east": "room_1"
+            }
+        },
+        "ravager_room_1": {
+            "name": "Ravager Room",
+            "descriptions": [
+                {"text": "You found a starving <@458036985353732097>, that hasn't feasted on a traveler for days."}
+            ],
+            "image_url": "https://dummyimage.com/800x400/e62b4a/422626.png&text=Ravager",
+            "northtext": "",
+            "easttext": "To the party's **!east**, you can see something shiny. ",
+            "southtext": "Move **!south** to go back. ",
+            "westtext": "Move **!west** to enter another room.",
+            "floor": 1,
+            "ravager": {
+                "level": [4, 5]
+            },
+            "connections": {
+                "east": "key_room_1",
+                "south": "room_1",
+                "west": "room_2"
+            }
+        },
+        "key_room_1": {
+            "name": "A Key",
+            "descriptions": [
+                {"text": "You found a **!key**! You should pick it up."}
+            ],
+            "objects": ["key"],
+            "image_url": "https://dummyimage.com/800x400/73778a/faf5f5.png&text=Key",
+            "northtext": "",
+            "easttext": "",
+            "southtext": "",
+            "westtext": "Go back with **!west**",
+            "floor": 1,
+            "connections": {
+                "west": "ravager_room_1"
+            },
+            "key": {
+                "command": "true",
+                "internal": "true",
+                "moveTo": "empty_key_room_1",
+                "moveFrom": "key_room_1",
+                "pickup": [
+                    {"item": "key"}
+                ]
+            }
+        },
+        "empty_key_room_1": {
+            "name": "A Key",
+            "descriptions": [
+                {"text": "The key here has been picked up."}
+            ],
+            "image_url": "https://dummyimage.com/800x400/73778a/faf5f5.png&text=Key",
+            "northtext": "",
+            "easttext": "",
+            "southtext": "",
+            "westtext": "Go back with **!west**",
+            "floor": 1,
+            "connections": {
+                "west": "ravager_room_1"
+            }
+        },
+        "room_2": {
+            "name": "Dungeon Room",
+            "descriptions": [
+                {"text": "Two rooms can be seen ahead, both with chests."}
+            ],
+            "image_url": "https://dummyimage.com/800x400/241f1a/e82525.png&text=Dungeon+Room",
+            "northtext": "Move **!north** to go to another room with another groan. ",
+            "easttext": "Back **!east** is a room filled with unconscious ones. ",
+            "southtext": "",
+            "westtext": "Move **!west** to check out another chest.",
+            "floor": 1,
+            
+            "connections": {
+                "north": "ravager_room_2",
+                "east": "ravager_room_1",
+                "west": "locked_chest_room_2"
+            }
+        },
+        "locked_chest_room_2": {
+            "name": "A Locked Chest",
+            "descriptions": [
+                {"text": "You found a locked **!chest**! Wonder what lies inside it. Hopefully there is something valuable."}
+            ],
+            "image_url": "https://dummyimage.com/800x400/593521/f5c91b.png&text=Chest",
+            "northtext": "",
+            "easttext": "Leave the chest by typing **!east**.",
+            "southtext": "",
+            "westtext": "",
+            "floor": 1,
+            "connections": {
+                "east": "room_2"
+            },
+            "chest": {
+                "command": true,
+                "type": "chest",
+                "removeItem": ["key"],
+                "embed": {
+                    "formatting": "author_title_image_desc",
+                    "setAuthor": {"title": "${dungeon.room.name}", "image": "${profile_pic}"},
+                    "setTitle": "A Locked Chest",
+                    "setDescription": "This chest requires a **:key: Key** to open.\n**:closed_lock_with_key: Unlock** chest with the key.\n:lock_with_ink_pen: **Lockpick** chest, and risk breaking the lock.\n:x: **Exit** options for the chest.",
+                    "waitBegin": 0,
+                    "waitEnd": 0
+                },
+                "options": [
+                    {"command": "unlock", "emote": "🔐"}, 
+                    {"command": "lockpick", "emote": "🔏"},
+                    {"command": "exit", "emote": "❌"}
+                ],
+                "unlock": {
+                    "command": true,
+                    "internal": true,
+                    "type": "chest",
+                    "moveFrom": "locked_chest_room_2",
+                    "moveTo": "empty_chest_room_2",
+                    "required": ["key"],
+                    "objects": [
+                        [
+                            {
+                                "name": "crystals",
+                                "amount": [5, 10]
+                            }
+                        ],
+                        [
+                            {
+                                "name": "crystals",
+                                "amount": [18, 22]
+                            }                            
+                        ]
+                    ]
+                },
+                "lockpick": {
+                    "command": true,
+                    "internal": true,
+                    "type": "chest",
+                    "moveFrom": "locked_chest_room_2",
+                    "moveToFail": "broken_chest_room_2",
+                    "moveTo": "empty_chest_room_2"
+                },
+                "exit": {
+                    "command": true,
+                    "internal": true,
+                    "type": "chest",
+                    "moveTo": "locked_chest_room_2"
+                }
+            }
+        },
+        "empty_chest_room_2": {
+            "name": "An Empty Chest",
+            "descriptions": [
+                {"text": "You have already opened this chest."}
+            ],
+            "image_url": "https://dummyimage.com/800x400/593521/f5c91b.png&text=Chest+(Opened)",
+            "northtext": "",
+            "easttext": "Leave the chest by typing **!east**.",
+            "southtext": "",
+            "westtext": "",
+            "floor": 1,
+            "connections": {
+                "east": "room_2"
+            }
+        },
+        "broken_chest_room_2": {
+            "name": "A Broken Chest",
+            "descriptions": [
+                {"text": "This chest has failed to be lockpicked, and cannot be opened."}
+            ],
+            "image_url": "https://dummyimage.com/800x400/593521/f5c91b.png&text=Chest+(Broken)",
+            "northtext": "",
+            "easttext": "Leave the chest by typing **!east**.",
+            "southtext": "",
+            "westtext": "",
+            "floor": 1,
+            "connections": {
+                "east": "room_2"
+            }
+        },
+        "ravager_room_2": {
+            "name": "Ravager Room",
+            "descriptions": [
+                {"text": "You found another <@458036985353732097>!"}
+            ],
+            "image_url": "https://dummyimage.com/800x400/e62b4a/422626.png&text=Ravager",
+            "northtext": "Move **!north** to find a key. ",
+            "easttext": "",
+            "southtext": "Move **!south** to go back. ",
+            "westtext": "",
+            "floor": 1,
+            "ravager": {
+                "level": [6, 7]
+            },
+            "connections": {
+                "north": "key_room_2",
+                "south": "room_2"
+            }
+        },
+        "key_room_2": {
+            "name": "A Key",
+            "descriptions": [
+                {"text": "You found a **!key**! You should pick it up."}
+            ],
+            "objects": ["key"],
+            "image_url": "https://dummyimage.com/800x400/73778a/faf5f5.png&text=Key",
+            "northtext": "",
+            "easttext": "Snarls are coming from the **!east**. ",
+            "southtext": "Go back with **!south**. ",
+            "westtext": "There's another key down **!west**, but at a distance it looks oddly different.",
+            "floor": 1,
+            "connections": {
+                "east": "ravager_room_3",
+                "west": "dungeon_key_room_1",
+                "south": "ravager_room_2"
+            },
+            "key": {
+                "command": "true",
+                "internal": "true",
+                "moveTo": "empty_key_room_2",
+                "moveFrom": "key_room_2",
+                "pickup": [
+                    {"item": "key"}
+                ]
+            }
+        },
+        "empty_key_room_2": {
+            "name": "A Key",
+            "descriptions": [
+                {"text": "The key here has been picked up."}
+            ],
+            "image_url": "https://dummyimage.com/800x400/73778a/faf5f5.png&text=Key",
+            "northtext": "",
+            "easttext": "Snarls are coming from the **!east**. ",
+            "southtext": "Go back with **!south**. ",
+            "westtext": "There's another key down **!west**, but at a distance it looks oddly different.",
+            "floor": 1,
+            "connections": {
+                "east": "ravager_room_3",
+                "west": "dungeon_key_room_1",
+                "south": "ravager_room_2"
+            }
+        },
+        "dungeon_key_room_1": {
+            "name": "The Dungeon Key",
+            "descriptions": [
+                {"text": "You found the dungeon **!key**! This item will be important later, likely."}
+            ],
+            "objects": ["key"],
+            "image_url": "https://dummyimage.com/800x400/555b66/a9b4c9.png&text=+Dungeon+Key",
+            "northtext": "",
+            "easttext": "Go back with **!east**.",
+            "southtext": "",
+            "westtext": "",
+            "floor": 1,
+            "connections": {
+                "east": "key_room_2"
+            },
+            "key": {
+                "command": "true",
+                "internal": "true",
+                "moveTo": "empty_dungeon_key_room_1",
+                "moveFrom": "dungeon_key_room_1",
+                "pickup": [
+                    {"item": "dungeon_key"},
+                    {"item": "crystals", "amount": [3, 5]}
+                ]
+            }
+        },
+        "empty_dungeon_key_room_1": {
+            "name": "The Dungeon Key",
+            "descriptions": [
+                {"text": "The dungeon key here has been picked up."}
+            ],
+            "objects": ["key"],
+            "image_url": "https://dummyimage.com/800x400/555b66/a9b4c9.png&text=+Dungeon+Key",
+            "northtext": "",
+            "easttext": "Go back with **!east**.",
+            "southtext": "",
+            "westtext": "",
+            "floor": 1,
+            "connections": {
+                "east": "key_room_2"
+            }
+        },
+        "ravager_room_3": {
+            "name": "Ravager Room",
+            "descriptions": [
+                {"text": "You found a high level <@458036985353732097>!"}
+            ],
+            "image_url": "https://dummyimage.com/800x400/e62b4a/422626.png&text=Ravager",
+            "northtext": "",
+            "easttext": "Move **!east** towards the next room, containing two locked doors. ",
+            "southtext": "",
+            "westtext": "Move back **!west** to find the room with a key again.",
+            "floor": 1,
+            "ravager": {
+                "level": [7, 8]
+            },
+            "connections": {
+                "east": "room_3",
+                "west": "key_room_2"
+            }
+        },
+        "room_3": {
+            "name": "Dungeon Room",
+            "descriptions": [
+                {"text": "Two locked doors lie before you. They may hold some significance."}
+            ],
+            "image_url": "https://dummyimage.com/800x400/241f1a/e82525.png&text=Dungeon+Room",
+            "northtext": "Move **!north** to enter the first door. ",
+            "easttext": "Move **!east** to enter the second door. ",
+            "southtext": "",
+            "westtext": "To move back, go **!west**.",
+            "floor": 1,
+            "connections": {
+                "north": "locked_door_room_1",
+                "east": "locked_door_room_2",
+                "west": "ravager_room_3"
+            }
+        },
+        "locked_door_room_1": {
+            "name": "A Locked Door",
+            "descriptions": [
+                {"text": "The first locked door locks growling and scratching here. You can check out the door with **!door**."}
+            ],
+            "image_url": "https://dummyimage.com/800x400/bfa897/7a4e4e.png&text=Locked+Door",
+            "northtext": "",
+            "easttext": "",
+            "southtext": "To move back, go **!south**.",
+            "westtext": "",
+            "floor": 1,
+            "connections": {
+                "south": "room_3"
+            },
+            "door": {
+                "command": true,
+                "type": "door",
+                "removeItem": [{"item": "key", "amount": 1}],
+                "embed": {
+                    "formatting": "author_title_image_desc",
+                    "setAuthor": {"title": "${dungeon.room.name}", "image": "${profile_pic}"},
+                    "setTitle": "A Locked Door",
+                    "setDescription": "This door requires a **:key: Key** to open.\n**:closed_lock_with_key: Unlock** door with the key.\n:lock_with_ink_pen: **Lockpick** door, and risk breaking the lock.\n:x: **Exit** options for the door.",
+                    "waitBegin": 0,
+                    "waitEnd": 0
+                },
+                "options": [
+                    {"command": "unlock", "emote": "🔐"}, 
+                    {"command": "lockpick", "emote": "🔏"},
+                    {"command": "exit", "emote": "❌"}
+                ],
+                "unlock": {
+                    "command": true,
+                    "internal": true,
+                    "type": "door",
+                    "moveFrom": "locked_door_room_1",
+                    "moveTo": "unlocked_door_room_1",
+                    "required": [{"item": "key", "amount": 1}]
+                },
+                "lockpick": {
+                    "command": true,
+                    "internal": true,
+                    "type": "door",
+                    "moveFrom": "locked_door_room_1",
+                    "moveToFail": "broken_door_room_1",
+                    "moveTo": "unlocked_door_room_1"
+                },
+                "exit": {
+                    "command": true,
+                    "internal": true,
+                    "type": "door",
+                    "moveTo": "locked_door_room_1"
+                }
+            }
+        },
+        "unlocked_door_room_1": {
+            "name": "An Unlocked Door",
+            "descriptions": [
+                {"text": "The first locked door has been opened! Beware the <@458036985353732097>."}
+            ],
+            "image_url": "https://dummyimage.com/800x400/bfa897/7a4e4e.png&text=Unlocked+Door",
+            "northtext": "Move **!north** to meet face-to-face with the Ravager. ",
+            "easttext": "",
+            "southtext": "To move back, go **!south**.",
+            "westtext": "",
+            "floor": 1,
+            "connections": {
+                "north": "ravager_room_4",
+                "south": "room_3"
+            }
+        },
+        "ravager_room_4": {
+            "name": "Ravager Room",
+            "descriptions": [
+                {"text": "You found a locked-in <@458036985353732097>!"}
+            ],
+            "image_url": "https://dummyimage.com/800x400/e62b4a/422626.png&text=Ravager",
+            "northtext": "Move **!north** to the chest, it doesn't have a lock on it! ",
+            "easttext": "",
+            "southtext": "Move back **!south** to go to the door.",
+            "westtext": "",
+            "floor": 1,
+            "ravager": {
+                "level": [8, 9]
+            },
+            "connections": {
+                "north": "free_chest_room_1",
+                "south": "locked_door_room_1"
+            }
+        },
+        "free_chest_room_1": {
+            "name": "A Chest",
+            "descriptions": [
+                {"text": "You found a **!chest**! Wonder what lies inside it. Hopefully there is something valuable."}
+            ],
+            "image_url": "https://dummyimage.com/800x400/593521/f5c91b.png&text=Chest",
+            "northtext": "",
+            "easttext": "",
+            "southtext": "Leave the chest by typing **!south**.",
+            "westtext": "",
+            "floor": 1,
+            "connections": {
+                "south": "ravager_room_4"
+            },
+            "chest": {
+                "command": true,
+                "type": "chest",
+                "embed": {
+                    "formatting": "author_title_image_desc",
+                    "setAuthor": {"title": "${dungeon.room.name}", "image": "${profile_pic}"},
+                    "setTitle": "A Chest",
+                    "setDescription": "Do you want to open the chest?\n**:unlock: Unlock** chest.\n:x: **Exit** options for the chest.",
+                    "waitBegin": 0,
+                    "waitEnd": 0
+                },
+                "options": [
+                    {"command": "unlock", "emote": "🔓"}, 
+                    {"command": "exit", "emote": "❌"}
+                ],
+                "unlock": {
+                    "command": true,
+                    "internal": true,
+                    "type": "chest",
+                    "moveFrom": "free_chest_room_1",
+                    "moveTo": "empty_free_chest_room_1",
+                    "objects": [
+                        [
+                            {
+                                "name": "crystals",
+                                "amount": [18, 22]
+                            }                            
+                        ]
+                    ]
+                },
+                "exit": {
+                    "command": true,
+                    "internal": true,
+                    "type": "chest",
+                    "moveTo": "free_chest_room_1"
+                }
+            }
+        },
+        "empty_free_chest_room_1": {
+            "name": "An Empty Chest",
+            "descriptions": [
+                {"text": "You have already opened this chest."}
+            ],
+            "image_url": "https://dummyimage.com/800x400/593521/f5c91b.png&text=Chest+(Opened)",
+            "northtext": "",
+            "easttext": "",
+            "southtext": "Leave the chest by typing **!south**.",
+            "westtext": "",
+            "floor": 1,
+            "connections": {
+                "south": "ravager_room_4"
+            }
+        },
+        "locked_door_room_2": {
+            "name": "A Locked Door",
+            "descriptions": [
+                {"text": "The second locked door leads to the end of the dungeon. You can check out the door with **!door**."}
+            ],
+            "image_url": "https://dummyimage.com/800x400/bfa897/7a4e4e.png&text=Locked+Door",
+            "northtext": "",
+            "easttext": "",
+            "southtext": "",
+            "westtext": "To move back, go **!west**.",
+            "floor": 1,
+            "connections": {
+                "west": "room_3"
+            },
+            "door": {
+                "command": true,
+                "type": "door",
+                "removeItem": [{"item": "dungeon_key", "amount": 1}],
+                "embed": {
+                    "formatting": "author_title_image_desc",
+                    "setAuthor": {"title": "${dungeon.room.name}", "image": "${profile_pic}"},
+                    "setTitle": "A Locked Door",
+                    "setDescription": "This door requires a **:key2: Dungeon Key** to open.\n**:closed_lock_with_key: Unlock** door with the dungeon key.\n:x: **Exit** options for the door.",
+                    "waitBegin": 0,
+                    "waitEnd": 0
+                },
+                "options": [
+                    {"command": "unlock", "emote": "🔐"},
+                    {"command": "exit", "emote": "❌"}
+                ],
+                "unlock": {
+                    "command": true,
+                    "internal": true,
+                    "type": "door",
+                    "moveFrom": "locked_door_room_2",
+                    "moveTo": "unlocked_door_room_2",
+                    "required": [{"item": "dungeon_key", "amount": 1}]
+                },
+                "exit": {
+                    "command": true,
+                    "internal": true,
+                    "type": "door",
+                    "moveTo": "locked_door_room_2"
+                }
+            }
+        },
+        "unlocked_door_room_2": {
+            "name": "An Unlocked Door",
+            "descriptions": [
+                {"text": "The second locked door has been opened! You may now exit the dungeon in the final room."}
+            ],
+            "image_url": "https://dummyimage.com/800x400/bfa897/7a4e4e.png&text=Unlocked+Door",
+            "northtext": "",
+            "easttext": "The final room lies down **!east**.",
+            "southtext": "",
+            "westtext": "To move back, go **!west**.",
+            "floor": 1,
+            "connections": {
+                "east": "final_room",
+                "west": "room_3"
+            }
+        },
+        "final_room": {
+            "name": "Dungeon Room",
+            "descriptions": [
+                {"text": "You can see the exit from here. There is a gate that opens to the outside."}
+            ],
+            "image_url": "https://dummyimage.com/800x400/69584b/ffffff.png&text=Dungeon+Exit",
+            "northtext": "Move **!north** to leave the dungeon. ",
+            "easttext": "",
+            "southtext": "",
+            "westtext": "Move **!west** to go back inside to get anything that has been missed.",
+            "floor": 1,
+            "connections": {
+                "north": "__END",
+                "west": "locked_door_room_2"
+            }
+        }
+    }
+}

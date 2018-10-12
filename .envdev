@@ -1,0 +1,91 @@
+#################################################
+#   _____                  _                    #
+#  / ____|                | |                   #
+# | (___   __ _ _ __   ___| |_ _   _ _ __ ___   #
+#  \___ \ / _` | '_ \ / __| __| | | | '_ ` _ \  #
+#  ____) | (_| | | | | (__| |_| |_| | | | | | | #
+# |_____/ \__,_|_| |_|\___|\__|\__,_|_| |_| |_| #
+#                                               #
+#################################################
+
+# <info>
+#
+# Welcome to the SANCTUM Discord bot code, and specifically the .envdev file.
+# 
+# To setup, !!! RENAME .envdev TO .env !!!, so it hooks into the bots
+# and will get .gitignored. Don't want your tokens flying into cyberspace.
+#
+# There are a bunch of fields that need replacing, so once you do that,
+# your new .env file should work perfectly. Until it doesn't.
+#
+# I wish you luck!
+#   - TheSomeoneXD
+#
+#</info>
+
+# Prefix
+PREFIX="!"
+
+# Discord Server ID
+# Replace them with your own on a sandbox server!
+SANCTUM_ID="454425466821017611"
+
+# Role IDs (A = Obsidian, B = Genesis, C = Hand)
+# Replace them with your own on a sandbox server!
+GROUP_A_ROLE="470656524042371072"
+GROUP_B_ROLE="470668082441093121"
+GROUP_C_ROLE="470656609295794199"
+
+# Channel IDs
+# Replace them with your own on a sandbox server!
+CODEX_CHANNEL_ID="457580831284789249"
+OUTSKIRTS_CHANNEL_ID="462382076927148054"
+TAVERN_CHANNEL_ID="462684096024543242"
+GATE_CHANNEL_ID="459196623923445779"
+STASIS_CHANNEL_ID="468984551113228318"
+CRYSTAL_SHORES_CHANNEL_ID="482629581690372099"
+SEA_OF_FOG_CHANNEL_ID="464150321699225634"
+DEADLANDS_CHANNEL_ID="459196395119837195"
+HELLS_GATE_CHANNEL_ID="464238060243124245"
+TEST_CHANNEL_ID="464838060262293514"
+
+# Bot Channels in SANCTUM (A = Obsidian, B = Genesis, C = Hand)
+# Replace them with your own on a sandbox server!
+GROUP_A_BOT_ID="493972208616603658"
+GROUP_B_BOT_ID="493972336190685185"
+GROUP_C_BOT_ID="493972354137849856"
+
+# Bot IDs
+# Replace them with your own on a sandbox server!
+MORI_ID="461294299515191306"
+RAVAGER_ID="458036985353732097"
+MOSIAH_ID="457713779078332416"
+GRAZE_ID="460640089198821377"
+SONYA_ID="458078969653100554"
+REY_ID="462675530928357376"
+ALEXIS_ID="462708244171718656"
+MONTGOMERY_GENESIS_ID="482642611023249409"
+KAMALA_OBSIDIAN_ID="482644250354384906"
+DAIRO_HAND_ID="482644985318211594"
+LIBRARIAN_ID="458033243481047082"
+
+# Bot Tokens
+ADAM_TOKEN=""
+RAVAGER_TOKEN=""
+WOLF_TOKEN=""
+CROW_TOKEN=""
+MOSIAH_TOKEN=""
+REY_TOKEN=""
+ALEXIS_TOKEN=""
+GRAZE_TOKEN=""
+MORI_TOKEN=""
+LIBRARIAN_TOKEN=""
+DRAVEN_MAW_TOKEN=""
+SONYA_TOKEN=""
+MONTGOMERY_GENESIS_TOKEN=""
+KAMALA_OBSIDIAN_TOKEN=""
+DAIRO_HAND_TOKEN=""
+GHOST_TOKEN=""
+
+# Server Pass Key
+SERVER_PASS_KEY=""
