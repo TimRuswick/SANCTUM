@@ -17,6 +17,10 @@ You will need:
 
     You can use programs like [Git](https://git-scm.com/), [SourceTree](https://www.sourcetreeapp.com/) or simply download the project, although you won't be able to submit changes as easily.
 
+    ```bash
+    git clone https://github.com/TimRuswick/SANCTUM
+    ```
+
 2. Rename the `.envdev` file to `.env`, and fill out tokens and channels. 
 
     Make sure you save it, and also don't push any of your tokens here! If you do though, consider them comprimised and then reset them. On Windows, you must give the .env file a name, but you can circumvent it by using a program like [VS Code](https://code.visualstudio.com/) to rename files!
@@ -26,12 +30,8 @@ You will need:
     Make sure you're in the project folder!
     On Windows, you can hold Shift and Right Click the folder to get the option of a command prompt, inside that folder.
     ```bash
-    # If you already haven't, clone the repo
-    git clone https://github.com/TimRuswick/SANCTUM
-    cd "SANCTUM"
-    
-    # Choose a bot
-    cd "A.D.A.M."
+    cd "SANCTUM"    # Navigate to project folder
+    cd "A.D.A.M."   # Choose a bot
     npm i
     node adam.js
     ```
