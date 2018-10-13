@@ -743,6 +743,8 @@ async function sendInventory(message, pageNum, newMessage) {
     // To make the message of "Page 1/0" with no items in !inventory not happen
     var moddedLength = groupedArr.length;
     if (moddedLength < 1) moddedLength = 1;
+    var moddedPageNum = pageNum;
+    if (moddedPageNum < 1) moddedPageNum = 1;
 
     const footer = getFooterCommands("!inventory");
 
@@ -751,7 +753,7 @@ async function sendInventory(message, pageNum, newMessage) {
         .setAuthor(`${message.member.displayName}`, message.author.avatarURL)
         .setColor(message.member.displayColor)
         .setDescription("I can appraise your items with `!item [ITEM NAME]`, traveler.")
-        .addField(`Items (Page ${pageNum}/${moddedLength})`, items)
+        .addField(`Items (Page ${moddedPageNum}/${moddedLength})`, items)
         .setFooter(`Commands: ${footer}`)
 
     var invMessage;
@@ -765,7 +767,7 @@ async function sendInventory(message, pageNum, newMessage) {
     // Collector for emotes
     const emotes = ['⬅', '❌', '➡'];
     const collector = invMessage.createReactionCollector(
-        (reaction, user) => emotes.includes(reaction.emoji.name) && user.id !== client.user.id , { time: 15 * 1000 });
+        (reaction, user) => emotes.includes(reaction.emoji.name) && user.id !== client.user.id & message.author.id === user.id, { time: 15 * 1000 });
     var react = "";
     var endedOnReact;
     
