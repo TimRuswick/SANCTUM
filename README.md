@@ -7,7 +7,7 @@ SANCTUM is an open-source Discord MMO, with 200+ players.
 - [Discord Game Invite Link](https://discord.gg/D7dyrVn)
 - [Developer's Discord](https://discord.gg/mP98ZYv)
 
-# Run the bots
+# Run the Bots
 ## Requirements:
 You will need:
 - [Node.js](https://nodejs.org/en/) (recommended v8.12.0 LTS)
@@ -26,7 +26,11 @@ You will need:
     Make sure you're in the project folder!
     On Windows, you can hold Shift and Right Click the folder to get the option of a command prompt, inside that folder.
     ```bash
-    # You have to be in the project folder first to navigate through it
+    # If you already haven't, clone the repo
+    git clone https://github.com/TimRuswick/SANCTUM
+    cd "SANCTUM"
+    
+    # Choose a bot
     cd "A.D.A.M."
     npm i
     node adam.js
@@ -34,7 +38,7 @@ You will need:
 
 4. ???
 
-5. Profit! You did it, unless something has happened along the way. ~~Probably likely, sadly.~~
+5. Profit! You did it, unless something has happened along the way. ~~Developer luck says yes.~~
 
 ## Quality of Life
 

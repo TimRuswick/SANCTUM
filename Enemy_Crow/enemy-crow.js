@@ -11,18 +11,70 @@ const io = require('socket.io-client');
 var socket = io.connect('http://localhost:80');
 
 // Bot Modules
+const npcSettings = require('./npcSettings')
 const dataRequest = require('../modules/dataRequest');
 const calcRandom = require('../modules/calcRandom');
 
 // State Machine
-var RavagerState = {
+var EnemyState = {
     INACTIVE: 0,
     PROWLING: 1,
     ACTIVE: 2,
     UNCONSCIOUS: 3
 }
 
-const prowling = 'Prowling...';
+// Enemy lists
+class EnemyBatchInstance {
+    constructor(channel) {
+        this.state = EnemyState.INACTIVE;
+        this.enemies = [];  // Array of `new Enemy()`s
+        this.channel = channel; // Channel of spawning
+        this.spawnPrecentage = 100;
+        this.hostileLevel = 1;
+        this.fastSummon = false; // Show prowling
+    }
+}
+
+// Enemy instance
+class Enemy {
+    constructor(type) {
+        this.state = EnemyState.INACTIVE;
+        this.type = type;
+        this.level = 1;
+        this.health = 420;
+        this.speed = 21;
+        this.strength = 33;
+        this.stash = 0;
+        this.fleeTime = undefined;
+        this.guid = undefined;
+        this.deletePrevMessage = false;
+    }
+    
+    // Creates flee time by randomization
+    get randomFleeTime() {
+        var randomFleeTime;
+        randomFleeTime = calcRandom.random(3 * 60 * 1000, 6 * 60 * 1000);
+        randomFleeTime -= (randomFleeTime % 1000);
+        return randomFleeTime;
+    }
+}
+
+var enemyBatchCollection = [];
+
+// Spawning patterns
+var spawnPatterns = {
+    "types": ['default', 'randomBatch2'],
+    "default": {
+        "ravager": {
+            "amount": 1
+        },
+        "type": "incrememt"
+    },
+    "randomBatch2": {
+        "amount": 2,
+        "type": "incrememt"
+    }
+}
 
 var socketReady = false;
 socket.on('spawn', (data) => {
@@ -52,10 +104,15 @@ client.on('ready', async () => {
     // You can set status to 'online', 'invisible', 'away', or 'dnd' (do not disturb)
     client.user.setStatus('invisible');
     // Sets your "Playing"
-    client.user.setActivity(prowling);
+    if (npcSettings.activity) {
+        client.user.setActivity(npcSettings.activity, { type: npcSettings.type })
+            .then(presence => console.log(`Activity set to ${presence.game ? presence.game.name : 'none'}`))
+            .catch(console.error);
+    }
+
     console.log(`Connected! \
     \nLogged in as: ${client.user.username} - (${client.user.id})`);
-    
+
     // Corrects Ravager username
     if (client.user.username == "Raveger") {
         const newName = "Ravager";
@@ -91,6 +148,11 @@ client.on('message', async message => {
             if (isAdmin(message.author.id))
                 message.reply("***...MRGRGRGR!***");
             break;
+        case npcSettings.id:
+            if (args[0].toLowerCase() === "summon" && isAdmin(message.author.id)) {
+                generateEnemy(process.env.DEADLANDS_CHANNEL_ID);
+            }
+            break;
     }
 });
 
@@ -100,20 +162,95 @@ cron.schedule('*/10 * * * *', function() {
    
 });
 
+async function generateEnemy(channelID) {
+    console.log("Generating enemy...")
+
+    // Gets an enemy batch instance, or creates if non-existant
+    var index = enemyBatchCollection.findIndex(data => data.channel === channelID);
+    var enemyBatch;
+    console.log(index <= -1)
+    if (index <= -1) {
+        enemyBatch = new EnemyBatchInstance(channelID);
+    } else {
+        enemyBatch = enemyBatchCollection[index];
+    }
+
+    // Generate a spawn pattern
+    var randomSpawnPattern = spawnPatterns.types[calcRandom.randomExc(0, spawnPatterns.types.length)];
+    var newSpawnPattern = spawnPatterns[randomSpawnPattern];
+    newSpawnPattern = spawnPatterns["default"]; // Overruled!
+
+    // Creates a bunch of new enemies
+    var amount = newSpawnPattern[npcSettings.id].amount;
+    var newEnemies = [];
+    for (let i = 0; i < amount; i++) {
+        var enemy = new Enemy(npcSettings.id);
+        var elevel = enemyBatch.hostileLevel;
+
+        // Replication of newHostile in sendData.php
+        const healthBase = 50; const strengthBase = 3; const speedBase = 3; const stashBase = 3;
+
+        const healthMin = (healthBase * elevel) / 2;
+        const healthMax = healthBase * elevel;
+        
+        const strengthMin = (strengthBase * elevel) / 2;
+        const strengthMax = strengthBase * elevel;
+
+        const speedMin = (speedBase * elevel) / 2;
+        const speedMax = speedBase * elevel;
+
+        const stashMin = (stashBase * elevel) / 2;
+        const stashMax = stashBase * elevel;
+
+        const health =   Math.floor(calcRandom.randomExc(healthMin, healthMax));
+        const strength = Math.floor(calcRandom.randomExc(strengthMin, strengthMax));
+        const speed =    Math.floor(calcRandom.randomExc(speedMin, speedMax));
+        const stash =    Math.floor(calcRandom.randomExc(stashMin, stashMax));
+
+        enemy.level = elevel;
+        enemy.health = health;
+        enemy.strength = strength;
+        enemy.speed = speed;
+        enemy.stash = stash;
+        enemy.state = EnemyState.PROWLING;
+        enemy.fleeTime = enemy.randomFleeTime;
+        enemy.guid = guidGenerator();
+
+        // Logs stats
+        console.log(`\n[===== | Enemy Stats | =====]`);
+        console.log(`HEALTH:    ${health} > ${healthMin} - ${healthMax}`);
+        console.log(`STRENGTH:  ${strength} > ${strengthMin} - ${strengthMax}`);
+        console.log(`SPEED:     ${speed} > ${speedMin} - ${speedMax}`);
+        console.log(`STASH:     ${stash} > ${stashMin} - ${stashMax}`);
+        console.log(`[===========================]\n`);
+        newEnemies.push(enemy);
+    }
+    enemyBatch.enemies = newEnemies;
+    enemyBatch.hostileLevel++;
+
+    console.log(JSON.stringify(newEnemies, null, 2));
+
+    if (calcRandom.gamble(enemyBatch.spawnPrecentage)) {
+        enemyBatch.spawnPrecentage = 50;
+
+        // Creation of Ravager timer
+        var creationTime = calcRandom.random(35000, 540000);
+        creationTime = 3 * 1000;   // shortcuts
+        
+        console.log(`[Enemy Spawn] ${amount} "${npcSettings.id}" will be created in ${fmtMSS(creationTime / 1000)} min.`);
+        await sleep(creationTime);
+        console.log(`[Enemy Spawn] ${amount} "${npcSettings.id}" has spawned!`);
+        summonEnemy(enemyBatch);
+
+        enemyBatch.hostileLevel++;
+    } else {
+        console.log("[Enemy Spawn] Fail to spawn. Adding 10% more to chances.");
+        enemyBatch.spawnPrecentage += 10;
+    }
+}
+
 // Turn online and turn offline
 async function summonEnemy(data) {
-    // Scans for Ravager already in channel
-    /*
-    var isRavagerInChannel = false;
-    ravagerCollection.forEach(element => {
-        if (element.channel === data.channel) {
-            console.log("There is already a Ravager in channel " + element.channel);
-            isRavagerInChannel = true;
-        }
-    });
-    if (isRavagerInChannel) return;
-    */
-
     // If timer exists, do outpost
     const summonTime = 4;       // 4 is debug, normal is 35
     if (!data.fastSummon) {
@@ -124,7 +261,7 @@ async function summonEnemy(data) {
         // Sets prowling states on the Ravagers
         for (let i = 0; i < data.enemies.length; i++) {
             const element = data.enemies[i];
-            element.state = RavagerState.PROWLING;
+            element.state = EnemyState.PROWLING;
         }
 
         // Notification code
@@ -151,14 +288,14 @@ async function summonEnemy(data) {
         
         for (let i = 0; i < data.enemies.length; i++) {
             const element = data.enemies[i];
-            element.state = RavagerState.ACTIVE;
+            element.state = EnemyState.ACTIVE;
         }
         enemyTimer(element, data, data.channel, element.fleeTime, newMessage);   
     }
 }
 
 // Counts down
-async function enemyTimer(newRavager, data, channel, fleeTime, newMessage) {
+async function enemyTimer(newEnemy, data, channel, fleeTime, newMessage) {
     function addUserToArray(userID) {
         attackingUsers.push(userID);
     }
@@ -180,84 +317,164 @@ async function enemyTimer(newRavager, data, channel, fleeTime, newMessage) {
         .setTitle("Status")
         .setDescription("...")
     
+    const sendMessageMinimum = true;
     var isReadyToFlee = false;
     var attackingUsers = [];
     var tempAttackUsers = "";
     var newChannel = client.channels.get(channel);
     var interactionMessage = await newChannel.send({embed: interactionEmbed});
-
-    // Collects emotes and reacts upon the reaction
-    const collector = newMessage.createReactionCollector(
-        (reaction, user) => options.includes(reaction.emoji.name) && user.id !== client.user.id);
     
     // Possible reaction attacks can go here
-    var options = ['🇦', '🇧', '🇨']
-    sendReactions(options);
-    
-    // Collect
-    collector.once("collect", async reaction => {
-        var user = reaction.users.last();
-        tempAttackUsers += `${user} :crossed_swords: 11 DAM | <:hitback:460969716580745236> MISS (150/150)\n`;
-        addUserToArray(user.id);
-        console.log(tempAttackUsers);
-        if (!interactionMessage.deleted) {
-            interactionEmbed.setDescription(`${tempAttackUsers}`);
-            interactionMessage = await newChannel.edit({embed: interactionEmbed});
+    var options = ['💥', '🇦', '🇧', '🇨']
+
+    // System for no message sending except the minimum
+    if (sendMessageMinimum) {
+        // Collects emotes and reacts upon the reaction
+        const collector = newMessage.createReactionCollector(
+            (reaction, user) => options.includes(reaction.emoji.name) && user.id !== client.user.id);
+        
+        sendReactions(options);
+        
+        // Collect
+        collector.on("collect", async reaction => {
+            var user = reaction.users.last();
+
+            // Just in case, I managed to bug out Ravager to display its own name.
+            if (user.id === client.user.id) {
+                console.log("Well then. It bypassed the collector filter, we're stopping the Ravager from attacking itself. Would be interesting though!");
+                return;
+            }
+
+            // Send damage to server
+            // TODO
+
+            tempAttackUsers += `${user} :crossed_swords: 11 DAM | <:hitback:460969716580745236> MISS (150/150)\n`;
+            addUserToArray(user.id);
+            console.log("Collecting a user! " + user.username)
+        });
+
+        // Ends
+        collector.once("end", async collector => {
+            console.log("Ended collector.")
+            flee(newEnemy, data, client.channels.get(channel));
+        });
+
+        // Goes every 4 seconds
+        var emoteRefresh = setInterval(async () => {
+            await newMessage.clearReactions();
+
+            if (isReadyToFlee && newEnemy.state !== EnemyState.UNCONSCIOUS) {
+                console.log("Has fled!");
+                //interactionEmbed.setDescription("👣 The Ravager has fled...")
+                if (interactionMessage) await interactionMessage.edit({embed: interactionEmbed});
+                clearInterval(emoteRefresh);
+                collector.stop();
+            } else {
+                console.log("Sending refreshed embed... |" + tempAttackUsers + "|")
+                if (tempAttackUsers === "") tempAttackUsers = "...";
+                interactionEmbed.setDescription(tempAttackUsers);
+                if (interactionMessage) await interactionMessage.edit({embed: interactionEmbed});
+                sendReactions(options);
+            }
+
+            tempAttackUsers = "";
+        }, 5 * 1000);
+        
+
+        // Waits to see if killed, and if not send a fleeing message
+        await sleep(fleeTime);
+        if (newEnemy.state === EnemyState.ACTIVE) {
+            newChannel.send("**YOU ARE WEAK. THERE IS NO CHALLENGE FOR ME HERE.**\n:bangbang:***ATTEMPTING TO FLEE...***");
+            await sleep(20 * 1000);
+            
+            // If still there despawn
+            if (newEnemy.state !== EnemyState.UNCONSCIOUS) {
+                console.log('Hostile is now able to flee, now awaiting for collector to finish.');
+                isReadyToFlee = true;
+            }
         }
-
-        // Send damage.
+    } else {
+        // Collects emotes and reacts upon the reaction
+        var collector = newMessage.createReactionCollector(
+            (reaction, user) => options.includes(reaction.emoji.name) && user.id !== client.user.id);
         
-    });
-
-    // Ends
-    collector.once("end", async collector => {
+        sendReactions(options);
         
-    });
+        // Collect
+        collector.on("collect", async reaction => {
+            var user = reaction.users.last();
 
-    // Goes every 4 seconds
-    var emoteRefresh = setInterval(async () => {
-        await newMessage.clearReactions();
-        interactionEmbed.setDescription("...");
+            // Just in case, I managed to bug out Ravager to display its own name.
+            if (user.id === client.user.id) {
+                console.log("Well then. It bypassed the collector filter, we're stopping the Ravager from attacking itself. Would be interesting though!");
+                return;
+            }
 
-        if (isReadyToFlee && newRavager.state !== RavagerState.UNCONSCIOUS) {
-            interactionEmbed.setDescription("👣 The Ravager has fled...")
-            if (interactionMessage) await interactionMessage.edit({embed: interactionEmbed});
-            clearInterval(emoteRefresh);
-            collector.stop();
-        } else {
-            if (interactionMessage) await interactionMessage.edit({embed: interactionEmbed});
-            sendReactions(options);
-        }
+            // Send damage to server
+            // TODO
 
-        tempAttackUsers = "";
-    }, 5 * 1000);
-    
+            tempAttackUsers += `${user} :crossed_swords: 11 DAM | <:hitback:460969716580745236> MISS (150/150)\n`;
+            addUserToArray(user.id);
+            console.log("Collecting a user! " + user.username)
+        });
 
-    // Waits to see if killed, and if not send a fleeing message
-    await sleep(fleeTime);
-    if (newRavager.state === RavagerState.ACTIVE) {
-        newChannel.send("**YOU ARE WEAK. THERE IS NO CHALLENGE FOR ME HERE.**\n:bangbang:***ATTEMPTING TO FLEE...***");
-        await sleep(20 * 1000);
+        // Ends
+        collector.once("end", async collector => {
+            console.log("Ended collector.")
+            flee(newEnemy, data, client.channels.get(channel));
+        });
+
+        // Goes every 4 seconds
+        var emoteRefresh = setInterval(async () => {
+            await newMessage.clearReactions();
+
+            if (isReadyToFlee && newEnemy.state !== EnemyState.UNCONSCIOUS) {
+                console.log("Has fled!");
+                //interactionEmbed.setDescription("👣 The Ravager has fled...")
+                if (interactionMessage) await interactionMessage.edit({embed: interactionEmbed});
+                clearInterval(emoteRefresh);
+                collector.stop();
+            } else {
+                console.log("Sending refreshed embed... |" + tempAttackUsers + "|")
+                if (tempAttackUsers === "") tempAttackUsers = "...";
+                interactionEmbed.setDescription(tempAttackUsers);
+                if (interactionMessage) await interactionMessage.edit({embed: interactionEmbed});
+                sendReactions(options);
+            }
+
+            tempAttackUsers = "";
+        }, 5 * 1000);
         
-        // If still there despawn
-        if (newRavager.state !== RavagerState.UNCONSCIOUS) {
-            console.log('Hostile is now able to flee, now awaiting for collector to finish.');
-            isReadyToFlee = true;
+
+        // Waits to see if killed, and if not send a fleeing message
+        await sleep(fleeTime);
+        if (newEnemy.state === EnemyState.ACTIVE) {
+            newChannel.send("**YOU ARE WEAK. THERE IS NO CHALLENGE FOR ME HERE.**\n:bangbang:***ATTEMPTING TO FLEE...***");
+            await sleep(20 * 1000);
+            
+            // If still there despawn
+            if (newEnemy.state !== EnemyState.UNCONSCIOUS) {
+                console.log('Hostile is now able to flee, now awaiting for collector to finish.');
+                isReadyToFlee = true;
+            }
         }
     }
 }
 
-async function flee(newRavager, data, newChannel) {
+// Does flee sequence
+async function flee(newEnemy, data, newChannel) {
     newChannel.send("**THE POOR, ILL-EQUIPPED TRAVELERS PUT UP NO FIGHT...**\n:footprints:***RETURNS TO THE WILD. ***");
     socket.emit('fled', {
         data: data,
-        ravager: newRavager
+        ravager: newEnemy
     });
 
     if (data.length < 1) {
         await client.user.setPresence('invisible');
         client.user.setActivity('Prowling...');
     }
+
+    console.log(data);
 }
 
 // Health bar
@@ -304,6 +521,14 @@ function fmtMSS(s){   // accepts seconds as Number or String. Returns m:ss
             ? ':'       // then  we don't need to prepend a zero
             : ':0'      // else  we do need to prepend a zero
           ) + s ;       // and we add Number s to the string (converting it to String as well)
+}
+
+// https://stackoverflow.com/questions/6860853/generate-random-string-for-div-id/6860916#6860916
+function guidGenerator() {
+    var S4 = function() {
+       return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
+    };
+    return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4());
 }
 
 function getDialog(dialogTag, data = "", data2 = "") {
