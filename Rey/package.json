@@ -2,7 +2,7 @@
   "name": "sanctum-deploypackage",
   "version": "1.0.1",
   "description": "Universal package for all SANCTUM bots, using pm2.",
-  "main": "",
+  "main": "rey.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "echo \"Error: you need to use the bot name as a command.\" && exit 1",

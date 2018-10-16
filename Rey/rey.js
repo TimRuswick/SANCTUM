@@ -64,11 +64,11 @@ client.on('message', async message => {
             materialsMessage(message, args);
             break;
         case "summon":
-            if (message.author.id === '200340393596944384' || message.author.id === '163770616581718017')
+            if (isAdmin(message.author.id))
                 ReySpawnTimer(process.env.OUTSKIRTS_CHANNEL_ID);
             break;
         case "vanish":
-            if (message.author.id === '200340393596944384' || message.author.id === '163770616581718017')
+            if (isAdmin(message.author.id))
                 ReyTurnOffline(process.env.OUTSKIRTS_CHANNEL_ID);
             break;
     }
@@ -125,6 +125,12 @@ cron.schedule('0 */2 * * *', function() {
     }
 });
 
+// Gets if user has an Overseers rank
+function isAdmin(userID) {
+    var guild = client.guilds.get(process.env.SANCTUM_ID);
+    return guild.members.get(userID).roles.find(role => role.name === "Overseers");
+}
+
 // Async Waiting
 function sleep(time) {
     return new Promise((resolve, reject) => {
@@ -132,17 +138,49 @@ function sleep(time) {
     });
 }
 
+// https://stackoverflow.com/questions/3733227/javascript-seconds-to-minutes-and-seconds
+function fmtMSS(s){   // accepts seconds as Number or String. Returns m:ss
+    return( s -         // take value s and subtract (will try to convert String to Number)
+            ( s %= 60 ) // the new value of s, now holding the remainder of s divided by 60 
+                        // (will also try to convert String to Number)
+          ) / 60 + (    // and divide the resulting Number by 60 
+                        // (can never result in a fractional value = no need for rounding)
+                        // to which we concatenate a String (converts the Number to String)
+                        // who's reference is chosen by the conditional operator:
+            9 < s       // if    seconds is larger than 9
+            ? ':'       // then  we don't need to prepend a zero
+            : ':0'      // else  we do need to prepend a zero
+          ) + s ;       // and we add Number s to the string (converting it to String as well)
+}
+
 // Rey spawn timer
 async function ReySpawnTimer(channel) {
     // Random from 6 sec up to 15 min
     var startTime = calcRandom.random(6000, 20 * 60 * 1000);
-    //var startTime = 0;
+    console.log(`Waiting for ${fmtMSS(Math.trunc(startTime / 1000))} min. for summon.`);
     await sleep(startTime);
 
     client.user.setStatus('online');
     client.user.setActivity('Scavenging...');
-    sendMessage(channel, `***Hey y\'all! Let's scavenge us some materials!***\
-    \nUse !scavenge to get some materials for **3** <:crystals:460974340247257089> and **1 STAM**.`);
+
+    const useEmbed = true;
+
+    if (!useEmbed)
+        sendMessage(channel, `***Hey y\'all! Let's scavenge us some materials!***\
+        \nUse !scavenge to get some materials.`);
+    else {
+        const reyBot = client.guilds.get(process.env.SANCTUM_ID).members.get(client.user.id);
+        const dialog = "***Hey y'all! Let's scavenge us some materials!***";
+        const embed = new Discord.RichEmbed()
+            .setAuthor(reyBot.displayName, reyBot.user.avatarURL)
+            .setColor(reyBot.displayColor)
+            .setTitle("Scavenging")
+            .setDescription(`Use **!scavenge** to get some materials.`)
+            .addField("Cost", `> <:crystals:460974340247257089> **Crystals** [3x]\n> **1 STAM**`)
+
+        client.channels.get(channel).send(dialog, embed);
+    }
+
     reyState = ReyEnumState.SCAVENGING;
 
     // Start time plus another 6 - 10 min
