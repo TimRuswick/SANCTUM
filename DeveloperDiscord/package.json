@@ -1,0 +1,22 @@
+{
+  "name": "developerdiscord",
+  "version": "1.0.0",
+  "description": "Developer Discord Bot",
+  "main": "developerdiscord.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TimRuswick/SANCTUM.git"
+  },
+  "author": "TheSomeoneXD",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/TimRuswick/SANCTUM/issues"
+  },
+  "homepage": "https://github.com/TimRuswick/SANCTUM#readme",
+  "dependencies": {
+    "discord.js": "^11.4.2"
+  }
+}
