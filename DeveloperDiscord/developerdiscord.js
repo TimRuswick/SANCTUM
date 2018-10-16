@@ -219,7 +219,7 @@ function displayJoinMessage(message) {
         var roleName = roles[element].name;
         var newRole = message.guild.roles.find(role => role.name === roleName);
         var memberLength = newRole.members.size;
-        newDialog += `${newRole} __${element}__ \`${memberLength} Members\`\n`;
+        newDialog += `__${element}__ \`${memberLength} Members\`\n`;
     });
 
     const embed = new Discord.RichEmbed()
