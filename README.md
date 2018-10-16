@@ -31,9 +31,10 @@ You will need:
     On Windows, you can hold Shift and Right Click the folder to get the option of a command prompt, inside that folder.
     ```bash
     cd "SANCTUM"    # Navigate to project folder
+    npm i           # For modules dependancies
     cd "A.D.A.M."   # Choose a bot
-    npm i
-    node adam.js
+    npm i           # Install dependancies
+    node adam.js    # Run the bot
     ```
 
 4. ???
