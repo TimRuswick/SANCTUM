@@ -17,6 +17,7 @@ const roles = {
         "artists", 
         "developers", 
         "designers",
+        "testers",
         "writers"
     ],
 
@@ -28,6 +29,9 @@ const roles = {
     },
     "designers": {
         "name": "Designers"
+    },
+    "testers": {
+        "name": "Testers"
     },
     "writers": {
         "name": "Writers"
