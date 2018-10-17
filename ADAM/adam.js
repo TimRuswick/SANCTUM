@@ -482,7 +482,7 @@ client.on('message', async message => {
             if (client.user.username == "A.D.A.M.") break;
             sendMessage(message.channel.id, dialog.getDialog("lore", args[0]));
             break;
-        case "stats":
+        case "tstats":
             if (client.user.username == "A.D.A.M.") break;
             getLevelUp(message.author.id);
 
@@ -531,7 +531,7 @@ client.on('message', async message => {
 
             sendMessage(message.channel.id, userStats);
             break;
-        case "estats":
+        case "stats":
             // Sees if the user is supposed to level up
             getLevelUp(message.author.id);
 
