@@ -58,10 +58,10 @@ client.on('message', async message => {
             else
                 message.reply("I'm out and about right now. Don't wanna get found by the wrong peoples.");
             break;
-        case "summon":
+        case "msummon":
             if (isAdmin(message.author.id)) MosiahTurnOnline();
             break;
-        case "vanish":
+        case "mvanish":
             if (isAdmin(message.author.id)) MosiahTurnOffline();
             break;
         case "rigged":
