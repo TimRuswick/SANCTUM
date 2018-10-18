@@ -30,11 +30,18 @@ PREFIX="!"
 # Replace them with your own on a sandbox server!
 SANCTUM_ID="454425466821017611"
 
+# Discord setup (Configred based on the server)
+ADMIN_ROLE="Overseer"
+
 # Role IDs (A = Obsidian, B = Genesis, C = Hand)
 # Replace them with your own on a sandbox server!
 GROUP_A_ROLE="470656524042371072"
 GROUP_B_ROLE="470668082441093121"
 GROUP_C_ROLE="470656609295794199"
+
+GROUP_A_NAME="Obsidian Technologies"
+GROUP_B_NAME="Genesis Command"
+GROUP_C_NAME="The Hand"
 
 # Channel IDs
 # Replace them with your own on a sandbox server!
