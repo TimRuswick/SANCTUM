@@ -21,7 +21,7 @@ client.on("disconnect", function() {
 
 client.on("message", function(msg) {
 	//only react to commands
-	if (msg.content.slice(0, 1) != "!") {
+	if (msg.content.slice(0, 1) !== process.env.PREFIX) {
 		return;
 	}
 
@@ -39,4 +39,4 @@ client.on("message", function(msg) {
 });
 
 //actually log in
-client.login("TOKEN");
+client.login(process.env.DEVELOPER_TOKEN);

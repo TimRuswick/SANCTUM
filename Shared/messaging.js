@@ -12,16 +12,16 @@ exports.SendPublicMessage = function(client, user, channel, message, typingDelay
 	if (message === undefined) {
 		message = channel;
 		channel = user;
-		userID = null;
+		user = null;
 	}
 
 	//handle user strings
-	if (typeof(user) == "string") {
+	if (typeof(user) === "string") {
 		user = client.users.find(item => item.username === user);
 	}
 
 	//handle channel strings
-	if (typeof(channel) == "string") {
+	if (typeof(channel) === "string") {
 		channel = client.channels.find(item => item.name === channel);
 	}
 
@@ -48,7 +48,7 @@ exports.SendPublicMessage = function(client, user, channel, message, typingDelay
 //message - message to send
 exports.SendPrivateMessage = function(client, user, message) {
 	//handle user strings
-	if (typeof(user) == "string") {
+	if (typeof(user) === "string") {
 		user = client.users.find(item => item.username === user);
 	}
 
