@@ -44,12 +44,12 @@ exports.SplitArray = function(arr, chunkSize) {
 	return groups;
 }
 
-// See if the bot should display its message
+//CheckValidDisplay
 //client - discord.js client
 //member - discord.js member OR username
 //channel - discord.js channel OR channel name
 //checkRole - check the member's role or not
-exports.CheckValidDisplay = function(client, member, channel, checkRole) {
+exports.CheckValidDisplay = function(client, member, channel, checkRole) { //See if the bot should display its message
 	//handle member strings
 	if (typeof(member) === "string") {
 		//get the member
