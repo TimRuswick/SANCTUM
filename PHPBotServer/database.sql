@@ -1,3 +1,5 @@
+CREATE DATABASE discordbot;
+
 CREATE TABLE discordbot.userLog (
     id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
     discordUserID bigint,
