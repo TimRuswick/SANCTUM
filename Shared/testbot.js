@@ -53,14 +53,13 @@ client.on("message", function(msg) {
 //DEBUGGING
 let dialogJson = {
 	"hello": [
-		"Hi there {1}!",
-		"Howdy {1}!"
+		"Hi there {1} {2} {3} {2} {1}!"
 	],
 	"goodbye": "See ya!"
 }
 
 let dialog = shared.GenerateDialogFunction(dialogJson); //eventually be require("./dialog.json")
-console.log(dialog("hello", "Kayne"));
+console.log(dialog("hello", "Kayne", "Matthew", "Ruse"));
 
 //actually log in
 client.login(process.env.DEVELOPER_TOKEN);

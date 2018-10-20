@@ -23,7 +23,7 @@ exports.CloneArray = function(arg) {
 //GenerateDialogFunction
 //dialogJson - the json object containing the bot's dialog
 exports.GenerateDialogFunction = function(dialogJson) {
-	return function(key, data1 = "", data2 = "", data3 = "") {
+	return function(key, ...data) {
 		let result;
 
 		if (Array.isArray(dialogJson[key])) {
@@ -32,10 +32,13 @@ exports.GenerateDialogFunction = function(dialogJson) {
 			result = dialogJson[key];
 		}
 
-		return result
-			.replace(/\{1\}/g, data1)
-			.replace(/\{2\}/g, data2)
-			.replace(/\{3\}/g, data3);
+		let counter = 0;
+		data.map((dat) => {
+			counter++;
+			result = result.replace(/\{([1-9][0-9]*)\}/g, a => a === "{" + counter + "}" ? dat : a);
+		});
+
+		return result;
 	}
 }
 
