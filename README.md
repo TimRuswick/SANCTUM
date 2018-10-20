@@ -47,7 +47,7 @@ We recommend [nodemon](https://nodemon.io/) for reloading bots automatically, in
 
 # Join the SANCTUM Development Team
 We're looking for:
-- Discord.js and/or PHP programmers
+- Discord.js programmers
 - Artists 
 - Writers
 - Designers
