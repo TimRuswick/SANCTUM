@@ -20,6 +20,25 @@ exports.CloneArray = function(arg) {
 	}
 }
 
+//GenerateDialogFunction
+//dialogJson - the json object containing the bot's dialog
+exports.GenerateDialogFunction = function(dialogJson) {
+	return function(key, data1 = "", data2 = "", data3 = "") {
+		let result;
+
+		if (Array.isArray(dialogJson[key])) {
+			result = dialogJson[key][Math.floor(Math.random() * dialogJson[key].length)];
+		} else {
+			result = dialogJson[key];
+		}
+
+		return result
+			.replace(/\{1\}/g, data1)
+			.replace(/\{2\}/g, data2)
+			.replace(/\{3\}/g, data3);
+	}
+}
+
 //GetFooterCommands - Gets footer commands for botspam channel commands
 //commandArray - the array of possible commands to use
 //excludeCommand (optional) - the command to filter out

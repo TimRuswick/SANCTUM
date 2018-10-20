@@ -50,8 +50,21 @@ client.on("message", function(msg) {
 	}
 });
 
+//DEBUGGING
+let dialogJson = {
+	"hello": [
+		"Hi there {1}!",
+		"Howdy {1}!"
+	],
+	"goodbye": "See ya!"
+}
+
+let dialog = shared.GenerateDialogFunction(dialogJson); //eventually be require("./dialog.json")
+console.log(dialog("hello", "Kayne"));
+
 //actually log in
 client.login(process.env.DEVELOPER_TOKEN);
 
 //TODO: change usernames to tags throughout the shared library
 //FIXME: The server currently queries chest count, which is not in the database.
+
