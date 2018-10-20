@@ -22,6 +22,8 @@ exports.CloneArray = function(arg) {
 
 //GenerateDialogFunction
 //dialogJson - the json object containing the bot's dialog
+//key - Json key
+//data (optional) - a number of arguments that are substituted into the resulting string
 exports.GenerateDialogFunction = function(dialogJson) {
 	return function(key, ...data) {
 		let result;
