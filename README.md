@@ -23,17 +23,17 @@ You will need:
 
 2. Rename the `.envdev` file to `.env`, and fill out tokens and channels. 
 
-    Make sure you save it, and also don't push any of your tokens here! If you do though, consider them comprimised and then reset them. On Windows, you must give the .env file a name, but you can circumvent it by using a program like [VS Code](https://code.visualstudio.com/) to rename files!
+    Make sure you save it, and also don't push any of your tokens here! If you do though, consider them compromised and then reset them. On Windows, you must give the .env file a name, but you can circumvent it by using a program like [VS Code](https://code.visualstudio.com/) to rename files!
 
-3. Navigate via command-line to a bot's folder, install dependancies, and run it!
+3. Navigate via command-line to a bot's folder, install dependencies, and run it!
 
     Make sure you're in the project folder!
     On Windows, you can hold Shift and Right Click the folder to get the option of a command prompt, inside that folder.
     ```bash
     cd "SANCTUM"    # Navigate to project folder
-    npm i           # For modules dependancies
+    npm i           # For modules dependencies
     cd "A.D.A.M."   # Choose a bot
-    npm i           # Install dependancies
+    npm i           # Install dependencies
     node adam.js    # Run the bot
     ```
 
@@ -47,7 +47,7 @@ We recommend [nodemon](https://nodemon.io/) for reloading bots automatically, in
 
 # Join the SANCTUM Development Team
 We're looking for:
-- Discord.js and/or PHP programmers
+- Discord.js programmers
 - Artists 
 - Writers
 - Designers
