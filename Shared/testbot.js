@@ -32,8 +32,20 @@ client.on("message", function(msg) {
 	//handle command
 	switch(command) {
 		//used for debugging
-		case "ping":
-			shared.ChangeFaction(client, process.env.GROUP_B_ROLE, msg.channel, msg.member);
+		case "create":
+			shared.ChangeFaction(client, process.env.GROUP_A_ROLE, "bot-spam", msg.member);
+			break;
+
+		case "xp":
+			shared.AddXP(client, msg.author, parseInt(args));
+			break;
+
+		case "levelup":
+			shared.LevelUp(client, msg.member);
+			break;
+
+		case "rankup":
+			shared.RankUp(client, msg.member, parseInt(args));
 			break;
 	}
 });
@@ -42,3 +54,4 @@ client.on("message", function(msg) {
 client.login(process.env.DEVELOPER_TOKEN);
 
 //TODO: change usernames to tags throughout the shared library
+//FIXME: The server currently queries chest count, which is not in the database.

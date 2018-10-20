@@ -101,5 +101,15 @@ DAIRO_HAND_TOKEN=""
 GHOST_TOKEN=""
 DEVELOPER_TOKEN=""
 
+# Channel access roles (must match roles in your server)
+# Replace them with your own on a sandbox server!
+RANK_1="LVL 1+"
+RANK_2="LVL 15+"
+RANK_3="LVL 30+"
+
+RANK_1_THRESHOLD=1
+RANK_2_THRESHOLD=15
+RANK_3_THRESHOLD=30
+
 # Server Pass Key
 SERVER_PASS_KEY=""

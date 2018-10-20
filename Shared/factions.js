@@ -56,6 +56,8 @@ exports.GetFactionChannel = function(user) {
 //ChangeFaction
 //client - discord.js client
 //factionRole - a faction role
+//channel - discord.js channel OR channel name
+//member - discord.js member
 exports.ChangeFaction = async function(client, factionRole, channel, member) {
 	//factionRole must be a faction role
 	if (!exports.CheckFaction(factionRole)) {

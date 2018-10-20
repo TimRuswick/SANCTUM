@@ -1,92 +1,105 @@
 exports = module.exports = {};
 
-/*
-function addXP(userID, amount) {
-	var response = String(dataRequest.sendServerData("addXP", amount, userID));
+const dataRequest = require('../modules/dataRequest');
+
+//AddXP
+//client - discord.js client
+//user - discord.js user OR username
+//amount - amount of XP to add
+exports.AddXP = function(client, user, amount) {
+	//handle user strings
+	if (typeof(user) === "string") {
+		user = client.users.find(item => item.username === user);
+	}
+
+	dataRequest.sendServerData("addXP", amount, user.id);
 }
 
-function getLevelUp(userID) {
-	const server = client.guilds.get(process.env.SANCTUM_ID);
-	const member = server.members.get(userID);
-	if (client.user.username == "Kamala, Obsidian Vice President"   && !member.roles.has(process.env.GROUP_A_ROLE)) return;
-	if (client.user.username == "Captain Montgomery"				 && !member.roles.has(process.env.GROUP_B_ROLE)) return;
-	if (client.user.username == "Dairo, High Prophet of The Hand"   && !member.roles.has(process.env.GROUP_C_ROLE)) return;
+//LevelUp
+//client - discord.js client
+//member - member to get the level up
+exports.LevelUp = function(client, member) { //NOTE: why is this called separately?
+	//handle member strings
+	if (typeof(member) === "string") {
+		//get the member
+		let user = client.users.find(item => item.username === member);
+		let guild = client.guilds.get(process.env.SANCTUM_ID);
+		member = guild.members.get(user.id);
+	}
 
-	//const user = server.members.get(userID);
-	var response = String(dataRequest.sendServerData("getLevelUp", 0, userID));
-	var responseMessage = String(response.split(",")[0]);
-	var lvl = Math.floor(parseFloat(response.split(",")[1]));
-	var statPoints = parseFloat(response.split(",")[2]);
+	//if the bot tries to level someone without the correct role, return
+	if (client.user.username == process.env.GROUP_A_LEADER_NAME && !member.roles.has(process.env.GROUP_A_ROLE)) return;
+	if (client.user.username == process.env.GROUP_B_LEADER_NAME && !member.roles.has(process.env.GROUP_B_ROLE)) return;
+	if (client.user.username == process.env.GROUP_C_LEADER_NAME && !member.roles.has(process.env.GROUP_C_ROLE)) return;
 
-	var attacker = String(dataRequest.loadServerData("userStats", userID));
-	var chests = parseFloat(attacker.split(",")[11]);
+	let response = String(dataRequest.sendServerData("getLevelUp", 0, member.user.id)); //TODO: please change the order of sendServerData's arguments!
+	let responseArray = response.split(",");
 
-	console.log(response.split(","));
-	
-	majorLevelUp(lvl, server, userID);
+	//DEBUGGING
+//	console.log("response: " + response);
+
+	let responseMessage = responseArray[0];
+	let level = Math.floor(parseFloat(responseArray[1]));
+	let statPoints = parseFloat(responseArray[2]);
+
+//	let userStats = String(dataRequest.loadServerData("userStats", member.user.id));
+
+	exports.RankUp(client, member, level);
 
 	if (responseMessage == "levelup") {
-	//if (true) {
-		console.log("Chests: " + chests)
-		checkinLevelUp(userID, lvl, statPoints, chests);
+		//TODO: proper dialog
 	}
 }
 
-async function majorLevelUp(level, server, userID) {
-	const user = server.members.get(userID);
+//GetLevelUp
+//client - discord.js client
+//member - member to get the upgrade
+//level - level of the member
+exports.RankUp = async function(client, member, level) {
+	//get the guild
+	let guild = client.guilds.get(process.env.SANCTUM_ID);
 
-	var newChannel = "";
+	//handle member strings
+	if (typeof(member) === "string") {
+		//get the member
+		let user = client.users.find(item => item.username === member);
+		member = guild.members.get(user.id);
+	}
 
-	var levels = [
-		// Role, Level
-		[server.roles.find(role => role.name === "LVL 1+"), 1, process.env.CRYSTAL_SHORES_CHANNEL_ID],
-		[server.roles.find(role => role.name === "LVL 15+"), 15, process.env.SEA_OF_FOG_CHANNEL_ID],
-		[server.roles.find(role => role.name === "LVL 30+"), 30, process.env.DEADLANDS_CHANNEL_ID]
+	//Snapping the level variable
+	if (level < process.env.RANK_2_THRESHOLD) {
+		level = process.env.RANK_1_THRESHOLD;
+	} else
+	if (level < process.env.RANK_3_THRESHOLD) {
+		level = process.env.RANK_2_THRESHOLD;
+	} else {
+		level = process.env.RANK_3_THRESHOLD;
+	}
+
+	//Get the new rank
+	let levelRole = guild.roles.find(role => role.name === `LVL ${level}+`); //I don't like constant strings
+
+	//set the new level
+	if (!levelRole) {
+		throw "levelRole not found";
+	}
+
+	if (member.roles.has(levelRole.id)) { //member has this role already
+		return;
+	}
+
+	//the ranks as roles
+	let ranks = [
+		guild.roles.find(role => role.name === process.env.RANK_1),
+		guild.roles.find(role => role.name === process.env.RANK_2),
+		guild.roles.find(role => role.name === process.env.RANK_3)
 	]
 
-	// Shrinking level
-	if (level < 30) {
-		level = 15;
-	} else if (level < 15) {
-		level = 1;
+	//remove all existing roles
+	for(let i = 0; i < ranks.length; i++) {
+		member.removeRole(ranks[i].id);
 	}
 
-	// Rank Level Up
-	var levelRole = server.roles.find(role => role.name === `LVL ${level}+`);
-	if (levelRole) {
-		var memberRole = user.roles.has(levelRole.id);
-		if (!memberRole) {
-			user.addRole(levelRole).catch(console.error);
-			for (let i = 0; i < levels.length; i++) {
-				const element = levels[i];
-				if (element[1] !== level) {
-					await user.removeRole(element[0]);
-				}
-			}
-			if (user !== undefined) {// && newChannel !== undefined) {
-				var levelMarks = [1, 15, 30];
-
-				for (let i = 0; i < levelMarks.length; i++) {
-					const element = levelMarks[i];
-					// Gets channel of array
-					newChannel = client.channels.get(levels[levels.findIndex(level => level[1] === element)][2]);
-					if (level === element) 
-						newChannel.send(dialog.getDialog("level" + level, user, newChannel));
-				}
-			}
-		}
-	}
+	//this will enable the new rooms
+	member.addRole(levelRole);
 }
-
-function checkinLevelUp(userID, lvl, statPoints, chests) {
-	const guild = client.guilds.get(process.env.SANCTUM_ID);
-	if (lvl === 30) {
-		//Post level cap level up!
-		sendMessage(userID, getFactionChannel(guild.members.get(userID)), dialog.getDialog("levelUpLevelCap", userID, lvl, chests));
-	} else {
-		//regular level up
-		sendMessage(userID, getFactionChannel(guild.members.get(userID)), dialog.getDialog("levelUp", userID, lvl, statPoints));
-	}
-	//sendMessage(testChannelID, dialog.getDialog("levelUp", userID, lvl, statPoints));
-}
-*/
