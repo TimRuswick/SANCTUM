@@ -1,6 +1,25 @@
 //initialize the exports
 exports = module.exports = {};
 
+//CloneArray
+//arg - an array to be copied
+exports.CloneArray = function(arg) {
+	// https://blog.andrewray.me/how-to-clone-a-nested-array-in-javascript/
+	let copy;
+
+	if(Array.isArray(arg)) {
+		copy = arg.slice(0);
+		for(let i = 0; i < copy.length; i++) {
+			copy[i] = arrayClone(copy[i]);
+		}
+		return copy;
+	} else if(typeof(arg) === "object") {
+		throw "Cannot clone array containing an object!";
+	} else {
+		return arg;
+	}
+}
+
 //GetFooterCommands - Gets footer commands for botspam channel commands
 //commandArray - the array of possible commands to use
 //excludeCommand (optional) - the command to filter out
@@ -16,6 +35,13 @@ exports.GetFooterCommands = function(commandArray, excludeCommand = null) {
 	});
 
 	return returnText;
+}
+
+//FormatMSS
+//s - seconds
+exports.FormatMSS = function(s){
+	//https://stackoverflow.com/questions/3733227/javascript-seconds-to-minutes-and-seconds
+	return (s - (s %= 60)) / 60 + (9 < s ? ':' : ':0') + s;
 }
 
 //IsAdmin
