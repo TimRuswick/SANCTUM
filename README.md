@@ -23,7 +23,7 @@ You will need:
 
 2. Rename the `.envdev` file to `.env`, and fill out tokens and channels. 
 
-    Make sure you save it, and also don't push any of your tokens here! If you do though, consider them comprimised and then reset them. On Windows, you must give the .env file a name, but you can circumvent it by using a program like [VS Code](https://code.visualstudio.com/) to rename files!
+    Make sure you save it, and also don't push any of your tokens here! If you do though, consider them compromised and then reset them. On Windows, you must give the .env file a name, but you can circumvent it by using a program like [VS Code](https://code.visualstudio.com/) to rename files!
 
 3. Navigate via command-line to a bot's folder, install dependancies, and run it!
 
