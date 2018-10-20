@@ -33,7 +33,7 @@ client.on("message", function(msg) {
 	switch(command) {
 		//used for debugging
 		case "ping":
-			shared.SendPublicMessage(client, "Ratstail91", "bot-spam", "pong", 3000);
+			console.log(shared.CheckValidDisplay(client, "Ratstail91", "bot-spam", true));
 			break;
 	}
 });

@@ -44,34 +44,74 @@ exports.SplitArray = function(arr, chunkSize) {
 	return groups;
 }
 
-/*
 // See if the bot should display its message
-function checkValidDisplay(member, channelID, checkRole) {
-	if (client.user.username == "Kamala, Obsidian Vice President"	   && channelID === process.env.GROUP_A_BOT_ID) {
-		if (checkRole) { if (member.roles.has(process.env.GROUP_A_ROLE)) return true; } else true;
-	}
-	else if (client.user.username == "Captain Montgomery"				&& channelID === process.env.GROUP_B_BOT_ID) {
-		if (checkRole) { if (member.roles.has(process.env.GROUP_B_ROLE)) return true; } else true;
-	}
-	else if (client.user.username == "Dairo, High Prophet of The Hand"  && channelID === process.env.GROUP_C_BOT_ID) {
-		if (checkRole) { if (member.roles.has(process.env.GROUP_C_ROLE)) return true; } else true;
-	}
-	else if (client.user.username == "Ghost 5.0.1") {		
-		// JSON
-		const rooms = require('../TextAdv/rooms.json');
-		var roomExists = false;
-
-		// Loops for all rooms
-		rooms.rooms.forEach(element => {
-			if (channelID === rooms[element].channel) roomExists = true; 
-		});
-
-		if (!roomExists) {
-			if (channelID === process.env.TEST_CHANNEL_ID) return true;
-		} else return true;
-	
+//client - discord.js client
+//member - discord.js member OR username
+//channel - discord.js channel OR channel name
+//checkRole - check the member's role or not
+exports.CheckValidDisplay = function(client, member, channel, checkRole) {
+	//handle member strings
+	if (typeof(member) === "string") {
+		//get the member
+		//NOTE: I think the bot needs to run inside a single server only, otherwise I don't know what will happen here due to the [0] part
+		member = client.guilds.map(guild => guild.members.filter(mbr => mbr.user.username === member))[0].first();
 	}
 
-	return false;
+	//handle channel strings
+	if (typeof(channel) === "string") {
+		channel = client.channels.find(item => item.name === channel);
+	}
+
+	switch(client.user.username) {
+		//NOTE: some copy/paste here that could be fixed
+		case process.env.GROUP_A_LEADER_NAME:
+			if (checkRole) {
+				return channel.id == process.env.GROUP_A_CHANNEL_ID && member.roles.has(process.env.GROUP_A_ROLE);
+			} else {
+				return channel.id == process.env.GROUP_A_CHANNEL_ID;
+			}
+
+		case process.env.GROUP_B_LEADER_NAME:
+			if (checkRole) {
+				return channel.id == process.env.GROUP_B_CHANNEL_ID && member.roles.has(process.env.GROUP_B_ROLE);
+			} else {
+				return channel.id == process.env.GROUP_B_CHANNEL_ID;
+			}
+
+		case process.env.GROUP_C_LEADER_NAME:
+			if (checkRole) {
+				return channel.id == process.env.GROUP_C_CHANNEL_ID && member.roles.has(process.env.GROUP_C_ROLE);
+			} else {
+				return channel.id == process.env.GROUP_C_CHANNEL_ID;
+			}
+
+		case process.env.GHOST_NAME: {
+			// JSON
+			let rooms = require('../TextAdv/rooms.json'); //TODO: should this be here?
+			let roomExists = false;
+
+			// Loops for all rooms
+			rooms.rooms.forEach(room => {
+				if (channel.id === rooms[room].channel) {
+					roomExists = true;
+				}
+			});
+
+			//if the given room exists
+			if (roomExists) {
+				return true;
+			}
+
+			//DEBUGGING: test channel
+			if (channel.id == process.env.TEST_CHANNEL_ID) {
+				return true;
+			}
+
+			//otherwise
+			return false;
+		}
+		default:
+			//default value
+			return false;
+	}
 }
-*/
