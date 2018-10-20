@@ -33,10 +33,12 @@ client.on("message", function(msg) {
 	switch(command) {
 		//used for debugging
 		case "ping":
-			console.log(shared.CheckValidDisplay(client, "Ratstail91", "bot-spam", true));
+			shared.ChangeFaction(client, process.env.GROUP_B_ROLE, msg.channel, msg.member);
 			break;
 	}
 });
 
 //actually log in
 client.login(process.env.DEVELOPER_TOKEN);
+
+//TODO: change usernames to tags throughout the shared library

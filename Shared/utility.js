@@ -53,8 +53,9 @@ exports.CheckValidDisplay = function(client, member, channel, checkRole) { //See
 	//handle member strings
 	if (typeof(member) === "string") {
 		//get the member
-		//NOTE: I think the bot needs to run inside a single server only, otherwise I don't know what will happen here due to the [0] part
-		member = client.guilds.map(guild => guild.members.filter(mbr => mbr.user.username === member))[0].first();
+		let user = client.users.find(item => item.username === member);
+		let guild = client.guilds.get(process.env.SANCTUM_ID);
+		member = guild.members.get(user.id);
 	}
 
 	//handle channel strings
