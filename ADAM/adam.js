@@ -221,9 +221,7 @@ function processGameplayCommands(message) {
 			}
 
 			//try to send the money
-			let val = dataRequest.sendServerData("transfer", targetMember.id, message.author.id, amount);
-			if (val != "success") {
-				shared.SendPublicMessage(client, message.author, message.channel, val);
+			if (dataRequest.sendServerData("transfer", targetMember.id, message.author.id, amount) != "success") {
 				shared.SendPublicMessage(client, message.author, message.channel, dialog("giveFailed"));
 				return true;
 			}
