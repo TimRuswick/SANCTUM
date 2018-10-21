@@ -79,11 +79,12 @@ exports.ChangeFaction = async function(client, factionRole, channel, member) {
 
 	if (member.roles.has(factionRole)) {
 		//can't change to this faction
-		return messaging.SendPublicMessage(client, member.user, channel, "You have already joined that faction.");
+		return "alreadyJoined";
 	}
 
 	if (dataRequest.loadServerData("hasConvertedToday", member.user.id) == 1) {
-		return messaging.SendPublicMessage(client, member.user, channel, "You have already converted today.");
+		//can't change too fast
+		return "hasConvertedToday";
 	}
 
 	//Creates a new user
@@ -98,12 +99,11 @@ exports.ChangeFaction = async function(client, factionRole, channel, member) {
 	//send the server the info (for logging)
 	dataRequest.sendServerData("conversion", "Converted to " + exports.GetFactionName(factionRole), member.user.id);
 
-	//send the public welcoming message
-	messaging.SendPublicMessage(client, member.user, channel, "Welcome to " + exports.GetFactionName(factionRole));
-
-	//send the private welcoming message
 	if (newUserResponse === "createdUser") {
-		//TODO: more dialog from adam & other faction leaders
-		messaging.SendPrivateMessage(client, member.user, "Welcome to SANCTUM.");
+		//send the private welcoming message
+		return newUserResponse;
+	} else {
+		//send the public welcoming message
+		return "joined";
 	}
 }

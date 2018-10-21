@@ -34,6 +34,10 @@ exports.GenerateDialogFunction = function(dialogJson) {
 			result = dialogJson[key];
 		}
 
+		if (typeof(result) === "undefined") {
+			return "";
+		}
+
 		let counter = 0;
 		data.map((dat) => {
 			counter++;
@@ -162,7 +166,7 @@ exports.CheckValidDisplay = function(client, member, channel, checkRole) { //See
 			return false;
 		}
 		default:
-			//default value
-			return false;
+			//default value: always show messages if not a faction leader
+			return true;
 	}
 }

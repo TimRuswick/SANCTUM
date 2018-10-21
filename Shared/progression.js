@@ -35,19 +35,16 @@ exports.LevelUp = function(client, member) { //NOTE: why is this called separate
 	let response = String(dataRequest.sendServerData("getLevelUp", 0, member.user.id)); //TODO: please change the order of sendServerData's arguments!
 	let responseArray = response.split(",");
 
-	//DEBUGGING
-//	console.log("response: " + response);
-
 	let responseMessage = responseArray[0];
 	let level = Math.floor(parseFloat(responseArray[1]));
 	let statPoints = parseFloat(responseArray[2]);
 
-//	let userStats = String(dataRequest.loadServerData("userStats", member.user.id));
+	let rankUp = exports.RankUp(client, member, level);
 
-	exports.RankUp(client, member, level);
-
-	if (responseMessage == "levelup") {
-		//TODO: proper dialog
+	if (rankUp == "rankUp") {
+		return rankUp;
+	} else if (responseMessage === "levelup") {
+		return "levelUp";
 	}
 }
 
@@ -85,7 +82,7 @@ exports.RankUp = async function(client, member, level) {
 	}
 
 	if (member.roles.has(levelRole.id)) { //member has this role already
-		return;
+		return "";
 	}
 
 	//the ranks as roles
@@ -102,4 +99,7 @@ exports.RankUp = async function(client, member, level) {
 
 	//this will enable the new rooms
 	member.addRole(levelRole);
+
+	//return the result
+	return "rankUp";
 }

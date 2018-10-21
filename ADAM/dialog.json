@@ -1,36 +1,36 @@
 {
-	"help": "_This world is strange and mysterious. And while I cannot help you on your journey or join your faction, I am here to help travelers to the best of my ability._\n\nHere is what I can do for you:\n\n!checkin\n```Once per day, you may come see me for a daily sum in exchange for your help around the city.```\n!stats\n```I can share all of your stats and your crystal count information.```\n!give [AMOUNT] [@USER]\n```I can transfer some of your crystals to another traveler's account. Just make sure you have enough.```\n!help [@NAME]\n```I can tell you a little bit about some of the other people with us here on New Eden.```\nI hope this helps you on your journey, traveler.",
+	"help": "*This world is strange and mysterious. And while I cannot help you on your journey or join your faction, I am here to help travelers to the best of my ability.*\n\n*Here is what I can do for you:*\n\n!checkin\n```Once per day, you may come see me for a daily sum in exchange for your help around the city.```\n!stats\n```I can share all of your stats and your crystal count information.```\n!give [AMOUNT] [@USER]\n```I can transfer some of your crystals to another traveler's account. Just make sure you have enough.```\n!help [@NAME]\n```I can tell you a little bit about some of the other people with us here on New Eden.```\nI hope this helps you on your journey, traveler.",
 
 	"helpCptMon": "TODO: Data Missing.",
 	"helpDairo": "TODO: Data Missing.",
 	"helpGhost": "TODO: Data Missing.",
 	"helpKamala": "TODO: Data Missing.",
 
-	"helpAlexis": "_Alexis is our top-of-the-line chemist who uses her talents to reward travelers with a nice and relaxing space. She'd be happy to have or provide you with some company._\n\n!buydrink\n```In #🍺travelers-watch, this allows you to buy a drink and relax.```\n!buydrink [@NAME]\n```In #🍺travelers-watch, you can buy a drink for a friend.```\n!tip [AMOUNT]\n```In #🍺travelers-watch, you can tip her for her great service. She might just give you a tip back.```",
-	"helpGraze": "_Graze is our loveable augmentation expert. He can help you upgrade your skills and boost your abilities. Here's what he can do:_\n\n!upgrade\n```Shows you the available upgrades that Graze can provide with your Nanotech Cannisters.```\n!upgrade [STAT]\n```Upgrades this specific stat permanently.```",
+	"helpAlexis": "*Alexis is our top-of-the-line chemist who uses her talents to reward travelers with a nice and relaxing space. She'd be happy to have or provide you with some company.*\n\n!buydrink\n```In #🍺travelers-watch, this allows you to buy a drink and relax.```\n!buydrink [@NAME]\n```In #🍺travelers-watch, you can buy a drink for a friend.```\n!tip [AMOUNT]\n```In #🍺travelers-watch, you can tip her for her great service. She might just give you a tip back.```",
+	"helpGraze": "*Graze is our loveable augmentation expert. He can help you upgrade your skills and boost your abilities. Here's what he can do:*\n\n!upgrade\n```Shows you the available upgrades that Graze can provide with your Nanotech Cannisters.```\n!upgrade [STAT]\n```Upgrades this specific stat permanently.```",
 	"helpLibrarian": "TODO: Data Missing.",
-	"helpMori": "_Mori is our resident head of the medbay. He can tend to your wounds and get you back on your feet. Here's what he can do:_\n\n!heal\n```Shows you Mori's available procedures for healing.```\n!heal [ITEM]\n```Purchases a procedure directly from him, and with his nanotech, takes effect immediately.```",
-	"helpMosiah": "_Mosiah was exiled from our great city for many counts of misconduct, but it's been said he's been seen recently. I recommend you not deal with him at all, but should you need to, here's what he can do:_\n\n!wager [AMOUNT]\n```Wagers your crystals in a primative coin flip bet. Winner takes all.```",
-	"helpRey": "_Rey is a master of finding things that we need around the city. Resources are scarce, so anything you can help her find would be most helpful._\n\n!scavenge\n```In #🌘the-outskirts, this allows you to look for materials and resources with Rey.```\n!materials\n```Shows you the current materials that you have in your inventory.```",
-	"helpSonya": "_Professor Sonya is our resident archeologist, and she is fascinated by this world. Scavenge for some artifacts in the outskirts of the city, and she will apy you handsomely._\n\n!scavenge\n```In #🌘the-outskirts, this allows you to look for rare artifacts for the professor.```\n!artifacts\n```Shows you the current artifacts that you have in your inventory.```\n!artifacts sell\n```Shows you the current prices that the professor is willing to pay for any artifacts that you may find.```\n!artifacts sell [TYPE]\n```Sells all of the artifacts that you have of that type to the professor, at current prices.```",
+	"helpMori": "*Mori is our resident head of the medbay. He can tend to your wounds and get you back on your feet. Here's what he can do:*\n\n!heal\n```Shows you Mori's available procedures for healing.```\n!heal [ITEM]\n```Purchases a procedure directly from him, and with his nanotech, takes effect immediately.```",
+	"helpMosiah": "*Mosiah was exiled from our great city for many counts of misconduct, but it's been said he's been seen recently. I recommend you not deal with him at all, but should you need to, here's what he can do:*\n\n!wager [AMOUNT]\n```Wagers your crystals in a primative coin flip bet. Winner takes all.```",
+	"helpRey": "*Rey is a master of finding things that we need around the city. Resources are scarce, so anything you can help her find would be most helpful.*\n\n!scavenge\n```In #🌘the-outskirts, this allows you to look for materials and resources with Rey.```\n!materials\n```Shows you the current materials that you have in your inventory.```",
+	"helpSonya": "*Professor Sonya is our resident archeologist, and she is fascinated by this world. Scavenge for some artifacts in the outskirts of the city, and she will apy you handsomely.*\n\n!scavenge\n```In #🌘the-outskirts, this allows you to look for rare artifacts for the professor.```\n!artifacts\n```Shows you the current artifacts that you have in your inventory.```\n!artifacts sell\n```Shows you the current prices that the professor is willing to pay for any artifacts that you may find.```\n!artifacts sell [TYPE]\n```Sells all of the artifacts that you have of that type to the professor, at current prices.```",
 
-	"helpRavager": "_The Ravagers have been hunting us since crashing here on New Eden. They roam this planet and will attack travelers on sight. But you can defend yourself:_\n\n!attack\n```Sends your weapon towards an active Ravager. If you win the fight, you can loot their corpse for crystals. But be careful: they bite back.```\n!details\n```Shows you the details of the last Ravager fight to take place as well as the crystal distribution.```",
+	"helpRavager": "*The Ravagers have been hunting us since crashing here on New Eden. They roam this planet and will attack travelers on sight. But you can defend yourself:*\n\n!attack\n```Sends your weapon towards an active Ravager. If you win the fight, you can loot their corpse for crystals. But be careful: they bite back.```\n!details\n```Shows you the details of the last Ravager fight to take place as well as the crystal distribution.```",
 
-	"checkin": "<@{1}> your presence has been noted. I've added {2} crystals to your account.",
-	"checkinLocked": ":x: <@{1}> you already checked in with me {2}. You can check in again tomorrow.",
-	"conversionLocked": ":x: <@{1}> as anxious as you may be, please don't attempt to change factions so quickly. You can only change once every 30 days.",
+	"checkin": "Your presence has been noted. I've added {1} crystals to your account.",
+	"checkinLocked": ":x: You already checked in with me {1}. You can check in again tomorrow.",
+	"conversionLocked": ":x: As anxious as you may be, please don't attempt to change factions so quickly. You can only change once every 30 days.",
 
 	"depositSuccessful": "<@{1}> your deposit of {2} crystals has been successful. Good luck.",
 	"depositFailed": ":x: <@{1}> I can't make the deposit at the moment. I apologize for the inconvenience.",
 
-	"giveSuccessful": "<@{1}> I've transferred {3} crystals to <@{2}> as per your request.",
-	"giveFailed": ":x: <@{1}> I can't make that transfer at the moment. I apologize for the inconvenience.",
-	"giveNotEnoughInAccount": ":x: <@{1}> You don't have that many crystals in your account. As such, I can't complete the transfer.",
-	"giveNotAboveZero": ":x: <@{1}> In order for me to complete the transfer I need an amount above zero.",
-	"giveInvalidUser": ":x: <@{1}> I can't find that traveler. Sorry.",
-	"giveInvalidUserSelf": ":x: <@{1}> You can't send crystals to yourself. Sorry.",
+	"giveSuccessful": "I've transferred {2} crystals to <@{1}> as per your request.",
+	"giveFailed": ":x: I can't make that transfer at the moment. I apologize for the inconvenience.",
+	"giveNotEnoughInAccount": ":x: You don't have that many crystals in your account. As such, I can't complete the transfer.",
+	"giveNotAboveZero": ":x: In order for me to complete the transfer I need an amount above zero.",
+	"giveInvalidUser": ":x: I can't find that traveler. Sorry.",
+	"giveInvalidUserSelf": ":x: You can't send crystals to yourself. Sorry.",
 
-	"LevelUp": "You just hit __level {2}__!{1} I've added a :cannister: __Nanotech Cannister to your inventory so that you can upgrade your skills. You now have __{3}__ total (you can check this any time with !stats).",
+	"LevelUp": "You just hit **level {2}**!{1} I've added a :cannister: **Nanotech Cannister** to your inventory so that you can upgrade your skills. You now have **{3}** total (you can check this any time with !stats).",
 	"levelUpRemark": [
 		" I appreciate all of your help.",
 		" Thank you for doing so much for the city.",
@@ -40,7 +40,7 @@
 		" The citizens of The Sanctum are most grateful.",
 		" I cannot thank you enough for your help defending the city."
 	],
-	"levelUpCap": "You're currently at __level {2}__ which is the current level cap!{1} I've added a :cyphercrate: __Cypher Crate__ to your inventory. Hopefully it contains something useful for you on your journey. You now have __{3}__ total (you can check this any time with !stats). Good luck.",
+	"levelUpCap": "You're currently at **level {2}** which is the current level cap!{1} I've added a :cyphercrate: **Cypher Crate** to your inventory. Hopefully it contains something useful for you on your journey. You now have **{3}** total (you can check this any time with !stats). Good luck.",
 	"levelUpCapRemark": [
 		" I appreciate all of your help.",
 		" Thank you for doing so much for the city.",
@@ -56,33 +56,35 @@
 	"victors": "Currently, {1} controls the fate of the codex.",
 	"noVictors": "The fate of the codex is still undetermined.",
 
-	"alreadyJoinedObsidian": ":x: <@{1}> You are already employed by Obsidian Technologies. There's no need to request a change.",
-	"joinObsidian": "<@{1}> You are now employed by Obsidian Technologies.",
+	"alreadyJoinedObsidian": ":x: You are already employed by Obsidian Technologies. There's no need to request a change.",
+	"joinObsidian": "You are now employed by Obsidian Technologies.",
 	
-	"alreadyJoinedGenesis": ":x: <@{1}> You are already serving Genesis Command. There's no need to request a change.",
-	"joinGenesis": "<@{1}> You have joined the Genesis Command. Finally, some order can be enacted in this chaos.",
+	"alreadyJoinedGenesis": ":x: You are already serving Genesis Command. There's no need to request a change.",
+	"joinGenesis": "You have joined the Genesis Command. Finally, some order can be enacted in this chaos.",
 
-	"alreadyJoinedHand": ":x: <@{1}> The Hand is happy to have you in their congregation already. There's no need to request a change.",
-	"joinHand": "<@{1}> You may now spread the word of the Hand. May the gods look favourably upon you.",
+	"alreadyJoinedHand": ":x: The Hand is happy to have you in their congregation already. There's no need to request a change.",
+	"joinHand": "You may now spread the word of the Hand. May the gods look favourably upon you.",
 
-	"newUserPublicMessage": "<@{1}> welcome to {2}. If you need me for anything, you can contact me via this secure channel. Just use __!help__ for a list of things I can do for you.\n\nAnd don't forget to say hello to your fellow travelers in {3}.",
-	"newUserPrivateMessage": "_Traveler, welcome to The Sanctum._\n\n{1}\n\nI'll get you patched up and give you access to our team to upgrade skills and meet the others. There's just a few things I need you to take care of around the city:\n\n__!checkin__ with me daily.\n```Once a day I'll give you your daily allotment of crystals in exchange for some help around the city.```\n__!attack__ any Ravagers in #the-deadlands.\n```With the constant bombardment from the enemies of the city, It's hard to keep us safe. I need your help```\n\n_Good luck. I'll be around if you need me._",
+	"newUserPublicMessage": "Welcome to {1}. If you need me for anything, you can contact me via this secure channel. Just use **!help** for a list of things I can do for you.\n\nAnd don't forget to say hello to your fellow travelers in {2}.",
+	"newUserPrivateMessage": "*Traveler, welcome to The Sanctum.*\n\n{1}\n\nI'll get you patched up and give you access to our team to upgrade skills and meet the others. There's just a few things I need you to take care of around the city:\n\n**!checkin** with me daily.\n```Once a day I'll give you your daily allotment of crystals in exchange for some help around the city.```\n**!attack** any Ravagers in #the-deadlands.\n```With the constant bombardment from the enemies of the city, It's hard to keep us safe. I need your help```\n\n*Good luck. I'll be around if you need me.*",
 
-	"newUserPrivateMessageRemarkObsidian": "I see that you've joined __Obsidian Technologies__. While they are the most chaotic of the 3 factions, I can see why you'd pick them. The Codex is a very powerful book, and should you be victorious, everyone will have equal access to it's secrets. TODO",
-	"newUserPrivateMessageRemarkGenesis": "I see that you've joined __Genesis Command__. The least reckless of the 3 factions, I can see why you'd pick them. You clearly understand that The Codex is a very powerful book, and should you be victorious, no one will have access to it's secrets. TODO",
-	"newUserPrivateMessageRemarkHand": "I see that you've joined __The Hand__. While they are certainly the most suspicious of the 3 factions, I can see why you'd pick them. The Codex is a very powerful book, and should you be victorious, it is your job to guide the rest of the city using it's secrets. TODO",
+	"newUserPrivateMessageRemarkObsidian": "I see that you've joined **Obsidian Technologies**. While they are the most chaotic of the 3 factions, I can see why you'd pick them. The Codex is a very powerful book, and should you be victorious, everyone will have equal access to it's secrets. TODO",
+	"newUserPrivateMessageRemarkGenesis": "I see that you've joined **Genesis Command**. The least reckless of the 3 factions, I can see why you'd pick them. You clearly understand that The Codex is a very powerful book, and should you be victorious, no one will have access to it's secrets. TODO",
+	"newUserPrivateMessageRemarkHand": "I see that you've joined **The Hand**. While they are certainly the most suspicious of the 3 factions, I can see why you'd pick them. The Codex is a very powerful book, and should you be victorious, it is your job to guide the rest of the city using it's secrets. TODO",
 
-	"intro": "_Hello weary traveler._\n\n_My name is A.D.A.M. and I would like to offer you the amenities of The Sanctum. However, I cannot come to your aid until you choose a faction. I am dearly sorry to be so blunt and put trivial human rules in place over your sustenance and safety, but this is the only way to protect The Codex. But the Codex no longer exists since the Librarian destroyed it, so make something up, player. TODO_\n\n_Your choices are as follows:_",
-	"introObsidian": "<@{1}> !obsidian\n```Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum eu aliquet mauris, id congue nisi. Integer et lobortis tellus. Sed bibendum a metus quis volutpat. Mauris faucibus quam at euismod scelerisque. Vestibulum a elit auctor, venenatis augue in, rhoncus nisi. Mauris sagittis sit amet ante eget luctus. Maecenas id malesuada elit. Vestibulum nec ante nec justo venenatis tincidunt.```",
-	"introGenesis": "<@{1}> !genesis\n```Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum eu aliquet mauris, id congue nisi. Integer et lobortis tellus. Sed bibendum a metus quis volutpat. Mauris faucibus quam at euismod scelerisque. Vestibulum a elit auctor, venenatis augue in, rhoncus nisi. Mauris sagittis sit amet ante eget luctus. Maecenas id malesuada elit. Vestibulum nec ante nec justo venenatis tincidunt.```",
-	"introHand": "<@{1}> !hand\n```Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum eu aliquet mauris, id congue nisi. Integer et lobortis tellus. Sed bibendum a metus quis volutpat. Mauris faucibus quam at euismod scelerisque. Vestibulum a elit auctor, venenatis augue in, rhoncus nisi. Mauris sagittis sit amet ante eget luctus. Maecenas id malesuada elit. Vestibulum nec ante nec justo venenatis tincidunt.```",
-	"introEnd": "_Choose wisely._",
+	"intro": "*Hello weary traveler.*\n\n*My name is A.D.A.M. and I would like to offer you the amenities of The Sanctum. However, I cannot come to your aid until you choose a faction. I am dearly sorry to be so blunt and put trivial human rules in place over your sustenance and safety, but this is the only way to protect The Codex. But the Codex no longer exists since the Librarian destroyed it, so make something up, player. TODO*\n\n*Your choices are as follows:*",
+	"introObsidian": "<@&{1}> !obsidian\n```Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum eu aliquet mauris, id congue nisi. Integer et lobortis tellus. Sed bibendum a metus quis volutpat. Mauris faucibus quam at euismod scelerisque. Vestibulum a elit auctor, venenatis augue in, rhoncus nisi. Mauris sagittis sit amet ante eget luctus. Maecenas id malesuada elit. Vestibulum nec ante nec justo venenatis tincidunt.```",
+	"introGenesis": "<@&{1}> !genesis\n```Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum eu aliquet mauris, id congue nisi. Integer et lobortis tellus. Sed bibendum a metus quis volutpat. Mauris faucibus quam at euismod scelerisque. Vestibulum a elit auctor, venenatis augue in, rhoncus nisi. Mauris sagittis sit amet ante eget luctus. Maecenas id malesuada elit. Vestibulum nec ante nec justo venenatis tincidunt.```",
+	"introHand": "<@&{1}> !hand\n```Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum eu aliquet mauris, id congue nisi. Integer et lobortis tellus. Sed bibendum a metus quis volutpat. Mauris faucibus quam at euismod scelerisque. Vestibulum a elit auctor, venenatis augue in, rhoncus nisi. Mauris sagittis sit amet ante eget luctus. Maecenas id malesuada elit. Vestibulum nec ante nec justo venenatis tincidunt.```",
+	"introEnd": "*Choose wisely.*",
 
-	"LVL 1+": "Congratulations {1}, you have reached __{2}__! Travelers defend the city from Ravagers here, and you can earn some crystals.",
-	"LVL 15+": "Congratulations {1}, you have reached __{2}__, where there are more dangerous enemies lurking in the fog.",
-	"LVL 30+": "Congratulations {1}, you have reached __{2}__, the area most teeming with the strongest monsters. Watch your back, and good luck!",
+	"LVL 1+": "Congratulations {1}, you have reached **{2}**! Travelers defend the city from Ravagers here, and you can earn some crystals.",
+	"LVL 15+": "Congratulations {1}, you have reached **{2}**, where there are more dangerous enemies lurking in the fog.",
+	"LVL 30+": "Congratulations {1}, you have reached **{2}**, the area most teeming with the strongest monsters. Watch your back, and good luck!",
 
-	"loreBackstory": "_Mother Earth had failed us._\n\n_In her dying breath, she bore a starship, __The Genesis__, to save the last of humankind. But the __travelers__ aboard were not prepared for the unwelcoming winds of barren space._\n\n_On the brink of extinction our forefathers landed here, but this was no earth. The desolate landscape of __The Deadlands__ traded our starvation for thirst, our isolation for open and empty space. But despite our struggles, we could breathe again._\n\n_We walked for many days and many nights in __The Deadlands__, consuming only the native __crystals__ protruding from the ground for sustenance. Leaving the shelter of our vessel behind for the hope of a new home. Many withered away under the scorching heat of the twin suns and the constant attacks from __Ravagers__, but Mother Earth kept her promise._\n\n_In our darkest hour, we laid eyes on __The Sanctum__, a city of the gods. Complete with a vault full of our edible crystals, and more than enough room for the entire population; A city with human amenities in the middle of an inhuman world, bestowed upon a dying nation in need. This place was truly a divine gift._\n\n_At the highest point of the city in the tower that touched the clouds, we found __The Librarian__. A meticulous mechanical record keeper hovering over his book, the great __Codex Arcana__. This was a book written in detail to record the actions of every man, woman, and child that lived among us. But it was far too powerful, and the secrets it contained proved lethal in the wrong hands._\n\n_And so began the __factions__, vying for control over the Codex._\n\n- Excerpt from the __Teachings of Tiberius__. March 22, 2630.",
+	"lore": "Choose one of these: !lore [backstory, genesis, travelers, deadlands, sanctum, librarian, codex, factions]",
+
+	"loreBackstory": "*Mother Earth had failed us.*\n\n*In her dying breath, she bore a starship, **The Genesis**, to save the last of humankind. But the **travelers** aboard were not prepared for the unwelcoming winds of barren space.*\n\n*On the brink of extinction our forefathers landed here, but this was no earth. The desolate landscape of **The Deadlands** traded our starvation for thirst, our isolation for open and empty space. But despite our struggles, we could breathe again.*\n\n*We walked for many days and many nights in **The Deadlands**, consuming only the native **crystals** protruding from the ground for sustenance. Leaving the shelter of our vessel behind for the hope of a new home. Many withered away under the scorching heat of the twin suns and the constant attacks from **Ravagers**, but Mother Earth kept her promise.*\n\n*In our darkest hour, we laid eyes on **The Sanctum**, a city of the gods. Complete with a vault full of our edible crystals, and more than enough room for the entire population; A city with human amenities in the middle of an inhuman world, bestowed upon a dying nation in need. This place was truly a divine gift.*\n\n*At the highest point of the city in the tower that touched the clouds, we found **The Librarian**. A meticulous mechanical record keeper hovering over his book, the great **Codex Arcana**. This was a book written in detail to record the actions of every man, woman, and child that lived among us. But it was far too powerful, and the secrets it contained proved lethal in the wrong hands.*\n\n*And so began the **factions**, vying for control over the Codex.*\n\n- Excerpt from the **Teachings of Tiberius**. March 22, 2630.",
 
 	"loreGenesis": "TODO: Sorry. I recognize the term but am unable to process the request. There is a corruption in my cognitive core. Try again soon.",
 	"loreTravelers": "TODO: Sorry. I recognize the term but am unable to process the request. There is a corruption in my cognitive core. Try again soon.",
@@ -90,5 +92,5 @@
 	"loreSanctum": "TODO: Sorry. I recognize the term but am unable to process the request. There is a corruption in my cognitive core. Try again soon.",
 	"loreLibrarian": "WARNING: DATA CORRUPTED",
 	"loreCodex": "WARNING: DATA CORRUPTED",
-	"loreFactions": "TODO: Sorry. I recognize the term but am unable to process the request. There is a corruption in my cognitive core. Try again soon.",
+	"loreFactions": "TODO: Sorry. I recognize the term but am unable to process the request. There is a corruption in my cognitive core. Try again soon."
 }
