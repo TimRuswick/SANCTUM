@@ -273,7 +273,7 @@ function processGameplayCommands(message) {
 				.setColor(message.member.displayColor)
 				.setDescription(`${levelText} ${levelProgress} | ${crystalText} | ${cannisterText}`)
 				.addField("Stats", userStats)
-				.setFooter("Commands: !help | !lore | !checkin");
+				.setFooter("Commands: !help | !lore | !checkin | !give");
 
 			message.channel.send(embed);
 
