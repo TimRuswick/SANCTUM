@@ -65,7 +65,7 @@
 	"alreadyJoinedHand": ":x: <@{1}> The Hand is happy to have you in their congregation already. There's no need to request a change.",
 	"joinHand": "You may now spread the word of the Hand. May the gods look favourably upon you.",
 
-	"newUserPublicMessage": "Welcome to {1}. If you need me for anything, you can contact me via this secure channel. Just use **!help** for a list of things I can do for you.\n\nAnd don't forget to say hello to your fellow travelers in {2}.",
+	"newUserPublicMessage": "Welcome to {1}. If you need me for anything, you can contact me via this secure channel. Just use **!help** for a list of things I can do for you.\n\nAnd don't forget to say hello to your fellow travelers in <#{2}>.",
 	"newUserPrivateMessage": "*Traveler, welcome to The Sanctum.*\n\n{1}\n\nI'll get you patched up and give you access to our team to upgrade skills and meet the others. There's just a few things I need you to take care of around the city:\n\n**!checkin** with me daily.\n```Once a day I'll give you your daily allotment of crystals in exchange for some help around the city.```\n**!attack** any Ravagers in #the-deadlands.\n```With the constant bombardment from the enemies of the city, It's hard to keep us safe. I need your help```\n\n*Good luck. I'll be around if you need me.*",
 
 	"newUserPrivateMessageRemarkObsidian": "I see that you've joined **Obsidian Technologies**. While they are the most chaotic of the 3 factions, I can see why you'd pick them. The Codex is a very powerful book, and should you be victorious, everyone will have equal access to it's secrets. TODO",

@@ -65,13 +65,6 @@ client.on('ready', async () => {
 		console.log('Updating STAMINA every 2 min.');
 		dataRequest.sendServerData("updateStamina");
 	});
-
-	//ADAM prints the intros in the gate
-	shared.SendPublicMessage(client, client.channels.get(process.env.GATE_CHANNEL_ID), dialog("intro"));
-	shared.SendPublicMessage(client, client.channels.get(process.env.GATE_CHANNEL_ID), dialog("introObsidian", process.env.GROUP_A_ROLE));
-	shared.SendPublicMessage(client, client.channels.get(process.env.GATE_CHANNEL_ID), dialog("introGenesis", process.env.GROUP_B_ROLE));
-	shared.SendPublicMessage(client, client.channels.get(process.env.GATE_CHANNEL_ID), dialog("introHand", process.env.GROUP_C_ROLE));
-	shared.SendPublicMessage(client, client.channels.get(process.env.GATE_CHANNEL_ID), dialog("introEnd"));
 });
 
 // Create an event listener for messages
@@ -101,7 +94,7 @@ client.on('message', async message => {
 	}
 
 	//check if can continue (used primarily by the faction leaders)
-	if (shared.CheckValidDisplay(client, message.member, message.channel)) {
+	if (!shared.CheckValidDisplay(client, message.member, message.channel)) {
 		return;
 	}
 
@@ -125,6 +118,11 @@ function processGateCommands(message) {
 	let command = args.shift().toLowerCase();
 
 	//WARNING: string constants used here
+
+	//if laying out the intro
+	if (command.substr(0, 5) === "intro") {
+		return false;
+	}
 
 	//if they haven't chosen a faction
 	if (!(command === "obsidian" || command === "genesis" || command === "hand")) {
@@ -158,6 +156,43 @@ function processBasicCommands(message) {
 
 		case "hand": //TODO: move this to the other bots
 			return processFactionChangeAttempt(client, message, process.env.GROUP_C_ROLE, "Hand");
+
+		//ADAM and the faction leaders print the intros in the gate
+		//TODO: prune the unneeded intros from each bot
+		case "intro":
+			if (shared.IsAdmin(client, message.author)) {
+				shared.SendPublicMessage(client, client.channels.get(process.env.GATE_CHANNEL_ID), dialog("intro"));
+				message.delete(1000);
+			}
+			return true;
+
+		case "introobsidian":
+			if (shared.IsAdmin(client, message.author)) {
+				shared.SendPublicMessage(client, client.channels.get(process.env.GATE_CHANNEL_ID), dialog("introObsidian", process.env.GROUP_A_ROLE));
+				message.delete(1000);
+			}
+			return true;
+
+		case "introgenesis":
+			if (shared.IsAdmin(client, message.author)) {
+				shared.SendPublicMessage(client, client.channels.get(process.env.GATE_CHANNEL_ID), dialog("introGenesis", process.env.GROUP_B_ROLE));
+				message.delete(1000);
+			}
+			return true;
+
+		case "introhand":
+			if (shared.IsAdmin(client, message.author)) {
+				shared.SendPublicMessage(client, client.channels.get(process.env.GATE_CHANNEL_ID), dialog("introHand", process.env.GROUP_C_ROLE));
+				message.delete(1000);
+			}
+			return true;
+
+		case "introend":
+			if (shared.IsAdmin(client, message.author)) {
+				shared.SendPublicMessage(client, client.channels.get(process.env.GATE_CHANNEL_ID), dialog("introEnd"));
+				message.delete(1000);
+			}
+			return true;
 
 		case "help":
 		case "lore":
@@ -306,7 +341,7 @@ function processFactionChangeAttempt(client, message, factionRole, factionShorth
 					shared.SendPublicMessage(client, message.channel, dialog("conversionLocked", message.author.id));
 					break;
 				case "createdUser":
-					shared.SendPublicMessage(client, message.author, message.channel, dialog("newUserPublicMessage", shared.GetFactionName(factionRole), "TODO: factionChannel"));
+					shared.SendPublicMessage(client, message.author, shared.GetFactionChannel(factionRole), dialog("newUserPublicMessage", shared.GetFactionName(factionRole), shared.GetFactionChannel(factionRole)));
 					shared.SendPrivateMessage(client, message.author, dialog("newUserPrivateMessage", dialog("newUserPrivateMessageRemark" + factionShorthand)));
 					break;
 				case "joined":
