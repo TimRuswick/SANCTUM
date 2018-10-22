@@ -17,7 +17,7 @@ exports.SendPublicMessage = function(client, user, channel, message, typingDelay
 
 	//handle user strings
 	if (typeof(user) === "string") {
-		user = client.users.find(item => item.username === user);
+		user = client.users.find(item => item.username === user || item.id === user);
 		if (!user) {
 			throw "Can't find that user";
 		}
@@ -25,7 +25,7 @@ exports.SendPublicMessage = function(client, user, channel, message, typingDelay
 
 	//handle channel strings
 	if (typeof(channel) === "string") {
-		channel = client.channels.find(item => item.name === channel);
+		channel = client.channels.find(item => item.name === channel || item.id === channel);
 		if (!channel) {
 			throw "Can't find that channel";
 		}
@@ -55,7 +55,7 @@ exports.SendPublicMessage = function(client, user, channel, message, typingDelay
 exports.SendPrivateMessage = function(client, user, message) {
 	//handle user strings
 	if (typeof(user) === "string") {
-		user = client.users.find(item => item.username === user);
+		user = client.users.find(item => item.username === user || item.id === user);
 	}
 
 	user.send(message);

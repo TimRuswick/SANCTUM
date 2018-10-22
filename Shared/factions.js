@@ -36,20 +36,20 @@ exports.GetFactionName = function(factionRole) {
 
 //GetFactionChannel
 //user - discord.js user
-exports.GetFactionChannel = function(user) {
+exports.GetFactionChannel = function(factionRole) {
 	//factionRole must be a faction role
 	if (!exports.CheckFaction(factionRole)) {
 		throw "factionRole is not a faction!";
 	}
 
-	if (user.roles.has(process.env.GROUP_A_ROLE)) {
-		return process.env.GROUP_A_BOT_ID;
+	if (factionRole === process.env.GROUP_A_ROLE) {
+		return process.env.GROUP_A_CHANNEL_ID;
 	}
-	if (user.roles.has(process.env.GROUP_B_ROLE)) {
-		return process.env.GROUP_B_BOT_ID;
+	if (factionRole === process.env.GROUP_B_ROLE) {
+		return process.env.GROUP_B_CHANNEL_ID;
 	}
-	if (user.roles.has(process.env.GROUP_C_ROLE)) {
-		return process.env.GROUP_C_BOT_ID;
+	if (factionRole === process.env.GROUP_C_ROLE) {
+		return process.env.GROUP_C_CHANNEL_ID;
 	}
 }
 
@@ -66,13 +66,13 @@ exports.ChangeFaction = async function(client, factionRole, channel, member) {
 
 	//handle channel strings
 	if (typeof(channel) === "string") {
-		channel = client.channels.find(item => item.name === channel);
+		channel = client.channels.find(item => item.name === channel || item.id === channel);
 	}
 
 	//handle member strings
 	if (typeof(member) === "string") {
 		//get the member
-		let user = client.users.find(item => item.username === member);
+		let user = client.users.find(item => item.username === member || item.id === member);
 		let guild = client.guilds.get(process.env.SANCTUM_ID);
 		member = guild.members.get(user.id);
 	}

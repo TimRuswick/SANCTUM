@@ -9,7 +9,7 @@ const dataRequest = require('../modules/dataRequest');
 exports.AddXP = function(client, user, amount) {
 	//handle user strings
 	if (typeof(user) === "string") {
-		user = client.users.find(item => item.username === user);
+		user = client.users.find(item => item.username === user || item.id === user);
 	}
 
 	dataRequest.sendServerData("addXP", amount, user.id);
@@ -22,7 +22,7 @@ exports.LevelUp = function(client, member) { //NOTE: why is this called separate
 	//handle member strings
 	if (typeof(member) === "string") {
 		//get the member
-		let user = client.users.find(item => item.username === member);
+		let user = client.users.find(item => item.username === member || item.id === member);
 		let guild = client.guilds.get(process.env.SANCTUM_ID);
 		member = guild.members.get(user.id);
 	}
@@ -59,7 +59,7 @@ exports.RankUp = async function(client, member, level) {
 	//handle member strings
 	if (typeof(member) === "string") {
 		//get the member
-		let user = client.users.find(item => item.username === member);
+		let user = client.users.find(item => item.username === member || item.id === member);
 		member = guild.members.get(user.id);
 	}
 
