@@ -105,6 +105,7 @@ client.on('message', async message => {
 		return;
 	}
 
+	//TODO: remove this from ADAM
 	if (processGameplayCommands(message)) {
 		return;
 	}
@@ -185,7 +186,7 @@ function processGameplayCommands(message) {
 				shared.SendPublicMessage(client, message.author, message.channel, dialog("checkin", checkinAmount));
 				shared.AddXP(client, message.author, 1); //1XP
 			} else {
-				shared.SendPublicMessage(client, message.author, message.channel, dialog("checkinLocked", checkInResponse));
+				shared.SendPublicMessage(client, message.channel, dialog("checkinLocked", message.author.id, checkInResponse));
 			}
 			return true;
 
@@ -194,13 +195,13 @@ function processGameplayCommands(message) {
 
 			//not enough
 			if (amount <= 0) {
-				shared.SendPublicMessage(client, message.author, message.channel, dialog("giveNotAboveZero"));
+				shared.SendPublicMessage(client, message.channel, dialog("giveNotAboveZero", message.author.id));
 				return true;
 			}
 
 			//didn't mention anyone
 			if (message.mentions.members.size == 0) {
-				shared.SendPublicMessage(client, message.author, message.channel, dialog("giveInvalidUser"));
+				shared.SendPublicMessage(client, message.channel, dialog("giveInvalidUser", message.author.id));
 				return true;
 			}
 
@@ -208,7 +209,7 @@ function processGameplayCommands(message) {
 
 			//can't give to yourself
 			if (targetMember.id === message.author.id) {
-				shared.SendPublicMessage(client, message.author, message.channel, dialog("giveInvalidUserSelf"));
+				shared.SendPublicMessage(client, message.channel, dialog("giveInvalidUserSelf", message.author.id));
 				return true;
 			}
 
@@ -216,13 +217,13 @@ function processGameplayCommands(message) {
 
 			//not enough money in account
 			if (accountBalance < amount) {
-				shared.SendPublicMessage(client, message.author, message.channel, dialog("giveNotEnoughInAccount"));
+				shared.SendPublicMessage(client, message.channel, dialog("giveNotEnoughInAccount", message.author.id));
 				return true;
 			}
 
 			//try to send the money
 			if (dataRequest.sendServerData("transfer", targetMember.id, message.author.id, amount) != "success") {
-				shared.SendPublicMessage(client, message.author, message.channel, dialog("giveFailed"));
+				shared.SendPublicMessage(client, message.channel, dialog("giveFailed", message.author.id));
 				return true;
 			}
 
@@ -299,10 +300,10 @@ function processFactionChangeAttempt(client, message, factionRole, factionShorth
 		.then(result => {
 			switch (result) {
 				case "alreadyJoined":
-					shared.SendPublicMessage(client, message.author, message.channel, dialog("alreadyJoined" + factionShorthand));
+					shared.SendPublicMessage(client, message.channel, dialog("alreadyJoined" + factionShorthand, message.author.id));
 					break;
 				case "hasConvertedToday":
-					shared.SendPublicMessage(client, message.author, message.channel, dialog("conversionLocked"));
+					shared.SendPublicMessage(client, message.channel, dialog("conversionLocked", message.author.id));
 					break;
 				case "createdUser":
 					shared.SendPublicMessage(client, message.author, message.channel, dialog("newUserPublicMessage", shared.GetFactionName(factionRole), "TODO: factionChannel"));

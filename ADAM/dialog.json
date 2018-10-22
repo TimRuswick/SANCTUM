@@ -17,18 +17,18 @@
 	"helpRavager": "*The Ravagers have been hunting us since crashing here on New Eden. They roam this planet and will attack travelers on sight. But you can defend yourself:*\n\n!attack\n```Sends your weapon towards an active Ravager. If you win the fight, you can loot their corpse for crystals. But be careful: they bite back.```\n!details\n```Shows you the details of the last Ravager fight to take place as well as the crystal distribution.```",
 
 	"checkin": "Your presence has been noted. I've added {1} crystals to your account.",
-	"checkinLocked": ":x: You already checked in with me {1}. You can check in again tomorrow.",
-	"conversionLocked": ":x: As anxious as you may be, please don't attempt to change factions so quickly. You can only change once every 30 days.",
+	"checkinLocked": ":x: <@{1}> You already checked in with me {2}. You can check in again tomorrow.",
+	"conversionLocked": ":x: <@{1}> As anxious as you may be, please don't attempt to change factions so quickly. You can only change once every 30 days.",
 
 	"depositSuccessful": "<@{1}> your deposit of {2} crystals has been successful. Good luck.",
 	"depositFailed": ":x: <@{1}> I can't make the deposit at the moment. I apologize for the inconvenience.",
 
 	"giveSuccessful": "I've transferred {2} crystals to <@{1}> as per your request.",
-	"giveFailed": ":x: I can't make that transfer at the moment. I apologize for the inconvenience.",
-	"giveNotEnoughInAccount": ":x: You don't have that many crystals in your account. As such, I can't complete the transfer.",
-	"giveNotAboveZero": ":x: In order for me to complete the transfer I need an amount above zero.",
-	"giveInvalidUser": ":x: I can't find that traveler. Sorry.",
-	"giveInvalidUserSelf": ":x: You can't send crystals to yourself. Sorry.",
+	"giveFailed": ":x: <@{1}> I can't make that transfer at the moment. I apologize for the inconvenience.",
+	"giveNotEnoughInAccount": ":x: <@{1}> You don't have that many crystals in your account. As such, I can't complete the transfer.",
+	"giveNotAboveZero": ":x: <@{1}> In order for me to complete the transfer I need an amount above zero.",
+	"giveInvalidUser": ":x: <@{1}> I can't find that traveler. Sorry.",
+	"giveInvalidUserSelf": ":x: <@{1}> You can't send crystals to yourself. Sorry.",
 
 	"LevelUp": "You just hit **level {2}**!{1} I've added a :cannister: **Nanotech Cannister** to your inventory so that you can upgrade your skills. You now have **{3}** total (you can check this any time with !stats).",
 	"levelUpRemark": [
@@ -56,13 +56,13 @@
 	"victors": "Currently, {1} controls the fate of the codex.",
 	"noVictors": "The fate of the codex is still undetermined.",
 
-	"alreadyJoinedObsidian": ":x: You are already employed by Obsidian Technologies. There's no need to request a change.",
+	"alreadyJoinedObsidian": ":x: <@{1}> You are already employed by Obsidian Technologies. There's no need to request a change.",
 	"joinObsidian": "You are now employed by Obsidian Technologies.",
 	
-	"alreadyJoinedGenesis": ":x: You are already serving Genesis Command. There's no need to request a change.",
+	"alreadyJoinedGenesis": ":x: <@{1}> You are already serving Genesis Command. There's no need to request a change.",
 	"joinGenesis": "You have joined the Genesis Command. Finally, some order can be enacted in this chaos.",
 
-	"alreadyJoinedHand": ":x: The Hand is happy to have you in their congregation already. There's no need to request a change.",
+	"alreadyJoinedHand": ":x: <@{1}> The Hand is happy to have you in their congregation already. There's no need to request a change.",
 	"joinHand": "You may now spread the word of the Hand. May the gods look favourably upon you.",
 
 	"newUserPublicMessage": "Welcome to {1}. If you need me for anything, you can contact me via this secure channel. Just use **!help** for a list of things I can do for you.\n\nAnd don't forget to say hello to your fellow travelers in {2}.",
