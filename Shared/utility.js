@@ -34,6 +34,10 @@ exports.GenerateDialogFunction = function(dialogJson) {
 			result = dialogJson[key];
 		}
 
+		if (typeof(result) === "undefined") {
+			return "";
+		}
+
 		let counter = 0;
 		data.map((dat) => {
 			counter++;
@@ -74,7 +78,7 @@ exports.FormatMSS = function(s){
 exports.IsAdmin = function(client, user) {
 	//handle user strings
 	if (typeof(user) === "string") {
-		user = client.users.find(item => item.username === user);
+		user = client.users.find(item => item.username === user || item.id === user);
 	}
 
 	let guild = client.guilds.get(process.env.SANCTUM_ID);
@@ -103,14 +107,14 @@ exports.CheckValidDisplay = function(client, member, channel, checkRole) { //See
 	//handle member strings
 	if (typeof(member) === "string") {
 		//get the member
-		let user = client.users.find(item => item.username === member);
+		let user = client.users.find(item => item.username === member || item.id === member);
 		let guild = client.guilds.get(process.env.SANCTUM_ID);
 		member = guild.members.get(user.id);
 	}
 
 	//handle channel strings
 	if (typeof(channel) === "string") {
-		channel = client.channels.find(item => item.name === channel);
+		channel = client.channels.find(item => item.name === channel || item.id === channel);
 	}
 
 	switch(client.user.username) {
@@ -162,7 +166,7 @@ exports.CheckValidDisplay = function(client, member, channel, checkRole) { //See
 			return false;
 		}
 		default:
-			//default value
-			return false;
+			//default value: always show messages if not a faction leader
+			return true;
 	}
 }

@@ -50,15 +50,16 @@ client.on("message", function(msg) {
 	}
 });
 
-//DEBUGGING
+//DEBUGGING: eventually be require("./dialog.json")
 let dialogJson = {
 	"hello": [
-		"Hi there {1} {2} {3} {2} {1}!"
+		"Hi there {1} {2} {3}!",
+		"Howdy {1} {3}, of the {3} clan!"
 	],
 	"goodbye": "See ya!"
 }
 
-let dialog = shared.GenerateDialogFunction(dialogJson); //eventually be require("./dialog.json")
+let dialog = shared.GenerateDialogFunction(dialogJson);
 console.log(dialog("hello", "Kayne", "Matthew", "Ruse"));
 
 //actually log in

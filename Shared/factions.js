@@ -36,20 +36,20 @@ exports.GetFactionName = function(factionRole) {
 
 //GetFactionChannel
 //user - discord.js user
-exports.GetFactionChannel = function(user) {
+exports.GetFactionChannel = function(factionRole) {
 	//factionRole must be a faction role
 	if (!exports.CheckFaction(factionRole)) {
 		throw "factionRole is not a faction!";
 	}
 
-	if (user.roles.has(process.env.GROUP_A_ROLE)) {
-		return process.env.GROUP_A_BOT_ID;
+	if (factionRole === process.env.GROUP_A_ROLE) {
+		return process.env.GROUP_A_CHANNEL_ID;
 	}
-	if (user.roles.has(process.env.GROUP_B_ROLE)) {
-		return process.env.GROUP_B_BOT_ID;
+	if (factionRole === process.env.GROUP_B_ROLE) {
+		return process.env.GROUP_B_CHANNEL_ID;
 	}
-	if (user.roles.has(process.env.GROUP_C_ROLE)) {
-		return process.env.GROUP_C_BOT_ID;
+	if (factionRole === process.env.GROUP_C_ROLE) {
+		return process.env.GROUP_C_CHANNEL_ID;
 	}
 }
 
@@ -66,24 +66,25 @@ exports.ChangeFaction = async function(client, factionRole, channel, member) {
 
 	//handle channel strings
 	if (typeof(channel) === "string") {
-		channel = client.channels.find(item => item.name === channel);
+		channel = client.channels.find(item => item.name === channel || item.id === channel);
 	}
 
 	//handle member strings
 	if (typeof(member) === "string") {
 		//get the member
-		let user = client.users.find(item => item.username === member);
+		let user = client.users.find(item => item.username === member || item.id === member);
 		let guild = client.guilds.get(process.env.SANCTUM_ID);
 		member = guild.members.get(user.id);
 	}
 
 	if (member.roles.has(factionRole)) {
 		//can't change to this faction
-		return messaging.SendPublicMessage(client, member.user, channel, "You have already joined that faction.");
+		return "alreadyJoined";
 	}
 
 	if (dataRequest.loadServerData("hasConvertedToday", member.user.id) == 1) {
-		return messaging.SendPublicMessage(client, member.user, channel, "You have already converted today.");
+		//can't change too fast
+		return "hasConvertedToday";
 	}
 
 	//Creates a new user
@@ -98,12 +99,11 @@ exports.ChangeFaction = async function(client, factionRole, channel, member) {
 	//send the server the info (for logging)
 	dataRequest.sendServerData("conversion", "Converted to " + exports.GetFactionName(factionRole), member.user.id);
 
-	//send the public welcoming message
-	messaging.SendPublicMessage(client, member.user, channel, "Welcome to " + exports.GetFactionName(factionRole));
-
-	//send the private welcoming message
 	if (newUserResponse === "createdUser") {
-		//TODO: more dialog from adam & other faction leaders
-		messaging.SendPrivateMessage(client, member.user, "Welcome to SANCTUM.");
+		//send the private welcoming message
+		return newUserResponse;
+	} else {
+		//send the public welcoming message
+		return "joined";
 	}
 }
