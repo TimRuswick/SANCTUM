@@ -42,9 +42,11 @@ exports.LevelUp = function(client, member) { //NOTE: why is this called separate
 	let rankUp = exports.RankUp(client, member, level);
 
 	if (rankUp == "rankUp") {
-		return rankUp;
+		return [rankUp, level, statPoints];
 	} else if (responseMessage === "levelup") {
-		return "levelUp";
+		return ["levelUp", level, statPoints];
+	} else {
+		return ["", level, statPoints];
 	}
 }
 
