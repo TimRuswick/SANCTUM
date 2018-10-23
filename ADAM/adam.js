@@ -9,7 +9,7 @@ let cron = require('node-cron');
 // Bot Modules
 let npcSettings = require('./npcSettings');
 let shared = require("../shared/shared");
-let core = require("../shared/core/core");
+let core = require("./core");
 let dataRequest = require('../modules/dataRequest');
 
 //dialog system

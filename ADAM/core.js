@@ -1,7 +1,8 @@
 exports = module.exports = {};
 
-let shared = require("../shared");
-let calcRandom = require('../../modules/calcRandom');
+let Discord = require('discord.js');
+let shared = require("../shared/shared");
+let calcRandom = require('../modules/calcRandom');
 
 //ProcessGameplayCommands
 //client - discord.js client
