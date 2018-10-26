@@ -17,7 +17,7 @@ exports.ProcessGameplayCommands = function(client, message, dialog) {
 
 	switch (command) {
 		case "checkin":
-			let checkinAmount = calcRandom.random(4, 9);
+			let checkinAmount = calcRandom.Random(4, 9);
 			let checkInResponse = String(dataRequest.SendServerData("checkin", message.author.id, checkinAmount));
 			if (checkInResponse === "available") {
 				shared.SendPublicMessage(client, message.author, message.channel, dialog("checkin", checkinAmount));

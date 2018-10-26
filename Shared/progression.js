@@ -32,7 +32,7 @@ exports.LevelUp = function(client, member) { //NOTE: why is this called separate
 	if (client.user.username == process.env.GROUP_B_LEADER_NAME && !member.roles.has(process.env.GROUP_B_ROLE)) return;
 	if (client.user.username == process.env.GROUP_C_LEADER_NAME && !member.roles.has(process.env.GROUP_C_ROLE)) return;
 
-	let response = String(dataRequest.sendServerData("getLevelUp", member.user.id));
+	let response = String(dataRequest.SendServerData("getLevelUp", member.user.id));
 	let responseArray = response.split(",");
 
 	let responseMessage = responseArray[0];
