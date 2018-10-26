@@ -27,7 +27,7 @@ dialog = function(baseDialog) {
 		let result = baseDialog(key, ...data);
 
 		if (result === "") {
-			return "No result for \"" + key + "\"";
+			return baseDialog("unknown");
 		}
 		return result;
 	}
@@ -109,7 +109,7 @@ function processBasicCommands(client, message) {
 			return true;
 
 		default:
-			shared.SendPublicMessage(client, message.author, message.channel, dialog("unknown"));
+			shared.SendPublicMessage(client, message.author, message.channel, dialog(command));
 			return true;
 	}
 
