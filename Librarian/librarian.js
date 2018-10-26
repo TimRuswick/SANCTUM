@@ -17,7 +17,7 @@ let dialog = shared.GenerateDialogFunction(require("./dialog.json"));
 //NOTE: This isn't strictly necessary for the bots
 dialog = function(baseDialog) {
 	return function(key, ...data) {
-		if ( (key === "help" || key === "lore") && typeof(data[0]) !== "undefined") {
+		if ( (key === "help" || key === "lore" || key == "book") && typeof(data[0]) !== "undefined") {
 			//force the arg into camelCase
 			arg = data[0].toLowerCase();
 			arg = arg.charAt(0).toUpperCase() + arg.substr(1);

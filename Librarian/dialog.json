@@ -1,6 +1,55 @@
 {
-	"help": "PLEASE CHOOSE A SUBJECT: help [subject]",
-	"lore": "PLEASE CHOOSE A SUBJECT: lore [subject]",
+	"help": "PLEASE CHOOSE A SUBJECT: lore [subject]. TYPE !subjects FOR A LIST OF SUBJECTS.",
+	"lore": "PLEASE CHOOSE A SUBJECT: lore [subject]. TYPE !subjects FOR A LIST OF SUBJECTS.",
+
+	"subjects": "SUBJECTS ARE: adam, kamala, captain, dairo, ghost, alexis, mori, mosiah, rey\n\nType !more1 for more.",
+
+	"loreAdam": "THE SHEPARD OF THE PEOPLE. THERE IS MORE TO HIM THAN MEETS THE LIGHT RECEPTOR. I DON'T LIKE HIM.",
+	"loreKamala": "MONEY-HUNGRY, BACK-STABBING, GREEDY-GUTS. EASY TO PREDICT. I LIKE HER.",
+	"loreCaptain": "CAPTAIN MONTGOMERY. FINE, UPSTANDING OFFICER OF LAW AND JUSTICE. EASY TO PREDICT. I LIKE HIM.",
+	"loreDairo": "DEVOUT TO A FAULT. BELIEVES HIS OWN TEACHINGS. EASY TO PREDICT. I LIKE HIM.",
+	"loreGhost": "UNKNOWN, GATHERING DATA. BE CAUTIOUS.",
+	"loreAlexis": "CHEMIST. BARTENDER. INFORMANT. EASY TO PREDICT. I LIKE HER.",
+	"loreMori": "DOCTOR. INTELLIGENT. DANGEROUS. DIFFICULT TO PREDICT. I DON'T LIKE HIM.",
+	"loreMosiah": "UNKNOWN, GATHERING DATA. BE CAUTIOUS.",
+	"loreRey": "UNKNOWN, GATHERING DATA. BE CAUTIOUS.",
+
+	"more1": "SUBJECTS ARE: city, obsidian, genesis, hand, librarian, crystals, eve, secrets\n\nType !more2 for more.",
+
+	"loreCity": "THE CITY. ALSO KNOWN AS SANCTUM. CONSTRUCTED FOR HUMANS.",
+	"loreObsidian": "CORPORATION. FACTION. BUSINESS LIKE. EASY TO PREDICT. I LIKE THEM.",
+	"loreGenesis": "COMMAND STRUCTURE. FACTION. LAW ENFORCERS. EASY TO PREDICT. I LIKE THEM.",
+	"loreHand": "RELIGION. FACTION. DEVOUT WORSHIPPERS OF TECHNOLOGY. EASY TO PREDICT. I LIKE THEM.",
+	"loreLibrarian": "ME. SENTINEL. AWAITING !signal.",
+	"loreCrystals": "PINKISH-PURPLE CRYSTALS. EDIBLE. USED AS NUTRIENTS AND CURRENCY.",
+	"loreEve": "WARNING WARNING WARNING DO NOT APPROACH EVE.",
+	"loreSecrets": "EVERY CITY HAS IT'S SECRETS. THIS ONE IS NO EXCEPTION.",
+
+	"loreSignal": "I MUST WAIT FOR THE signal.",
+	"signal": "I CANNOT INITIATE THE signal. I MUST WAIT FOR THE signal.",
+
+	"more2": "SUBJECTS ARE: about, games, books, library, tavern, bugs\n\nType !more4 for more.",
+
+	"loreAbout": "CREATED BY THE WONDERFUL FOLKS AT GAME DEV UNDERGROUND.",
+	"loreGames": "THIS IS A LIBRARY. NOT A PLACE FOR GAMES.",
+	"loreBooks": "PLEASE CHOOSE A BOOK: !book [name].",
+	"loreLibrary": "THERE ARE 114,327 BOOKS CATALOGUED AND ARCHIVED WITHIN THIS LIBRARY. THE CONTENTS OF THIS LIBRARY IS ESTIMATED TO BE 23% CATALOGUED AND ARCHIVED.",
+	"loreTavern": "THIS IS A LIBRARY. NOT A PLACE FOR DRINKS.",
+	"loreBugs": "WHERE?",
+
+	"more3": "data expunged -A.D.A.M.",
+
+	"more4": "SUBJECTS ARE: ",
+	"more5": "SUBJECTS ARE: ",
+	"more6": "SUBJECTS ARE: ",
+
+	"book": "THAT BOOK IS NOT CATALOGUED OR ARCHIVED.",
+
+	"bookCodex": "codex HAS BEEN REMOVED FROM THE LIBRARY FOR CLEANING.",
+
+	"buydrink": "THIS IS A LIBRARY. NOT A PLACE FOR DRINKS.",
+	"heal": "THIS IS A LIBRARY. NOT A PLACE FOR HEALING.",
+	"read": "PLEASE CHOOSE A BOOK: !book [name].",
 
 	"unknown": "UNKNOWN"
 }
