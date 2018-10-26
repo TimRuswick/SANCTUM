@@ -91,16 +91,6 @@ client.on('message', async message => {
 	if (processBasicCommands(client, message)) {
 		return;
 	}
-
-	//check if can continue (used primarily by the faction leaders)
-	if (!shared.CheckValidDisplay(client, message.member, message.channel)) {
-		return;
-	}
-
-	//TODO: remove this from ADAM
-	if (core.ProcessGameplayCommands(client, message, dialog)) {
-		return;
-	}
 });
 
 //Log our bot in
@@ -125,13 +115,13 @@ function processGateCommands(message) {
 
 	//if they haven't chosen a faction
 	if (!(command === "obsidian" || command === "genesis" || command === "hand")) {
-		message.reply("Please choose one of the factions by typing your desired faction shown above (!genesis, !obsidian, or !hand).")
+		message.reply("Please choose one of the factions by typing your desired faction shown above (!obsidian, !genesis, or !hand).")
 			.then(msg => msg.delete(10000)) //remove the error message
 			.catch(console.error);
 	}
 
 	message.delete(100); //remove the user's input to keep the gate clean
-	return false; //TODO: set to true once the faction change commands have been assigned to other bots
+	return true;
 }
 
 function processBasicCommands(client, message) {
@@ -147,41 +137,11 @@ function processBasicCommands(client, message) {
 			}
 			return true;
 
-		case "obsidian": //TODO: move this to the other bots
-			return core.ProcessFactionChangeAttempt(client, message, process.env.GROUP_A_ROLE, dialog, "Obsidian");
-
-		case "genesis": //TODO: move this to the other bots
-			return core.ProcessFactionChangeAttempt(client, message, process.env.GROUP_B_ROLE, dialog, "Genesis");
-
-		case "hand": //TODO: move this to the other bots
-			return core.ProcessFactionChangeAttempt(client, message, process.env.GROUP_C_ROLE, dialog, "Hand");
-
 		//ADAM and the faction leaders print the intros in the gate
 		//TODO: prune the unneeded intros from each bot
 		case "intro":
 			if (shared.IsAdmin(client, message.author)) {
 				shared.SendPublicMessage(client, client.channels.get(process.env.GATE_CHANNEL_ID), dialog("intro"));
-				message.delete(1000);
-			}
-			return true;
-
-		case "introobsidian":
-			if (shared.IsAdmin(client, message.author)) {
-				shared.SendPublicMessage(client, client.channels.get(process.env.GATE_CHANNEL_ID), dialog("introObsidian", process.env.GROUP_A_ROLE));
-				message.delete(1000);
-			}
-			return true;
-
-		case "introgenesis":
-			if (shared.IsAdmin(client, message.author)) {
-				shared.SendPublicMessage(client, client.channels.get(process.env.GATE_CHANNEL_ID), dialog("introGenesis", process.env.GROUP_B_ROLE));
-				message.delete(1000);
-			}
-			return true;
-
-		case "introhand":
-			if (shared.IsAdmin(client, message.author)) {
-				shared.SendPublicMessage(client, client.channels.get(process.env.GATE_CHANNEL_ID), dialog("introHand", process.env.GROUP_C_ROLE));
 				message.delete(1000);
 			}
 			return true;
@@ -206,4 +166,3 @@ function processBasicCommands(client, message) {
 
 	return false;
 }
-
