@@ -1,8 +1,9 @@
 exports = module.exports = {};
 
-let Discord = require('discord.js');
-let shared = require("../shared/shared");
-let calcRandom = require('../modules/calcRandom');
+let dataRequest = require("../Shared/data_request");
+let discord = require('discord.js');
+let shared = require("../Shared/shared");
+let calcRandom = require('../Shared/calc_random');
 
 //ProcessGameplayCommands
 //client - discord.js client
@@ -16,8 +17,8 @@ exports.ProcessGameplayCommands = function(client, message, dialog) {
 
 	switch (command) {
 		case "checkin":
-			let checkinAmount = calcRandom.random(4, 9);
-			let checkInResponse = String(dataRequest.sendServerData("checkin", checkinAmount, message.author.id));
+			let checkinAmount = calcRandom.Random(4, 9);
+			let checkInResponse = String(dataRequest.SendServerData("checkin", message.author.id, checkinAmount));
 			if (checkInResponse === "available") {
 				shared.SendPublicMessage(client, message.author, message.channel, dialog("checkin", checkinAmount));
 				shared.AddXP(client, message.author, 1); //1XP
@@ -28,7 +29,12 @@ exports.ProcessGameplayCommands = function(client, message, dialog) {
 			return true;
 
 		case "give": //TODO: fold this code into a function
-			let amount = Math.floor(args[0]);
+			let amount = Math.floor(parseFloat(args[0]));
+
+			if (isNaN(amount)) {
+				shared.SendPublicMessage(client, message.channel, dialog("giveFailed", message.author.id));
+				return true;
+			}
 
 			//not enough
 			if (amount <= 0) {
@@ -50,7 +56,7 @@ exports.ProcessGameplayCommands = function(client, message, dialog) {
 				return true;
 			}
 
-			let accountBalance = dataRequest.loadServerData("account",message.author.id);
+			let accountBalance = dataRequest.LoadServerData("account", message.author.id);
 
 			//not enough money in account
 			if (accountBalance < amount) {
@@ -59,7 +65,7 @@ exports.ProcessGameplayCommands = function(client, message, dialog) {
 			}
 
 			//try to send the money
-			if (dataRequest.sendServerData("transfer", targetMember.id, message.author.id, amount) != "success") {
+			if (dataRequest.SendServerData("transfer", message.author.id, targetMember.id, amount) != "success") {
 				shared.SendPublicMessage(client, message.channel, dialog("giveFailed", message.author.id));
 				return true;
 			}
@@ -130,7 +136,7 @@ exports.GetStats = function(user) { //Grabs all parameters from server
 		user = client.users.find(item => item.username === user || item.id === user);
 	}
 
-	let userStatsResponse = String(dataRequest.loadServerData("userStats",user.id)).split(",");
+	let userStatsResponse = String(dataRequest.LoadServerData("userStats", user.id)).split(",");
 
 	if (userStatsResponse[0] == "failure") {
 		throw "server returned an error to userStats request";
@@ -194,14 +200,14 @@ exports.PrintStats = function(client, member, channel, stats) {
 	}
 
 	// Creates embed & sends it
-	const embed = new Discord.RichEmbed()
+	const embed = new discord.RichEmbed()
 		.setAuthor(`${member.user.username}`, member.user.avatarURL)
 		.setColor(member.displayColor)
 		.setDescription(`${levelText} ${levelProgress} | ${crystalText} | ${cannisterText}`)
 		.addField("Stats", userStats)
 		.setFooter("Commands: !help | !lore | !checkin | !give");
 
-	channel.send(embed);
+	channel.send({ embed });
 }
 
 //HandleLevelUp
@@ -210,6 +216,18 @@ exports.PrintStats = function(client, member, channel, stats) {
 //channel - discord.js channel
 //dialog - dialog function
 exports.HandleLevelUp = function(client, member, channel, dialog) {
+	//handle member strings
+	if (typeof(member) === "string") { //TODO: fold these into their own functions EVERYWHERE.
+		//get the member
+		let user = client.users.find(item => item.username === member || item.id === member);
+		member = guild.members.get(user.id);
+	}
+
+	//handle channel strings
+	if (typeof(channel) === "string") {
+		channel = client.channels.find(item => item.name === channel || item.id === channel);
+	}
+
 	// Sees if the user is supposed to level up
 	let [levelUpResponse, level, statPoints] = shared.LevelUp(client, member);
 

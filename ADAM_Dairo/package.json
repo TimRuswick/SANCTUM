@@ -4,14 +4,17 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "forever -o forever.log -e error.log start adam-dairo.js",
+    "restart": "forever -o forever.log -e error.log restart adam-dairo.js",
+    "stop": "forever stop adam-dairo.js",
+    "node": "node adam-dairo.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "discord.js": "^11.4.2",
     "dotenv": "^6.0.0",
+    "forever": "^0.15.3",
     "node-cron": "^1.2.1"
   }
 }
