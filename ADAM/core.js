@@ -29,7 +29,12 @@ exports.ProcessGameplayCommands = function(client, message, dialog) {
 			return true;
 
 		case "give": //TODO: fold this code into a function
-			let amount = Math.floor(args[0]);
+			let amount = Math.floor(parseFloat(args[0]));
+
+			if (isNaN(amount)) {
+				shared.SendPublicMessage(client, message.channel, dialog("giveFailed", message.author.id));
+				return true;
+			}
 
 			//not enough
 			if (amount <= 0) {
@@ -202,7 +207,7 @@ exports.PrintStats = function(client, member, channel, stats) {
 		.addField("Stats", userStats)
 		.setFooter("Commands: !help | !lore | !checkin | !give");
 
-	channel.send(embed);
+	channel.send({ embed });
 }
 
 //HandleLevelUp
@@ -211,6 +216,18 @@ exports.PrintStats = function(client, member, channel, stats) {
 //channel - discord.js channel
 //dialog - dialog function
 exports.HandleLevelUp = function(client, member, channel, dialog) {
+	//handle member strings
+	if (typeof(member) === "string") { //TODO: fold these into their own functions EVERYWHERE.
+		//get the member
+		let user = client.users.find(item => item.username === member || item.id === member);
+		member = guild.members.get(user.id);
+	}
+
+	//handle channel strings
+	if (typeof(channel) === "string") {
+		channel = client.channels.find(item => item.name === channel || item.id === channel);
+	}
+
 	// Sees if the user is supposed to level up
 	let [levelUpResponse, level, statPoints] = shared.LevelUp(client, member);
 

@@ -91,8 +91,9 @@ function processBasicCommands(client, message) {
 		case "hand":
 			return core.ProcessFactionChangeAttempt(client, message, process.env.GROUP_C_ROLE, dialog, "Hand");
 
+		//ADAM and the faction leaders print the intros in the gate
 		case "introhand":
-			if (shared.IsAdmin(client, message.author)) {
+			if (shared.IsAdmin(client, message.author) && message.channel.id !== process.env.GATE_CHANNEL_ID) {
 				shared.SendPublicMessage(client, client.channels.get(process.env.GATE_CHANNEL_ID), dialog("introHand", process.env.GROUP_C_ROLE));
 				message.delete(1000);
 			}

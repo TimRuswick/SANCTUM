@@ -93,7 +93,7 @@ function processBasicCommands(client, message) {
 
 		//ADAM and the faction leaders print the intros in the gate
 		case "introgenesis":
-			if (shared.IsAdmin(client, message.author)) {
+			if (shared.IsAdmin(client, message.author) && message.channel.id !== process.env.GATE_CHANNEL_ID) {
 				shared.SendPublicMessage(client, client.channels.get(process.env.GATE_CHANNEL_ID), dialog("introGenesis", process.env.GROUP_B_ROLE));
 				message.delete(1000);
 			}

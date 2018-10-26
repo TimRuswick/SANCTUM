@@ -140,14 +140,14 @@ function processBasicCommands(client, message) {
 		//ADAM and the faction leaders print the intros in the gate
 		//TODO: prune the unneeded intros from each bot
 		case "intro":
-			if (shared.IsAdmin(client, message.author)) {
+			if (shared.IsAdmin(client, message.author) && message.channel.id !== process.env.GATE_CHANNEL_ID) {
 				shared.SendPublicMessage(client, client.channels.get(process.env.GATE_CHANNEL_ID), dialog("intro"));
 				message.delete(1000);
 			}
 			return true;
 
 		case "introend":
-			if (shared.IsAdmin(client, message.author)) {
+			if (shared.IsAdmin(client, message.author) && message.channel.id !== process.env.GATE_CHANNEL_ID) {
 				shared.SendPublicMessage(client, client.channels.get(process.env.GATE_CHANNEL_ID), dialog("introEnd"));
 				message.delete(1000);
 			}
