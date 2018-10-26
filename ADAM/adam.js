@@ -2,15 +2,14 @@
 require('dotenv').config({path: '../.env'});
 
 // Node Modules
-let Discord = require('discord.js');
-let client = new Discord.Client();
+let discord = require('discord.js');
+let client = new discord.Client();
 let cron = require('node-cron');
 
 // Bot Modules
-let npcSettings = require('./npcSettings');
-let shared = require("../shared/shared");
 let core = require("./core");
-let dataRequest = require('../modules/dataRequest');
+let npcSettings = require('./npcSettings');
+let shared = require("../Shared/shared");
 
 //dialog system
 let dialog = shared.GenerateDialogFunction(require("./dialog.json"));
@@ -37,7 +36,7 @@ dialog = function(baseDialog) {
 //handle errors
 client.on('error', console.error);
 
-// The ready event is vital, it means that your bot will only start reacting to information from Discord _after_ ready is emitted
+// The ready event is vital, it means that your bot will only start reacting to information from discord _after_ ready is emitted
 client.on('ready', async () => {
 	// Generates invite link
 	try {
@@ -63,7 +62,7 @@ client.on('ready', async () => {
 	//ADAM updates stamina (1) and health by 1% every 2 min.
 	cron.schedule('*/2 * * * *', () => {
 		console.log('Updating STAMINA every 2 min.');
-		dataRequest.sendServerData("updateStamina");
+		shared.SendServerData("updateStamina");
 	});
 });
 

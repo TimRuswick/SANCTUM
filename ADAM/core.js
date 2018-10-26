@@ -1,8 +1,9 @@
 exports = module.exports = {};
 
-let Discord = require('discord.js');
-let shared = require("../shared/shared");
-let calcRandom = require('../modules/calcRandom');
+let dataRequest = require("../Shared/data_request");
+let discord = require('discord.js');
+let shared = require("../Shared/shared");
+let calcRandom = require('../Shared/calc_random');
 
 //ProcessGameplayCommands
 //client - discord.js client
@@ -17,7 +18,7 @@ exports.ProcessGameplayCommands = function(client, message, dialog) {
 	switch (command) {
 		case "checkin":
 			let checkinAmount = calcRandom.random(4, 9);
-			let checkInResponse = String(dataRequest.sendServerData("checkin", checkinAmount, message.author.id));
+			let checkInResponse = String(dataRequest.SendServerData("checkin", message.author.id, checkinAmount));
 			if (checkInResponse === "available") {
 				shared.SendPublicMessage(client, message.author, message.channel, dialog("checkin", checkinAmount));
 				shared.AddXP(client, message.author, 1); //1XP
@@ -50,7 +51,7 @@ exports.ProcessGameplayCommands = function(client, message, dialog) {
 				return true;
 			}
 
-			let accountBalance = dataRequest.loadServerData("account",message.author.id);
+			let accountBalance = dataRequest.LoadServerData("account", message.author.id);
 
 			//not enough money in account
 			if (accountBalance < amount) {
@@ -59,7 +60,7 @@ exports.ProcessGameplayCommands = function(client, message, dialog) {
 			}
 
 			//try to send the money
-			if (dataRequest.sendServerData("transfer", targetMember.id, message.author.id, amount) != "success") {
+			if (dataRequest.SendServerData("transfer", message.author.id, targetMember.id, amount) != "success") {
 				shared.SendPublicMessage(client, message.channel, dialog("giveFailed", message.author.id));
 				return true;
 			}
@@ -130,7 +131,7 @@ exports.GetStats = function(user) { //Grabs all parameters from server
 		user = client.users.find(item => item.username === user || item.id === user);
 	}
 
-	let userStatsResponse = String(dataRequest.loadServerData("userStats",user.id)).split(",");
+	let userStatsResponse = String(dataRequest.LoadServerData("userStats", user.id)).split(",");
 
 	if (userStatsResponse[0] == "failure") {
 		throw "server returned an error to userStats request";
@@ -194,7 +195,7 @@ exports.PrintStats = function(client, member, channel, stats) {
 	}
 
 	// Creates embed & sends it
-	const embed = new Discord.RichEmbed()
+	const embed = new discord.RichEmbed()
 		.setAuthor(`${member.user.username}`, member.user.avatarURL)
 		.setColor(member.displayColor)
 		.setDescription(`${levelText} ${levelProgress} | ${crystalText} | ${cannisterText}`)
