@@ -15,7 +15,6 @@
     "discord.js": "^11.4.2",
     "dotenv": "^6.1.0",
     "forever": "^0.15.3",
-    "node-cron": "^1.2.1",
-    "sync-request": "^6.0.0"
+    "node-cron": "^1.2.1"
   }
 }
