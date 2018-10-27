@@ -13,6 +13,25 @@ let shared = require("../Shared/shared");
 //dialog system
 let dialog = shared.GenerateDialogFunction(require("./dialog.json"));
 
+//dialog decorator
+dialog = function(baseDialog) {
+	return function(key, ...data) {
+		if ( (key === "help" || key === "lore") && typeof(data[0]) !== "undefined") {
+			//force the arg into camelCase
+			arg = data[0].toLowerCase();
+			arg = arg.charAt(0).toUpperCase() + arg.substr(1);
+			key += arg;
+		}
+
+		let result = baseDialog(key, ...data);
+
+		if (result === "") {
+			return dialog("noResult", key);
+		}
+		return result;
+	}
+}(dialog);
+
 //handle errors
 client.on('error', console.error);
 
@@ -97,6 +116,16 @@ function processBasicCommands(client, message) {
 				shared.SendPublicMessage(client, client.channels.get(process.env.GATE_CHANNEL_ID), dialog("introObsidian", process.env.GROUP_A_ROLE));
 				message.delete(1000);
 			}
+			return true;
+
+		case "help":
+		case "lore":
+			//skip the gate channel
+			if (message.channel.id === process.env.GATE_CHANNEL_ID) {
+				return true;
+			}
+
+			shared.SendPublicMessage(client, message.author, message.channel, dialog(command, args[0]));
 			return true;
 	}
 

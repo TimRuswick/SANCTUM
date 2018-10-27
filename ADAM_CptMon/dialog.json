@@ -92,5 +92,7 @@
 	"loreSanctum": "TODO: Sorry. I recognize the term but am unable to process the request. There is a corruption in my cognitive core. Try again soon.",
 	"loreLibrarian": "WARNING: DATA CORRUPTED",
 	"loreCodex": "WARNING: DATA CORRUPTED",
-	"loreFactions": "TODO: Sorry. I recognize the term but am unable to process the request. There is a corruption in my cognitive core. Try again soon."
+	"loreFactions": "TODO: Sorry. I recognize the term but am unable to process the request. There is a corruption in my cognitive core. Try again soon.",
+
+	"noResult": "No result for \"{1}\""
 }

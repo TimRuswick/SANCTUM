@@ -27,7 +27,7 @@ dialog = function(baseDialog) {
 		let result = baseDialog(key, ...data);
 
 		if (result === "") {
-			return baseDialog("unknown");
+			return baseDialog("noResult");
 		}
 		return result;
 	}

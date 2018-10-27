@@ -51,5 +51,5 @@
 	"heal": "THIS IS A LIBRARY. NOT A PLACE FOR HEALING.",
 	"read": "PLEASE CHOOSE A BOOK: !book [name].",
 
-	"unknown": "UNKNOWN"
+	"noResult": "UNKNOWN"
 }

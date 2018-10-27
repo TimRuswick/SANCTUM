@@ -14,7 +14,7 @@ let shared = require("../Shared/shared");
 //dialog system
 let dialog = shared.GenerateDialogFunction(require("./dialog.json"));
 
-//ADAM dialog decorator
+//dialog decorator
 dialog = function(baseDialog) {
 	return function(key, ...data) {
 		if ( (key === "help" || key === "lore") && typeof(data[0]) !== "undefined") {
@@ -27,7 +27,7 @@ dialog = function(baseDialog) {
 		let result = baseDialog(key, ...data);
 
 		if (result === "") {
-			return "No result for \"" + key + "\"";
+			return dialog("noResult", key);
 		}
 		return result;
 	}
@@ -151,16 +151,6 @@ function processBasicCommands(client, message) {
 				shared.SendPublicMessage(client, client.channels.get(process.env.GATE_CHANNEL_ID), dialog("introEnd"));
 				message.delete(1000);
 			}
-			return true;
-
-		case "help":
-		case "lore":
-			shared.SendPublicMessage(client, message.author, message.channel, dialog(command, args[0]));
-			return true;
-
-		//DEBUGGING
-		case "debugxp":
-			shared.AddXP(client, message.author, args[0]);
 			return true;
 	}
 
