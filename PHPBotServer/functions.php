@@ -1,6 +1,8 @@
 <?php
+ini_set('display_errors', 'On');
+
 function privateKey(){
-		return "INSERT PRIVATE KEY";
+		return "<REDACTED>";
 }
 
 function throwError($errorName){
@@ -178,10 +180,10 @@ function addhttp($url) {
 
 
 function mysqlConnect() {
-		$dbhost = 'INSERT DB HOST';
-		$dbusername = 'INSERT DB USERNAME';
-		$dbpassword = 'INSERT DB PASSWORD';
-		$dbtable = 'INSERT DB TABLE';
+		$dbhost = 'localhost';
+		$dbusername = 'root';
+		$dbpassword = '<REDACTED>';
+		$dbtable = 'discordbot';
 
 		$userDB = 'user';
 		$userdataDB = 'userdata';
@@ -189,7 +191,7 @@ function mysqlConnect() {
 		$memberdataDB = 'memberdata';
 
 		$con = mysqli_connect($dbhost,$dbusername,$dbpassword,$dbtable);
-		if (!$con) { die('Could not connect: ' . mysqli_error());}
+		if (!$con) { die('Could not connect: ' . mysqli_error($con));}
 		mysqli_select_db($con, "$dbtable")or die("cannot select DB");
 		return $con;
 }
