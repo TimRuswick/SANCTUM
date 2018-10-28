@@ -3,7 +3,7 @@
 //header('Access-Control-Allow-Methods: GET, PUT, POST, DELETE, OPTIONS');
 include_once 'functions.php';
 
-if( isset($_GET['dataToLoad']) ){ $dataToLoad = $_GET['dataToLoad']; } else{ $dataToLoad = ''; };
+if( isset($_GET['dataType']) ){ $dataToLoad = $_GET['dataType']; } else{ $dataToLoad = ''; };
 if( isset($_GET['userid']) ){ $userID = $_GET['userid']; } else{ $userID = ''; };
 if( isset($_GET['pk']) ){ $privateKey = $_GET['pk']; } else{ $privateKey = ''; };
 $sqlterms = '';
@@ -97,7 +97,7 @@ case "lastHostileActive":
 		}
 break;
 case "userStats":
-		$q = "SELECT strength,speed,stamina,health,maxStamina,maxHealth,wallet,xp,lvl,statPoints,chests FROM users WHERE discordUserID = '$userID';";
+		$q = "SELECT strength,speed,stamina,health,maxStamina,maxHealth,wallet,xp,lvl,statPoints FROM users WHERE discordUserID = '$userID';";
 		$r2 = mysqli_query($con,$q);
 		if ( $r2 !== false && mysqli_num_rows($r2) > 0 ) {
 			while ( $a = mysqli_fetch_assoc($r2) ) {
@@ -111,15 +111,14 @@ case "userStats":
 					$xp=stripslashes($a['xp']);
 					$recordedLVL=stripslashes($a['lvl']);
 					$statPoints=stripslashes($a['statPoints']);
-					$chests=stripslashes($a['chests']);
 					$lvlbase = getLevelBase();
 					$lvl = getLevel($xp,$lvlbase);
 					$lvlpercent = getCurrentLevelProgress($xp,$lvl);
 			}
-			echo $strength.",".$speed.",".$stamina.",".$health.",".$maxStamina.",".$maxHealth.",".$wallet.",".$xp.",".$recordedLVL.",".$lvlpercent.",".$statPoints.",".$chests;
+			echo "success,".$strength.",".$speed.",".$stamina.",".$health.",".$maxStamina.",".$maxHealth.",".$wallet.",".$xp.",".$recordedLVL.",".$lvlpercent.",".$statPoints;
 			exit;
 		} else{
-			echo "0";
+			echo "failure";
 		}
 break;
 
