@@ -32,7 +32,7 @@ Install this first before going through the steps!
 
     On Windows, you will get an error message about having to give the .env file a name. You can circumvent it by adding an extra period to the file name. 
     
-    **RENAME IT TO `.env.` WITH AN EXTRA PERIOD**, and Windows will automatically remove it for you! Poof, it's like magic.
+    **RENAME IT TO `.env.` WITH THE EXTRA PERIOD**, and Windows will automatically remove it for you! Poof, it's like magic.
 
     Don't place any of your tokens in `.envdev`, and push them to GitHub! If you do though, consider them compromised and then reset them. 
 
