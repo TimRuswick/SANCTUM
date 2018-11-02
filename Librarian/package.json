@@ -1,29 +1,20 @@
 {
-  "name": "sanctum-deploypackage",
-  "version": "1.0.1",
-  "description": "Universal package for all SANCTUM bots, using pm2.",
-  "main": "",
+  "name": "nodejs-elasticbeanstalk",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "echo \"Error: you need to use the bot name as a command.\" && exit 1",
-    "alexis": "pm2 start alexis.js -i max --watch",
-    "graze": "pm2 start graze.js -i max --watch",
-    "librarian": "pm2 start librarian.js -i max --watch",
-    "mainframe": "pm2 start mainframe.js -i max --watch",
-    "mori": "pm2 start mori.js -i max --watch",
-    "mosiah": "pm2 start mosiah.js -i max --watch",
-    "ravager": "pm2 start ravager.js -i max --watch",
-    "rey": "pm2 start rey.js -i max --watch",
-    "troll": "pm2 start troll.js -i max --watch"
+    "start": "forever -o forever.log -e error.log start librarian.js",
+    "restart": "forever -o forever.log -e error.log restart librarian.js",
+    "stop": "forever stop librarian.js",
+    "node": "node librarian.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "discord.js": "^11.4.2",
-    "dotenv": "^6.0.0",
-    "express": "^4.16.3",
-    "node-cron": "^1.2.1",
-    "socket.io": "^2.1.1",
-    "socket.io-request": "^0.8.0"
+    "dotenv": "^6.1.0",
+    "forever": "^0.15.3",
+    "node-cron": "^1.2.1"
   }
 }

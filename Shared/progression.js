@@ -1,6 +1,6 @@
 exports = module.exports = {};
 
-const dataRequest = require('../modules/dataRequest');
+let dataRequest = require('./data_request');
 
 //AddXP
 //client - discord.js client
@@ -12,7 +12,7 @@ exports.AddXP = function(client, user, amount) {
 		user = client.users.find(item => item.username === user || item.id === user);
 	}
 
-	dataRequest.sendServerData("addXP", amount, user.id);
+	dataRequest.SendServerData("addXP", user.id, amount);
 }
 
 //LevelUp
@@ -32,7 +32,7 @@ exports.LevelUp = function(client, member) { //NOTE: why is this called separate
 	if (client.user.username == process.env.GROUP_B_LEADER_NAME && !member.roles.has(process.env.GROUP_B_ROLE)) return;
 	if (client.user.username == process.env.GROUP_C_LEADER_NAME && !member.roles.has(process.env.GROUP_C_ROLE)) return;
 
-	let response = String(dataRequest.sendServerData("getLevelUp", 0, member.user.id)); //TODO: please change the order of sendServerData's arguments!
+	let response = String(dataRequest.SendServerData("getLevelUp", member.user.id));
 	let responseArray = response.split(",");
 
 	let responseMessage = responseArray[0];
@@ -42,9 +42,11 @@ exports.LevelUp = function(client, member) { //NOTE: why is this called separate
 	let rankUp = exports.RankUp(client, member, level);
 
 	if (rankUp == "rankUp") {
-		return rankUp;
+		return [rankUp, level, statPoints];
 	} else if (responseMessage === "levelup") {
-		return "levelUp";
+		return ["levelUp", level, statPoints];
+	} else {
+		return ["", level, statPoints];
 	}
 }
 

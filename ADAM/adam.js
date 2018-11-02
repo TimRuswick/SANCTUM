@@ -2,15 +2,14 @@
 require('dotenv').config({path: '../.env'});
 
 // Node Modules
-let Discord = require('discord.js');
-let client = new Discord.Client();
+let discord = require('discord.js');
+let client = new discord.Client();
 let cron = require('node-cron');
 
 // Bot Modules
+let core = require("./core");
 let npcSettings = require('./npcSettings');
-let shared = require("../shared/shared");
-let dataRequest = require('../modules/dataRequest');
-let calcRandom = require('../modules/calcRandom');
+let shared = require("../Shared/shared");
 
 //dialog system
 let dialog = shared.GenerateDialogFunction(require("./dialog.json"));
@@ -28,7 +27,7 @@ dialog = function(baseDialog) {
 		let result = baseDialog(key, ...data);
 
 		if (result === "") {
-			return "No result for \"" + key + "\"";
+			return dialog("noResult", key);
 		}
 		return result;
 	}
@@ -37,7 +36,7 @@ dialog = function(baseDialog) {
 //handle errors
 client.on('error', console.error);
 
-// The ready event is vital, it means that your bot will only start reacting to information from Discord _after_ ready is emitted
+// The ready event is vital, it means that your bot will only start reacting to information from discord _after_ ready is emitted
 client.on('ready', async () => {
 	// Generates invite link
 	try {
@@ -49,7 +48,7 @@ client.on('ready', async () => {
 
 	// You can set status to 'online', 'invisible', 'away', or 'dnd' (do not disturb)
 	client.user.setStatus('online');
-	
+
 	// Sets your "Playing"
 	if (npcSettings.activity) {
 		client.user.setActivity(npcSettings.activity, { type: npcSettings.type })
@@ -63,7 +62,7 @@ client.on('ready', async () => {
 	//ADAM updates stamina (1) and health by 1% every 2 min.
 	cron.schedule('*/2 * * * *', () => {
 		console.log('Updating STAMINA every 2 min.');
-		dataRequest.sendServerData("updateStamina");
+		shared.SendServerData("updateStamina");
 	});
 });
 
@@ -89,17 +88,7 @@ client.on('message', async message => {
 		return;
 	}
 
-	if (processBasicCommands(message)) {
-		return;
-	}
-
-	//check if can continue (used primarily by the faction leaders)
-	if (!shared.CheckValidDisplay(client, message.member, message.channel)) {
-		return;
-	}
-
-	//TODO: remove this from ADAM
-	if (processGameplayCommands(message)) {
+	if (processBasicCommands(client, message)) {
 		return;
 	}
 });
@@ -126,16 +115,16 @@ function processGateCommands(message) {
 
 	//if they haven't chosen a faction
 	if (!(command === "obsidian" || command === "genesis" || command === "hand")) {
-		message.reply("Please choose one of the factions by typing your desired faction shown above (!genesis, !obsidian, or !hand).")
+		message.reply("Please choose one of the factions by typing your desired faction shown above (!obsidian, !genesis, or !hand).")
 			.then(msg => msg.delete(10000)) //remove the error message
 			.catch(console.error);
 	}
 
 	message.delete(100); //remove the user's input to keep the gate clean
-	return false; //TODO: set to true once the faction change commands have been assigned to other bots
+	return true;
 }
 
-function processBasicCommands(message) {
+function processBasicCommands(client, message) {
 	// "This is the best way to define args. Trust me."
 	// - Some tutorial dude on the internet
 	let args = message.content.slice(process.env.PREFIX.length).trim().split(/ +/g);
@@ -148,210 +137,22 @@ function processBasicCommands(message) {
 			}
 			return true;
 
-		case "obsidian": //TODO: move this to the other bots
-			return processFactionChangeAttempt(client, message, process.env.GROUP_A_ROLE, "Obsidian");
-
-		case "genesis": //TODO: move this to the other bots
-			return processFactionChangeAttempt(client, message, process.env.GROUP_B_ROLE, "Genesis");
-
-		case "hand": //TODO: move this to the other bots
-			return processFactionChangeAttempt(client, message, process.env.GROUP_C_ROLE, "Hand");
-
 		//ADAM and the faction leaders print the intros in the gate
 		//TODO: prune the unneeded intros from each bot
 		case "intro":
-			if (shared.IsAdmin(client, message.author)) {
+			if (shared.IsAdmin(client, message.author) && message.channel.id == process.env.GATE_CHANNEL_ID) {
 				shared.SendPublicMessage(client, client.channels.get(process.env.GATE_CHANNEL_ID), dialog("intro"));
 				message.delete(1000);
 			}
 			return true;
 
-		case "introobsidian":
-			if (shared.IsAdmin(client, message.author)) {
-				shared.SendPublicMessage(client, client.channels.get(process.env.GATE_CHANNEL_ID), dialog("introObsidian", process.env.GROUP_A_ROLE));
-				message.delete(1000);
-			}
-			return true;
-
-		case "introgenesis":
-			if (shared.IsAdmin(client, message.author)) {
-				shared.SendPublicMessage(client, client.channels.get(process.env.GATE_CHANNEL_ID), dialog("introGenesis", process.env.GROUP_B_ROLE));
-				message.delete(1000);
-			}
-			return true;
-
-		case "introhand":
-			if (shared.IsAdmin(client, message.author)) {
-				shared.SendPublicMessage(client, client.channels.get(process.env.GATE_CHANNEL_ID), dialog("introHand", process.env.GROUP_C_ROLE));
-				message.delete(1000);
-			}
-			return true;
-
 		case "introend":
-			if (shared.IsAdmin(client, message.author)) {
+			if (shared.IsAdmin(client, message.author) && message.channel.id == process.env.GATE_CHANNEL_ID) {
 				shared.SendPublicMessage(client, client.channels.get(process.env.GATE_CHANNEL_ID), dialog("introEnd"));
 				message.delete(1000);
 			}
 			return true;
-
-		case "help":
-		case "lore":
-			shared.SendPublicMessage(client, message.author, message.channel, dialog(command, args[0]));
-			return true;
-
-		case "xp":
-			shared.AddXP(client, message.author, args[0]);
-			return true;
 	}
 
 	return false;
-}
-
-function processGameplayCommands(message) {
-	// "This is the best way to define args. Trust me."
-	// - Some tutorial dude on the internet
-	let args = message.content.slice(process.env.PREFIX.length).trim().split(/ +/g);
-	let command = args.shift().toLowerCase();
-
-	switch (command) {
-		case "checkin":
-			let checkinAmount = calcRandom.random(4, 9);
-			let checkInResponse = String(dataRequest.sendServerData("checkin", checkinAmount, message.author.id));
-			if (checkInResponse === "available") {
-				shared.SendPublicMessage(client, message.author, message.channel, dialog("checkin", checkinAmount));
-				shared.AddXP(client, message.author, 1); //1XP
-			} else {
-				shared.SendPublicMessage(client, message.channel, dialog("checkinLocked", message.author.id, checkInResponse));
-			}
-			return true;
-
-		case "give": //TODO: fold this code into a function
-			let amount = Math.floor(args[0]);
-
-			//not enough
-			if (amount <= 0) {
-				shared.SendPublicMessage(client, message.channel, dialog("giveNotAboveZero", message.author.id));
-				return true;
-			}
-
-			//didn't mention anyone
-			if (message.mentions.members.size == 0) {
-				shared.SendPublicMessage(client, message.channel, dialog("giveInvalidUser", message.author.id));
-				return true;
-			}
-
-			let targetMember = message.mentions.members.first();
-
-			//can't give to yourself
-			if (targetMember.id === message.author.id) {
-				shared.SendPublicMessage(client, message.channel, dialog("giveInvalidUserSelf", message.author.id));
-				return true;
-			}
-
-			let accountBalance = dataRequest.loadServerData("account",message.author.id);
-
-			//not enough money in account
-			if (accountBalance < amount) {
-				shared.SendPublicMessage(client, message.channel, dialog("giveNotEnoughInAccount", message.author.id));
-				return true;
-			}
-
-			//try to send the money
-			if (dataRequest.sendServerData("transfer", targetMember.id, message.author.id, amount) != "success") {
-				shared.SendPublicMessage(client, message.channel, dialog("giveFailed", message.author.id));
-				return true;
-			}
-
-			//print the success message
-			shared.SendPublicMessage(client, message.author, message.channel, dialog("giveSuccessful", targetMember.id, amount));
-			return true;
-
-		case "stats": //TODO: fold this code into a function
-			// Sees if the user is supposed to level up
-			let levelUp = shared.LevelUp(client, message.member); //TODO: process automatically
-
-			// Grabs all parameters from server
-			//TODO: improve this once the server-side has been updated
-			let attacker = String(dataRequest.loadServerData("userStats",message.author.id)).split(",");
-
-			if (attacker[0] == "failure") {
-				shared.SendPublicMessage(client, message.author, message.channel, "The server returned an error.");
-				return true;
-			}
-
-			let attackerStrength   = parseFloat(attacker[1]); //TODO: constants representing the player structure instead of [0]
-			let attackerSpeed      = parseFloat(attacker[2]);
-			let attackerStamina    = parseFloat(attacker[3]);
-			let attackerHealth     = parseFloat(attacker[4]);
-			let attackerMaxStamina = parseFloat(attacker[5]);
-			let attackerMaxHealth  = parseFloat(attacker[6]);
-			let attackerWallet     = parseFloat(attacker[7]);
-			let attackerXP         = parseFloat(attacker[8]);
-			let attackerLVL        = Math.floor(parseFloat(attacker[9]));
-			let attackerLvlPercent = parseFloat(attacker[10]);
-			let attackerStatPoints = parseFloat(attacker[11]);
-
-			// Forms stats into a string
-			var levelText = `:level: **${attackerLVL}**`; //NOTE: I don't like backticks
-			var levelProgress = `(${attackerLvlPercent}%)`;
-			var crystalText = `:crystals: **${attackerWallet}**`;
-			var cannisterText = `:cannister: **${attackerStatPoints}**`;
-			var userStats = "```" + `STR: ${attackerStrength} | SPD: ${attackerSpeed} | STAM: ${attackerStamina}/${attackerMaxStamina} | HP: ${attackerHealth}/${attackerMaxHealth}` + "```";
-
-			// Says level is maxed out if it is LVL 30+
-			if (attackerLVL >= process.env.RANK_3_THRESHOLD) {
-				levelProgress = "(MAX)";
-			}
-
-			// Creates embed & sends it
-			const embed = new Discord.RichEmbed()
-				.setAuthor(`${message.member.displayName}`, message.author.avatarURL)
-				.setColor(message.member.displayColor)
-				.setDescription(`${levelText} ${levelProgress} | ${crystalText} | ${cannisterText}`)
-				.addField("Stats", userStats)
-				.setFooter("Commands: !help | !lore | !checkin | !give");
-
-			message.channel.send(embed);
-
-			//handle levelling up
-			if (levelUp === "levelUp" || levelUp === "RankUp") {
-				if (attackerLVL >= process.env.RANK_3_THRESHOLD) {
-					shared.SendPublicMessage(client, message.author, message.channel, dialog("levelUpCap", dialog("levelUpCapRemark"), attackerLVL));
-				} else {
-					shared.SendPublicMessage(client, message.author, message.channel, dialog("LevelUp", dialog("levelUpRemark"), attackerLVL, attackerStatPoints));
-				}
-			}
-
-			return true;
-	}
-
-	//didn't process it
-	return false;
-}
-
-//tailor this for each faction leader
-function processFactionChangeAttempt(client, message, factionRole, factionShorthand) {
-	shared.ChangeFaction(client, factionRole, message.channel, message.member)
-		.then(result => {
-			switch (result) {
-				case "alreadyJoined":
-					shared.SendPublicMessage(client, message.channel, dialog("alreadyJoined" + factionShorthand, message.author.id));
-					break;
-				case "hasConvertedToday":
-					shared.SendPublicMessage(client, message.channel, dialog("conversionLocked", message.author.id));
-					break;
-				case "createdUser":
-					shared.SendPublicMessage(client, message.author, shared.GetFactionChannel(factionRole), dialog("newUserPublicMessage", shared.GetFactionName(factionRole), shared.GetFactionChannel(factionRole)));
-					shared.SendPrivateMessage(client, message.author, dialog("newUserPrivateMessage", dialog("newUserPrivateMessageRemark" + factionShorthand)));
-					break;
-				case "joined":
-					shared.SendPublicMessage(client, message.author, message.channel, dialog("join" + factionShorthand));
-					break;
-				default:
-					//DEBUGGING
-					console.log("processFactionChangeAttempt failed:" + result);
-			}
-		})
-		.catch(console.error);
-	return true;
 }

@@ -62,3 +62,6 @@ typings/
 
 # Private build tool
 buildanddeploy.py
+
+#annoying
+**package-lock.json

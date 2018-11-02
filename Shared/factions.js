@@ -1,8 +1,8 @@
 //initialize the exports
 exports = module.exports = {};
 
-dataRequest = require("../modules/dataRequest");
-messaging = require("./messaging");
+let dataRequest = require("./data_request");
+let messaging = require("./messaging");
 
 //CheckFaction
 //factionRole - the value to check
@@ -82,13 +82,13 @@ exports.ChangeFaction = async function(client, factionRole, channel, member) {
 		return "alreadyJoined";
 	}
 
-	if (dataRequest.loadServerData("hasConvertedToday", member.user.id) == 1) {
+	if (dataRequest.LoadServerData("hasConvertedToday", member.user.id) == 1) {
 		//can't change too fast
 		return "hasConvertedToday";
 	}
 
 	//Creates a new user
-	var newUserResponse = String(dataRequest.sendServerData("newUser", "New user.", member.user.id));
+	var newUserResponse = String(dataRequest.SendServerData("newUser", member.user.id, "New user."));
 
 	//joins the new faction
 	await member.removeRole(process.env.GROUP_A_ROLE);
@@ -97,7 +97,7 @@ exports.ChangeFaction = async function(client, factionRole, channel, member) {
 	await member.addRole(factionRole);
 
 	//send the server the info (for logging)
-	dataRequest.sendServerData("conversion", "Converted to " + exports.GetFactionName(factionRole), member.user.id);
+	dataRequest.SendServerData("conversion", member.user.id, "Converted to " + exports.GetFactionName(factionRole));
 
 	if (newUserResponse === "createdUser") {
 		//send the private welcoming message
