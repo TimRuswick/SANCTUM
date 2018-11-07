@@ -32,8 +32,15 @@
                 { "text": "The entrance is a bunch of code cobbled together to make a half-working mass of \"Dungeon\". Hopefully it doesn't kill you, or the party." },
                 { "text": "\nThere is a tired **!traveler** that seemed to have learned that idea all too well, try talking to him." }
             ],
+            "commands": [
+                {
+                    "emote": "👥",
+                    "command": "traveler",
+                    "text": "Talk to the traveler."
+                }
+            ],
             "image_url": "https://dummyimage.com/800x400/241f1a/e82525.png&text=Room",
-            "northtext": "Move **!north** to enter the dungeon.",
+            "northtext": "Move **north** to enter the dungeon.",
             "easttext": "",
             "southtext": "",
             "westtext": "",
@@ -79,10 +86,10 @@
                 {"text": "You can feel the hot air hitting your face entering. Hot lava is seeping out of the rocks. You should watch your step." }
             ],
             "image_url": "https://dummyimage.com/800x400/241f1a/e82525.png&text=Dungeon+Room",
-            "northtext": "You can hear loud groans **!north** that don't sound human, ",
+            "northtext": "You can hear loud groans **north** that don't sound human, ",
             "easttext": "",
-            "southtext": "Go back with **!south**, ",
-            "westtext": "or investigate the chest down **!west**.",
+            "southtext": "Go back with **south**, ",
+            "westtext": "or investigate the chest down **west**.",
             "floor": 1,
             "connections": {
                 "north": "ravager_room_1",
@@ -95,9 +102,16 @@
             "descriptions": [
                 {"text": "You found a locked **!chest**! Wonder what lies inside it. Hopefully there is something valuable."}
             ],
+            "commands": [
+                {
+                    "emote": "📦",
+                    "command": "chest",
+                    "text": "Attempt to open the chest."
+                }
+            ],
             "image_url": "https://dummyimage.com/800x400/593521/f5c91b.png&text=Chest",
             "northtext": "",
-            "easttext": "Leave the chest by typing **!east**.",
+            "easttext": "Leave the chest by typing **east**.",
             "southtext": "",
             "westtext": "",
             "floor": 1,
@@ -166,7 +180,7 @@
             ],
             "image_url": "https://dummyimage.com/800x400/593521/f5c91b.png&text=Chest+(Opened)",
             "northtext": "",
-            "easttext": "Leave the chest by typing **!east**.",
+            "easttext": "Leave the chest by typing **east**.",
             "southtext": "",
             "westtext": "",
             "floor": 1,
@@ -181,7 +195,7 @@
             ],
             "image_url": "https://dummyimage.com/800x400/593521/f5c91b.png&text=Chest+(Broken)",
             "northtext": "",
-            "easttext": "Leave the chest by typing **!east**.",
+            "easttext": "Leave the chest by typing **east**.",
             "southtext": "",
             "westtext": "",
             "floor": 1,
@@ -196,9 +210,9 @@
             ],
             "image_url": "https://dummyimage.com/800x400/e62b4a/422626.png&text=Ravager",
             "northtext": "",
-            "easttext": "To the party's **!east**, you can see something shiny. ",
-            "southtext": "Move **!south** to go back. ",
-            "westtext": "Move **!west** to enter another room.",
+            "easttext": "To the party's **east**, you can see something shiny. ",
+            "southtext": "Move **south** to go back. ",
+            "westtext": "Move **west** to enter another room.",
             "floor": 1,
             "ravager": {
                 "level": [4, 5]
@@ -214,12 +228,18 @@
             "descriptions": [
                 {"text": "You found a **!key**! You should pick it up."}
             ],
-            "objects": ["key"],
+            "commands": [
+                {
+                    "emote": "🔑",
+                    "command": "key",
+                    "text": "Pick up the key."
+                }
+            ],
             "image_url": "https://dummyimage.com/800x400/73778a/faf5f5.png&text=Key",
             "northtext": "",
             "easttext": "",
             "southtext": "",
-            "westtext": "Go back with **!west**",
+            "westtext": "Go back with **west**",
             "floor": 1,
             "connections": {
                 "west": "ravager_room_1"
@@ -243,7 +263,7 @@
             "northtext": "",
             "easttext": "",
             "southtext": "",
-            "westtext": "Go back with **!west**",
+            "westtext": "Go back with **west**",
             "floor": 1,
             "connections": {
                 "west": "ravager_room_1"
@@ -255,10 +275,10 @@
                 {"text": "Two rooms can be seen ahead, both with chests."}
             ],
             "image_url": "https://dummyimage.com/800x400/241f1a/e82525.png&text=Dungeon+Room",
-            "northtext": "Move **!north** to go to another room with another groan. ",
-            "easttext": "Back **!east** is a room filled with unconscious ones. ",
+            "northtext": "Move **north** to go to another room with another groan. ",
+            "easttext": "Back **east** is a room filled with unconscious ones. ",
             "southtext": "",
-            "westtext": "Move **!west** to check out another chest.",
+            "westtext": "Move **west** to check out another chest.",
             "floor": 1,
             
             "connections": {
@@ -272,9 +292,16 @@
             "descriptions": [
                 {"text": "You found a locked **!chest**! Wonder what lies inside it. Hopefully there is something valuable."}
             ],
+            "commands": [
+                {
+                    "emote": "📦",
+                    "command": "chest",
+                    "text": "Attempt to open the chest."
+                }
+            ],
             "image_url": "https://dummyimage.com/800x400/593521/f5c91b.png&text=Chest",
             "northtext": "",
-            "easttext": "Leave the chest by typing **!east**.",
+            "easttext": "Leave the chest by typing **east**.",
             "southtext": "",
             "westtext": "",
             "floor": 1,
@@ -343,7 +370,7 @@
             ],
             "image_url": "https://dummyimage.com/800x400/593521/f5c91b.png&text=Chest+(Opened)",
             "northtext": "",
-            "easttext": "Leave the chest by typing **!east**.",
+            "easttext": "Leave the chest by typing **east**.",
             "southtext": "",
             "westtext": "",
             "floor": 1,
@@ -358,7 +385,7 @@
             ],
             "image_url": "https://dummyimage.com/800x400/593521/f5c91b.png&text=Chest+(Broken)",
             "northtext": "",
-            "easttext": "Leave the chest by typing **!east**.",
+            "easttext": "Leave the chest by typing **east**.",
             "southtext": "",
             "westtext": "",
             "floor": 1,
@@ -372,9 +399,9 @@
                 {"text": "You found another <@458036985353732097>!"}
             ],
             "image_url": "https://dummyimage.com/800x400/e62b4a/422626.png&text=Ravager",
-            "northtext": "Move **!north** to find a key. ",
+            "northtext": "Move **north** to find a key. ",
             "easttext": "",
-            "southtext": "Move **!south** to go back. ",
+            "southtext": "Move **south** to go back. ",
             "westtext": "",
             "floor": 1,
             "ravager": {
@@ -390,12 +417,18 @@
             "descriptions": [
                 {"text": "You found a **!key**! You should pick it up."}
             ],
-            "objects": ["key"],
+            "commands": [
+                {
+                    "emote": "🔑",
+                    "command": "key",
+                    "text": "Pick up the key."
+                }
+            ],
             "image_url": "https://dummyimage.com/800x400/73778a/faf5f5.png&text=Key",
             "northtext": "",
-            "easttext": "Snarls are coming from the **!east**. ",
-            "southtext": "Go back with **!south**. ",
-            "westtext": "There's another key down **!west**, but at a distance it looks oddly different.",
+            "easttext": "Snarls are coming from the **east**. ",
+            "southtext": "Go back with **south**. ",
+            "westtext": "There's another key down **west**, but at a distance it looks oddly different.",
             "floor": 1,
             "connections": {
                 "east": "ravager_room_3",
@@ -419,9 +452,9 @@
             ],
             "image_url": "https://dummyimage.com/800x400/73778a/faf5f5.png&text=Key",
             "northtext": "",
-            "easttext": "Snarls are coming from the **!east**. ",
-            "southtext": "Go back with **!south**. ",
-            "westtext": "There's another key down **!west**, but at a distance it looks oddly different.",
+            "easttext": "Snarls are coming from the **east**. ",
+            "southtext": "Go back with **south**. ",
+            "westtext": "There's another key down **west**, but at a distance it looks oddly different.",
             "floor": 1,
             "connections": {
                 "east": "ravager_room_3",
@@ -434,10 +467,16 @@
             "descriptions": [
                 {"text": "You found the dungeon **!key**! This item will be important later, likely."}
             ],
-            "objects": ["key"],
+            "commands": [
+                {
+                    "emote": "🗝",
+                    "command": "key",
+                    "text": "Pick up the dungeon key."
+                }
+            ],
             "image_url": "https://dummyimage.com/800x400/555b66/a9b4c9.png&text=+Dungeon+Key",
             "northtext": "",
-            "easttext": "Go back with **!east**.",
+            "easttext": "Go back with **east**.",
             "southtext": "",
             "westtext": "",
             "floor": 1,
@@ -460,10 +499,9 @@
             "descriptions": [
                 {"text": "The dungeon key here has been picked up."}
             ],
-            "objects": ["key"],
             "image_url": "https://dummyimage.com/800x400/555b66/a9b4c9.png&text=+Dungeon+Key",
             "northtext": "",
-            "easttext": "Go back with **!east**.",
+            "easttext": "Go back with **east**.",
             "southtext": "",
             "westtext": "",
             "floor": 1,
@@ -478,9 +516,9 @@
             ],
             "image_url": "https://dummyimage.com/800x400/e62b4a/422626.png&text=Ravager",
             "northtext": "",
-            "easttext": "Move **!east** towards the next room, containing two locked doors. ",
+            "easttext": "Move **east** towards the next room, containing two locked doors. ",
             "southtext": "",
-            "westtext": "Move back **!west** to find the room with a key again.",
+            "westtext": "Move back **west** to find the room with a key again.",
             "floor": 1,
             "ravager": {
                 "level": [7, 8]
@@ -496,10 +534,10 @@
                 {"text": "Two locked doors lie before you. They may hold some significance."}
             ],
             "image_url": "https://dummyimage.com/800x400/241f1a/e82525.png&text=Dungeon+Room",
-            "northtext": "Move **!north** to enter the first door. ",
-            "easttext": "Move **!east** to enter the second door. ",
+            "northtext": "Move **north** to enter the first door. ",
+            "easttext": "Move **east** to enter the second door. ",
             "southtext": "",
-            "westtext": "To move back, go **!west**.",
+            "westtext": "To move back, go **west**.",
             "floor": 1,
             "connections": {
                 "north": "locked_door_room_1",
@@ -512,10 +550,17 @@
             "descriptions": [
                 {"text": "The first locked door locks growling and scratching here. You can check out the door with **!door**."}
             ],
+            "commands": [
+                {
+                    "emote": "🚪",
+                    "command": "door",
+                    "text": "Attempt to open the door."
+                }
+            ],
             "image_url": "https://dummyimage.com/800x400/bfa897/7a4e4e.png&text=Locked+Door",
             "northtext": "",
             "easttext": "",
-            "southtext": "To move back, go **!south**.",
+            "southtext": "To move back, go **south**.",
             "westtext": "",
             "floor": 1,
             "connections": {
@@ -568,9 +613,9 @@
                 {"text": "The first locked door has been opened! Beware the <@458036985353732097>."}
             ],
             "image_url": "https://dummyimage.com/800x400/bfa897/7a4e4e.png&text=Unlocked+Door",
-            "northtext": "Move **!north** to meet face-to-face with the Ravager. ",
+            "northtext": "Move **north** to meet face-to-face with the Ravager. ",
             "easttext": "",
-            "southtext": "To move back, go **!south**.",
+            "southtext": "To move back, go **south**.",
             "westtext": "",
             "floor": 1,
             "connections": {
@@ -584,9 +629,9 @@
                 {"text": "You found a locked-in <@458036985353732097>!"}
             ],
             "image_url": "https://dummyimage.com/800x400/e62b4a/422626.png&text=Ravager",
-            "northtext": "Move **!north** to the chest, it doesn't have a lock on it! ",
+            "northtext": "Move **north** to the chest, it doesn't have a lock on it! ",
             "easttext": "",
-            "southtext": "Move back **!south** to go to the door.",
+            "southtext": "Move back **south** to go to the door.",
             "westtext": "",
             "floor": 1,
             "ravager": {
@@ -602,10 +647,17 @@
             "descriptions": [
                 {"text": "You found a **!chest**! Wonder what lies inside it. Hopefully there is something valuable."}
             ],
+            "commands": [
+                {
+                    "emote": "📦",
+                    "command": "chest",
+                    "text": "Open the chest."
+                }
+            ],
             "image_url": "https://dummyimage.com/800x400/593521/f5c91b.png&text=Chest",
             "northtext": "",
             "easttext": "",
-            "southtext": "Leave the chest by typing **!south**.",
+            "southtext": "Leave the chest by typing **south**.",
             "westtext": "",
             "floor": 1,
             "connections": {
@@ -657,7 +709,7 @@
             "image_url": "https://dummyimage.com/800x400/593521/f5c91b.png&text=Chest+(Opened)",
             "northtext": "",
             "easttext": "",
-            "southtext": "Leave the chest by typing **!south**.",
+            "southtext": "Leave the chest by typing **south**.",
             "westtext": "",
             "floor": 1,
             "connections": {
@@ -669,11 +721,18 @@
             "descriptions": [
                 {"text": "The second locked door leads to the end of the dungeon. You can check out the door with **!door**."}
             ],
+            "commands": [
+                {
+                    "emote": "🚪",
+                    "command": "door",
+                    "text": "Attempt to open the door."
+                }
+            ],
             "image_url": "https://dummyimage.com/800x400/bfa897/7a4e4e.png&text=Locked+Door",
             "northtext": "",
             "easttext": "",
             "southtext": "",
-            "westtext": "To move back, go **!west**.",
+            "westtext": "To move back, go **west**.",
             "floor": 1,
             "connections": {
                 "west": "room_3"
@@ -717,9 +776,9 @@
             ],
             "image_url": "https://dummyimage.com/800x400/bfa897/7a4e4e.png&text=Unlocked+Door",
             "northtext": "",
-            "easttext": "The final room lies down **!east**.",
+            "easttext": "The final room lies down **east**.",
             "southtext": "",
-            "westtext": "To move back, go **!west**.",
+            "westtext": "To move back, go **west**.",
             "floor": 1,
             "connections": {
                 "east": "final_room",
@@ -732,10 +791,10 @@
                 {"text": "You can see the exit from here. There is a gate that opens to the outside."}
             ],
             "image_url": "https://dummyimage.com/800x400/69584b/ffffff.png&text=Dungeon+Exit",
-            "northtext": "Move **!north** to leave the dungeon. ",
+            "northtext": "Move **north** to leave the dungeon. ",
             "easttext": "",
             "southtext": "",
-            "westtext": "Move **!west** to go back inside to get anything that has been missed.",
+            "westtext": "Move **west** to go back inside to get anything that has been missed.",
             "floor": 1,
             "connections": {
                 "north": "__END",

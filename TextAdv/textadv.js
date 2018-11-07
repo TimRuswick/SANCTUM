@@ -41,7 +41,7 @@ var DungeonState = {
     BOSS_BATTLE: 3
 }
 
-// Modes (these better not be final, me.)
+// Modes
 var DungeonModes = {
     HEIRARCHY: 0,   // Uses heirarchy to determine movement
     ANARCHY: 1,     // Anyone can determine movement
@@ -174,26 +174,8 @@ client.on('message', async message => {
     switch (command) {
         case "check":
             return sendMessage(message.author.id, message.channel.id, "Please use **!map** for checking the map.");
-        case "members":
-            if (args[0] !== undefined) {
-                var num = Math.floor(parseInt(args[0]));       
-                if (Number.isSafeInteger(num) && Math.sign(num) > 0) {
-                    return partyMembers(playerDungeon, num);
-                }
-            } else {
-                return partyMembers(playerDungeon);
-            }
-        break;
         case "party":
-            if (args[0] !== undefined) {
-                var num = Math.floor(parseInt(args[0]));       
-                if (Number.isSafeInteger(num) && Math.sign(num) > 0) {
-                    return partyMembers(playerDungeon, num);
-                }
-            } else {
-                return partyMembers(playerDungeon);
-            }
-        break;
+        case "members":
         case "p":
             if (args[0] !== undefined) {
                 var num = Math.floor(parseInt(args[0]));       
@@ -205,47 +187,24 @@ client.on('message', async message => {
             }
         break;
         case "promote":
-            return promoteCommander(message.author, message.mentions.members.first(), isLeader, message.channel.id);
         case "pr":
             return promoteCommander(message.author, message.mentions.members.first(), isLeader, message.channel.id);
         case "demote":
-            return demoteCommander(message.author, message.mentions.members.first(), isLeader, message.channel.id);
         case "de":
             return demoteCommander(message.author, message.mentions.members.first(), isLeader, message.channel.id);
         case "transferleadership":
-            return transferLeader(message, message.mentions.members.first());
         case "giveleadership":
             return transferLeader(message, message.mentions.members.first());
         case "map":
-            return sendEmbedLocation(playerDungeon);
         case "m":
-            return sendEmbedLocation(playerDungeon);
         case "location":
-            return sendEmbedLocation(playerDungeon);
         case "l":
             return sendEmbedLocation(playerDungeon);
         case "locationtext":
-            return sendLocation(playerDungeon, message.author);
         case "lt":
             return sendLocation(playerDungeon, message.author);
         case "pinventory":
-            if (args[0] !== undefined) {
-                var num = Math.floor(parseInt(args[0]));       
-                if (Number.isSafeInteger(num) && Math.sign(num) > 0) {
-                    return sendInventory(playerDungeon, num);
-                }
-            } else {
-                return sendInventory(playerDungeon);
-            }
         case "pinv":
-            if (args[0] !== undefined) {
-                var num = Math.floor(parseInt(args[0]));       
-                if (Number.isSafeInteger(num) && Math.sign(num) > 0) {
-                    return sendInventory(playerDungeon, num);
-                }
-            } else {
-                return sendInventory(playerDungeon);
-            }
         case "pi":
             if (args[0] !== undefined) {
                 var num = Math.floor(parseInt(args[0]));       
@@ -257,10 +216,12 @@ client.on('message', async message => {
             }
         case "timer":
             return sendTimerInChat(playerDungeon);
+        /*
         case "cleardialog":
             console.log("Clearing player dungeon by command trigger...");
             playerDungeon.dialogObj = undefined;
             return;
+        */
         case "debug":
             console.log(playerDungeon.reroutedRooms);
             return;
@@ -986,7 +947,7 @@ async function lootChest(playerDungeon, newCommand, author, newMessage, embedDat
             break;
     
         case "materials":
-            openMessage = `:unlock: **You obtained materials that I have implemented!**`;
+            openMessage = `:unlock: **You obtained materials that I have implemented!** ~~oh wait a second~~`;
             break;
 
         default:
@@ -1695,7 +1656,7 @@ function checkValidMovement(direction, dungeon, silent) {
 
     if (directionFailure) {
         if (!silent) {
-            var deniedMessage = `:x: ${user} You can't go ${directionFailure}, please choose a valid path.`;
+            var deniedMessage = `:x: You cannot go ${directionFailure}, please choose a valid path.`;
             client.channels.get(dungeon.room.channel).send(deniedMessage);
         }
         return false;
@@ -1774,18 +1735,40 @@ async function move(direction, dungeon, isPartyLeader, user, moveToOverride) {
 }
 
 // Movement option text
-function movementOptions(dungeon) {
+function movementOptions(playerDungeon) {
     var temp = "";
 
-    if (dungeon.location.northtext  !== "" && dungeon.location.northtext)
-        temp += `:arrow_up: ${dungeon.location.northtext}\n`;
-    if (dungeon.location.easttext   !== "" && dungeon.location.easttext)
-        temp += `:arrow_right: ${dungeon.location.easttext}\n`;
-    if (dungeon.location.southtext  !== "" && dungeon.location.southtext)
-        temp += `:arrow_down: ${dungeon.location.southtext}\n`;
-    if (dungeon.location.westtext   !== "" && dungeon.location.westtext)
-        temp += `:arrow_left: ${dungeon.location.westtext}\n`;
+    if (playerDungeon.location.northtext  !== "" && playerDungeon.location.northtext)
+        temp += `:arrow_up: ${playerDungeon.location.northtext}\n`;
+    if (playerDungeon.location.easttext   !== "" && playerDungeon.location.easttext)
+        temp += `:arrow_right: ${playerDungeon.location.easttext}\n`;
+    if (playerDungeon.location.southtext  !== "" && playerDungeon.location.southtext)
+        temp += `:arrow_down: ${playerDungeon.location.southtext}\n`;
+    if (playerDungeon.location.westtext   !== "" && playerDungeon.location.westtext)
+        temp += `:arrow_left: ${playerDungeon.location.westtext}\n`;
+
+    var options = giveDungeonCommandOptions(playerDungeon);
+    options.forEach(element => {
+        temp += `${element.emote} ${element.text}\n`;
+    });
+
     return temp;
+}
+
+// Gives dungeon options in array
+function giveDungeonCommandOptions(playerDungeon) {
+    var options = [];
+    console.log("Command exists: " + playerDungeon.location.commands)
+    if (playerDungeon.location.commands) {
+        playerDungeon.location.commands.forEach(element => {
+            options.push({
+                "emote": element.emote,
+                "command": element.command,
+                "text": element.text
+            })
+        });
+    }
+    return options;
 }
 
 async function sendInventory(playerDungeon, pageNum) {
@@ -1839,70 +1822,116 @@ async function sendInventory(playerDungeon, pageNum) {
 }
 
 // Sends location into chat (non-embed)
-function sendLocation(dungeon, author) {
-    var temp = `Current Room: **${dungeon.location.name}**\n\n`;
-    temp += location(dungeon);
+function sendLocation(playerDungeon, author) {
+    var temp = `Current Room: **${playerDungeon.location.name}**\n\n`;
+    temp += location(playerDungeon);
     temp += "\n\n";
-    temp += movementOptions(dungeon);
+    temp += movementOptions(playerDungeon);
 
     // Sends message
-    var channel = client.channels.get(dungeon.room.channel);
+    var channel = client.channels.get(playerDungeon.room.channel);
     channel.send(author + " " + temp);
 }
 
 // Sends location into chat (embed)
-async function sendEmbedLocation(dungeon) {
-    if (dungeon.directionalMessageID) {
-        dungeon.directionalCollector.stop();
+async function sendEmbedLocation(playerDungeon) {
+    if (playerDungeon.directionalMessageID) {
+        playerDungeon.directionalCollector.stop();
     }
-    var channel = client.channels.get(dungeon.room.channel);
-
-    // Does image for background (future map)
+    var channel = client.channels.get(playerDungeon.room.channel);
+    // Does image for background (& future map)
     const imageEmbed = new Discord.RichEmbed()
-        //.setAuthor("Ghost", client.user.avatarURL)
-        .setColor(dungeon.room.color)
-        .setImage(dungeon.location.image_url)
+        .setColor(playerDungeon.room.color)
+        .setImage(playerDungeon.location.image_url)
     await channel.send({embed: imageEmbed});
 
     // Does text dialog
     const textEmbed = new Discord.RichEmbed()
         .setAuthor("Ghost", client.user.avatarURL)
-        .setTitle(`${dungeon.location.name}`)
-        .setColor(dungeon.room.color)
-        .setDescription(`${location(dungeon)}\n\n${movementOptions(dungeon)}`)
+        .setTitle(`${playerDungeon.location.name}`)
+        .setColor(playerDungeon.room.color)
+        .setDescription(`${location(playerDungeon)}\n\n${movementOptions(playerDungeon)}`)
     var newMessage = await channel.send({embed: textEmbed});
 
     // Collects emotes and reacts upon the reaction (120 seconds)
-    var options = ['⬆', '⬇', '⬅', '➡']
+    var moveOptions = [
+        {
+            "emote": '⬆',
+            "direction": "north",
+            "enumDirection": Directions.NORTH
+        },
+        {
+            "emote": '⬇',
+            "direction": "south",
+            "enumDirection": Directions.SOUTH
+        },
+        {
+            "emote": '⬅',
+            "direction": "west",
+            "enumDirection": Directions.WEST
+        },
+        {
+            "emote": '➡',
+            "direction": "east",
+            "enumDirection": Directions.EAST
+        }
+    ]
+    var options = moveOptions.filter(element => checkValidMovement(element.enumDirection, playerDungeon, true));
+    // Adds dungeon command options to existing array
+    //console.log(JSON.stringify(giveDungeonCommandOptions(playerDungeon), null, 4))
+    var options = options.concat(giveDungeonCommandOptions(playerDungeon));
+    console.log(JSON.stringify(options, null, 4));
+    
+    // When I'm not as lazy, add a timer to this, and make it as long as the dungeon timer itself
     const collector = newMessage.createReactionCollector(
-        (reaction, user) => options.includes(reaction.emoji.name) && user.id !== client.user.id);
+        (reaction, user) => options.some(o => o.emote === reaction.emoji.name) && user.id !== client.user.id);
 
     // Reacts
     for (let i = 0; i < options.length; i++) {
         const element = options[i];
-        console.log("[Reaction Options] Emote: " + element + "  | newMessage: " + newMessage);
-        await newMessage.react(element);
+        //console.log("Direction -> " + element.direction + " | " + JSON.stringify(playerDungeon.location.connections, null, 4))
+        console.log("Element: " + JSON.stringify(element, null, 4));
+        if (playerDungeon.location.connections[element.direction]) {
+            console.log("[Reaction Options] Emote: " + element.emote + "  | newMessage: " + newMessage);
+            await newMessage.react(element.emote);
+        } else if (element.command) {
+            console.log("[Reaction Options] Assuming command as emote: " + element.emote + " | newMessage: " + newMessage);
+            await newMessage.react(element.emote);
+        }
     }
 
     // Collect
     collector.once("collect", async reaction => {
         const user = reaction.users.last();
-        var moveSuccessful;
         switch (reaction.emoji.name) {
             case '⬆':
-                moveSuccessful = move(Directions.NORTH, dungeon, (getDungeonPlayer(user.id).isLeader || getDungeonPlayer(user.id).isCommander), user, false);
+                move(Directions.NORTH, playerDungeon, (getDungeonPlayer(user.id).isLeader || getDungeonPlayer(user.id).isCommander), user, false);
                 break;
 
             case '⬇':
-                moveSuccessful = move(Directions.SOUTH, dungeon, (getDungeonPlayer(user.id).isLeader || getDungeonPlayer(user.id).isCommander), user, false);
+                move(Directions.SOUTH, playerDungeon, (getDungeonPlayer(user.id).isLeader || getDungeonPlayer(user.id).isCommander), user, false);
                 break;
             
             case '⬅':
-                moveSuccessful = move(Directions.WEST, dungeon, (getDungeonPlayer(user.id).isLeader || getDungeonPlayer(user.id).isCommander), user, false);
+                move(Directions.WEST, playerDungeon, (getDungeonPlayer(user.id).isLeader || getDungeonPlayer(user.id).isCommander), user, false);
                 break;
 
             case '➡':
-                moveSuccessful = move(Directions.EAST, dungeon, (getDungeonPlayer(user.id).isLeader || getDungeonPlayer(user.id).isCommander), user, false);
+                move(Directions.EAST, playerDungeon, (getDungeonPlayer(user.id).isLeader || getDungeonPlayer(user.id).isCommander), user, false);
+                break;
+
+            default:
+                var index = options.findIndex(o => o.emote === reaction.emoji.name);
+                // Failsafe
+                if (index !== -1) {
+                    var newOption = options[index];
+                    console.log(JSON.stringify(playerDungeon.location, null, 4))
+                    console.log(JSON.stringify(newOption, null, 4))
+                    var newCommand = playerDungeon.location[newOption.command];
+                    customCommands(newCommand, playerDungeon, client.users.get(user.id), newOption.command);
+                } else {
+                    console.log("alkjdsljflksajfdlksjf");
+                }
                 break;
         }
         collector.stop();
