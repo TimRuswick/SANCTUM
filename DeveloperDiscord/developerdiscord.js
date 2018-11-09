@@ -4,7 +4,7 @@ require('dotenv').config({path: '../.env'});
 // Node Modules
 const Discord = require('discord.js');
 const client = new Discord.Client();
-//const cron = require('node-cron');
+const cron = require('node-cron');
 
 // Bot Modules
 //const dataRequest = require('../modules/dataRequest');
@@ -61,13 +61,10 @@ client.on('ready', async () => {
 client.on('message', async message => {
     // Ignores ALL bot messages
     if (message.author.bot) return;
-    /*
-    // Message has to be in Outskirts (should be edited later)
-    if (!(message.channel.id === process.env.TAVERN_CHANNEL_ID
-        || message.channel.id === process.env.TEST_CHANNEL_ID)) return;
+
     // Has to be (prefix)command
     if (message.content.indexOf(process.env.PREFIX) !== 0) return;
-    */
+    
     // "This is the best way to define args. Trust me."
     // - Some tutorial dude on the internet
     const args = message.content.slice(process.env.PREFIX.length).trim().split(/ +/g);
@@ -79,8 +76,69 @@ client.on('message', async message => {
                 message.reply("What is your command, glorious master!");
             break;
         case "test":
-            // For testing embeds
-            
+            // Does image for background (& future map)
+            const imageEmbed = new Discord.RichEmbed()
+                .setColor('ORANGE')
+                .setImage("https://cdn.discordapp.com/attachments/509560565429960746/509572140882984970/unknown.png")
+            await message.channel.send({embed: imageEmbed});
+
+            // Does text dialog
+            const textEmbed = new Discord.RichEmbed()
+                .setAuthor("Vivian (DAO)", client.user.avatarURL)
+                .setTitle(`Somewhere, Someplace`)
+                .setColor('ORANGE')
+                .setDescription(`Somewhere. Someplace. I dunno what to say here, it's just placeholder.\n\n` + 
+                `:arrow_up: Move up somewhere else.\n:arrow_right: Move somewhere that's not up.\n:key: Unlock the mysterious door that doesn't exist.`)
+            var newMessage = await message.channel.send({embed: textEmbed});
+
+            // Collects emotes and reacts upon the reaction (120 seconds)
+            // Directions
+            var Directions = {
+                NORTH: 0,
+                EAST: 1,
+                SOUTH: 2,
+                WEST: 3
+            }
+            var moveOptions = [
+                {
+                    "emote": '⬆',
+                    "direction": "north",
+                    "enumDirection": Directions.NORTH
+                },
+                {
+                    "emote": '⬇',
+                    "direction": "south",
+                    "enumDirection": Directions.SOUTH
+                },
+                {
+                    "emote": '⬅',
+                    "direction": "west",
+                    "enumDirection": Directions.WEST
+                },
+                {
+                    "emote": '➡',
+                    "direction": "east",
+                    "enumDirection": Directions.EAST
+                },
+                {
+                    "emote": "🔑",
+                    "command": true
+                }
+            ]
+            var options = [moveOptions[0], moveOptions[3], moveOptions[4]];
+            // Reacts
+            for (let i = 0; i < options.length; i++) {
+                const element = options[i];
+                //console.log("Direction -> " + element.direction + " | " + JSON.stringify(playerDungeon.location.connections, null, 4))
+                console.log("Element: " + JSON.stringify(element, null, 4));
+                if (!element.command) {
+                    console.log("[Reaction Options] Emote: " + element.emote + "  | newMessage: " + newMessage);
+                    await newMessage.react(element.emote);
+                } else if (element.command) {
+                    console.log("[Reaction Options] Assuming command as emote: " + element.emote + " | newMessage: " + newMessage);
+                    await newMessage.react(element.emote);
+                }
+            }
             break;
         case "join":
             // If chose a parameter
@@ -201,6 +259,12 @@ client.on('message', async message => {
 });
 
 client.on('error', console.error);
+
+// Minute cron
+cron.schedule('*/1 * * * *', function() {
+    // Sets your "Playing"
+    client.user.setActivity(playingMessage);
+});
 
 // Async Waiting
 function sleep(time) {
