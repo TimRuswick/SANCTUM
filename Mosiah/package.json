@@ -1,8 +1,8 @@
 {
-  "name": "sanctum-deploypackage",
+  "name": "sanctum-mosiah",
   "version": "1.0.1",
   "description": "Universal package for all SANCTUM bots, using pm2.",
-  "main": "",
+  "main": "mosiah.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "echo \"Error: you need to use the bot name as a command.\" && exit 1",
@@ -16,14 +16,11 @@
     "rey": "pm2 start rey.js -i max --watch",
     "troll": "pm2 start troll.js -i max --watch"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Sanctum Developers",
+  "license": "MIT",
   "dependencies": {
     "discord.js": "^11.4.2",
     "dotenv": "^6.0.0",
-    "express": "^4.16.3",
-    "node-cron": "^1.2.1",
-    "socket.io": "^2.1.1",
-    "socket.io-request": "^0.8.0"
+    "node-cron": "^1.2.1"
   }
 }

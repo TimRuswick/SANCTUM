@@ -1,3 +1,4 @@
+// @ts-nocheck
 // .env Variables
 require('dotenv').config({path: '../.env'});
 
@@ -7,8 +8,7 @@ const client = new Discord.Client();
 const cron = require('node-cron');
 
 // Bot Modules
-const dataRequest = require('../modules/dataRequest');
-const calcRandom = require('../modules/calcRandom');
+const shared = require('../Shared/shared');
 
 const normalActivity = '!wager | Games of Fortune';
 
@@ -31,7 +31,6 @@ client.on('ready', async () => {
     }
 
     client.user.setStatus('invisible');
-    client.user.setActivity(normalActivity);
     console.log(`Connected! \
     \nLogged in as: ${client.user.username} - (${client.user.id})`);
 });
@@ -50,94 +49,85 @@ client.on('message', async message => {
     // - Some tutorial dude on the internet
     const args = message.content.slice(process.env.PREFIX.length).trim().split(/ +/g);
     const command = args.shift().toLowerCase();
+    const guild = client.guilds.get(process.env.SANCTUM_ID);
 
     switch (command) {
+        case "mosiah":
+            switch (args[0]) {
+                case "summon":
+                case "s":
+                    if (shared.utility.isAdmin(message.author.id, guild)) 
+                        mosiahTurnOnline();
+                    break;
+                case "vanish":
+                case "v":
+                    if (shared.utility.isAdmin(message.author.id, guild))
+                        mosiahTurnOffline();
+                    break;
+            }
+            break;
         case "wager":
             if (mosiahState == MosiahEnumState.GAMBLING)
                 wagerMessage(message, args);
             else
                 message.reply("I'm out and about right now. Don't wanna get found by the wrong peoples.");
             break;
-        case "msummon":
-            if (isAdmin(message.author.id)) MosiahTurnOnline();
-            break;
-        case "mvanish":
-            if (isAdmin(message.author.id)) MosiahTurnOffline();
-            break;
         case "rigged":
-            message.channel.send("What are you talkin' about? I may look like it, being an outcaster from the city, but I'd never rip peoples off.");
+            // Better dialog would be nice
+            message.channel.send("What are ya talkin' about? I may look like it, being an outcaster from the city, but I'd never rip peoples off.");
 
             // Testing out textadv payment
-            if (isAdmin(message.author.id)) dataRequest.sendServerData("gambleWon", 50, message.author.id);
+            if (shared.utility.isAdmin(message.author.id, guild)) shared.dataRequest.sendServerData("gambleWon", 50, message.author.id);
             break;
     }
 });
 
+// Handles errors
 client.on('error', console.error);
 
-// Gets if user has an Overseers rank
-function isAdmin(userID) {
-    var guild = client.guilds.get(process.env.SANCTUM_ID);
-    return guild.members.get(userID).roles.find(role => role.name === "Overseers");
-}
-
+// Wagering
 function wagerMessage(message, args) {
     var amount = Math.floor(args[0]);
-    var account = dataRequest.loadServerData("account", message.author.id);
+    var account = shared.dataRequest.loadServerData("account", message.author.id);
     if (amount > 0) {
         if (amount <= account) {
-            if (calcRandom.gamble(49)) {
-                sendMessage(message.channel.id, "<@" + message.author.id + "> Ya got me. Here's your " + amount + " crystals. ");
-                dataRequest.sendServerData("gambleWon", amount, message.author.id);
+            if (shared.utility.randomPercent(49)) {
+                message.channel.send(`${message.author} Ya got me. Here's your ${amount} crystals.`);
+                shared.dataRequest.sendServerData("gambleWon", amount, message.author.id);
             } else {
-                sendMessage(message.channel.id, "<@" + message.author.id + "> Looks like ya lost. Guess I'll keep your " + amount + " crystals. ");
-                dataRequest.sendServerData("gambleLost", amount, message.author.id);
+                message.channel.send(`${message.author} Looks like ya lost. Guess I'll keep your ${amount} crystals.`);
+                shared.dataRequest.sendServerData("gambleLost", amount, message.author.id);
             }
         } else {
-              sendMessage(message.channel.id, ":x: <@" + message.author.id + "> Yer a funny one ain't ya. Show me the crystals first.");
+              message.channel.send(`:x: ${message.author} Yer a funny one ain't ya. Show me the crystals first.`);
         }
     } else {
-        sendMessage(message.channel.id, ":x: <@" + message.author.id + "> Aww c'mon. You wanna wager me nothin'?");
+        message.channel.send(`:x: ${message.author} Aww c'mon. You wanna wager me nothin'?`);
     }
 }
 
+// Cron schedules to determine when Mosiah is online or offline
 cron.schedule('0 7 * * Saturday', function(){
     console.log('Saturday join.' + new Date().toLocaleString());
-    MosiahTurnOnline();
+    mosiahTurnOnline();
 });
   
 cron.schedule('0 7 * * Sunday', function(){
     console.log('Sunday leave.' + new Date().toLocaleString());
-    MosiahTurnOffline();
+    mosiahTurnOffline();
 });
-  
-function MosiahTurnOnline() {
+
+// Functions for turning Mosiah online and offline
+function mosiahTurnOnline() {
     client.user.setStatus('online');
-    client.channels.get(process.env.TAVERN_CHANNEL_ID).send("*Psst.* Anyone wanna wager a few **<:crystals:460974340247257089> Crystals** with me?");
+    client.user.setActivity(normalActivity);
+    client.channels.get(process.env.TAVERN_CHANNEL_ID).send("Anyone wanna wager a few crystals with me?");
     mosiahState = MosiahEnumState.GAMBLING;
 }
 
-function MosiahTurnOffline() {
+function mosiahTurnOffline() {
     client.user.setStatus('invisible');
     mosiahState = MosiahEnumState.WAITING;
-}
-
-// Send message handler
-function sendMessage(userID, channelID, message) {
-    // Handle optional first argument (so much for default arugments in node)
-    if (message === undefined) {
-        message = channelID;
-        channelID = userID;
-        userID = null;
-    }
-
-    // Utility trick (@userID with an optional argument)
-    if (userID != null) {
-        message = "<@" + userID + "> " + message;
-    }
-    
-    // Sends message (needs client var, therefore I think external script won't work)
-    client.channels.get(channelID).send(message);
 }
 
 // Log our bot in
