@@ -1,12 +1,11 @@
-//initialize the exports
+// Initialize the exports
 exports = module.exports = {};
 
-let dataRequest = require("./data_request");
-let messaging = require("./messaging");
+const shared = require("./shared");
 
 //CheckFaction
 //factionRole - the value to check
-exports.CheckFaction = function(factionRole) {
+exports.checkFaction = function(factionRole) {
 	switch(factionRole) {
 		case process.env.GROUP_A_ROLE:
 		case process.env.GROUP_B_ROLE:
@@ -18,9 +17,9 @@ exports.CheckFaction = function(factionRole) {
 
 //GetFactionName
 //factionRole - the discord role ID of the faction
-exports.GetFactionName = function(factionRole) {
+exports.getFactionName = function(factionRole) {
 	//factionRole must be a faction role
-	if (!exports.CheckFaction(factionRole)) {
+	if (!exports.checkFaction(factionRole)) {
 		throw "factionRole is not a faction!";
 	}
 
@@ -34,21 +33,22 @@ exports.GetFactionName = function(factionRole) {
 	}
 }
 
-//GetFactionChannel
-//user - discord.js user
-exports.GetFactionChannel = function(factionRole) {
+/**
+ * @param  {} factionRoleID - Discord role ID of Sanctum faction
+ */
+exports.getFactionChannel = function(factionRoleID) {
 	//factionRole must be a faction role
-	if (!exports.CheckFaction(factionRole)) {
+	if (!exports.checkFaction(factionRoleID)) {
 		throw "factionRole is not a faction!";
 	}
 
-	if (factionRole === process.env.GROUP_A_ROLE) {
+	if (factionRoleID === process.env.GROUP_A_ROLE) {
 		return process.env.GROUP_A_CHANNEL_ID;
 	}
-	if (factionRole === process.env.GROUP_B_ROLE) {
+	if (factionRoleID === process.env.GROUP_B_ROLE) {
 		return process.env.GROUP_B_CHANNEL_ID;
 	}
-	if (factionRole === process.env.GROUP_C_ROLE) {
+	if (factionRoleID === process.env.GROUP_C_ROLE) {
 		return process.env.GROUP_C_CHANNEL_ID;
 	}
 }
@@ -58,52 +58,44 @@ exports.GetFactionChannel = function(factionRole) {
 //factionRole - a faction role
 //channel - discord.js channel OR channel name
 //member - discord.js member
-exports.ChangeFaction = async function(client, factionRole, channel, member) {
+exports.changeFaction = async function(client, factionRole, channel, member, bypassConversionLimit) {
 	//factionRole must be a faction role
-	if (!exports.CheckFaction(factionRole)) {
+	if (!exports.checkFaction(factionRole)) {
 		throw "factionRole is not a faction!";
 	}
 
-	//handle channel strings
-	if (typeof(channel) === "string") {
-		channel = client.channels.find(item => item.name === channel || item.id === channel);
-	}
+	// Handles channel and member strings
+	channel = shared.utility.getChannel(client, channel);
+	member = shared.utility.getMember(client, member);
 
-	//handle member strings
-	if (typeof(member) === "string") {
-		//get the member
-		let user = client.users.find(item => item.username === member || item.id === member);
-		let guild = client.guilds.get(process.env.SANCTUM_ID);
-		member = guild.members.get(user.id);
-	}
-
+	// Already joined this faction
 	if (member.roles.has(factionRole)) {
-		//can't change to this faction
 		return "alreadyJoined";
 	}
-
-	if (dataRequest.LoadServerData("hasConvertedToday", member.user.id) == 1) {
-		//can't change too fast
-		return "hasConvertedToday";
+	// Can't change too fast (30 days)
+	if (shared.dataRequest.loadServerData("hasConvertedToday", member.user.id) == 1) {
+		if (!bypassConversionLimit) return "hasConvertedToday";
 	}
 
-	//Creates a new user
-	var newUserResponse = String(dataRequest.SendServerData("newUser", member.user.id, "New user."));
+	// Creates a new user (returns "userAlreadyExists" if already exists)
+	var newUserResponse = String(shared.dataRequest.sendServerData("newUser", member.user.id, "New user."));
 
-	//joins the new faction
-	await member.removeRole(process.env.GROUP_A_ROLE);
-	await member.removeRole(process.env.GROUP_B_ROLE);
-	await member.removeRole(process.env.GROUP_C_ROLE);
+	// Joins the new faction
+	await member.removeRoles([
+		process.env.GROUP_A_ROLE, 
+		process.env.GROUP_B_ROLE, 
+		process.env.GROUP_C_ROLE
+	]);
 	await member.addRole(factionRole);
 
 	//send the server the info (for logging)
-	dataRequest.SendServerData("conversion", member.user.id, "Converted to " + exports.GetFactionName(factionRole));
+	shared.dataRequest.sendServerData("conversion", member.user.id, "Converted to " + exports.getFactionName(factionRole));
 
 	if (newUserResponse === "createdUser") {
-		//send the private welcoming message
+		// Send the private welcoming message
 		return newUserResponse;
 	} else {
-		//send the public welcoming message
+		// Send the public welcoming message
 		return "joined";
 	}
 }

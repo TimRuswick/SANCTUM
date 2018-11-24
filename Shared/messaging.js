@@ -7,15 +7,15 @@ exports = module.exports = {};
 //channel - discord.js channel OR channel name
 //message - message to send
 //typingDelay (optional) - delay in milliseconds for the message, while typing is shown
-exports.SendPublicMessage = function(client, user, channel, message, typingDelay = 0) {
-	//Handle optional second argument (so much for default arugments in node)
+exports.sendMessage = function(client, user, channel, message, typingDelay = 0) {
+	// Handle optional second argument (so much for default arugments in node)
 	if (message === undefined) {
 		message = channel;
 		channel = user;
 		user = null;
 	}
 
-	//handle user strings
+	// Handle user strings
 	if (typeof(user) === "string") {
 		user = client.users.find(item => item.username === user || item.id === user);
 		if (!user) {
@@ -23,7 +23,7 @@ exports.SendPublicMessage = function(client, user, channel, message, typingDelay
 		}
 	}
 
-	//handle channel strings
+	// Handle channel strings
 	if (typeof(channel) === "string") {
 		channel = client.channels.find(item => item.name === channel || item.id === channel);
 		if (!channel) {
@@ -31,7 +31,7 @@ exports.SendPublicMessage = function(client, user, channel, message, typingDelay
 		}
 	}
 
-	//Utility trick: @user
+	// Utility trick: @user
 	if (user !== null) {
 		message = "<@" + user.id + "> " + message;
 	}
@@ -52,11 +52,20 @@ exports.SendPublicMessage = function(client, user, channel, message, typingDelay
 //client - discord.js client
 //user - discord.js user OR username
 //message - message to send
-exports.SendPrivateMessage = function(client, user, message) {
+exports.sendDM = function(client, user, message) {
 	//handle user strings
 	if (typeof(user) === "string") {
 		user = client.users.find(item => item.username === user || item.id === user);
 	}
 
 	user.send(message);
+}
+
+exports.isFactionBotspam = function(channelID) {
+	let validBotChannels = [
+		process.env.GROUP_A_CHANNEL_ID, 
+		process.env.GROUP_B_CHANNEL_ID,
+		process.env.GROUP_C_CHANNEL_ID
+	]
+	return validBotChannels.includes(channelID);
 }

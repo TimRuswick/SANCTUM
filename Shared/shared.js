@@ -1,11 +1,11 @@
-//initialize the exports
-exports = module.exports = {};
-
-exports = Object.assign(exports, require("./calc_random.js"));
-exports = Object.assign(exports, require("./data_request.js"));
-exports = Object.assign(exports, require("./factions.js"));
-exports = Object.assign(exports, require("./inventory.js"));
-exports = Object.assign(exports, require("./messaging.js"));
-exports = Object.assign(exports, require("./progression.js"));
-exports = Object.assign(exports, require("./utility.js"));
-
+/**
+ * Totally working module
+ * @module shared
+ */
+module.exports.core = require("./core");
+module.exports.dataRequest = require('./dataRequest');
+module.exports.factions = require('./factions');
+module.exports.inventory = require('./inventory');
+module.exports.messaging = require('./messaging');
+module.exports.progression = require("./progression");
+module.exports.utility = require("./utility");

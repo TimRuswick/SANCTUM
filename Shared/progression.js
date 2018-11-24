@@ -1,71 +1,56 @@
+// Initialize exports
 exports = module.exports = {};
 
-let dataRequest = require('./data_request');
+const shared = require('./shared');
 
-//AddXP
-//client - discord.js client
-//user - discord.js user OR username
-//amount - amount of XP to add
-exports.AddXP = function(client, user, amount) {
-	//handle user strings
-	if (typeof(user) === "string") {
-		user = client.users.find(item => item.username === user || item.id === user);
-	}
-
-	dataRequest.SendServerData("addXP", user.id, amount);
+/**
+ * Adds XP to user
+ * @param  {string} userID - Discord user ID
+ * @param  {string|number} amount - Amount of XP to add
+ */
+exports.addXP = function(userID, amount) {
+	return shared.dataRequest.sendServerData("addXP", amount, userID);
 }
+/**
+ * Checks the level of someone
+ * @param  {object} client - Discord client
+ * @param  {object|string} member - Discord member object or ID
+ */
+exports.checkLevel = function(client, member) {
+	// Makes sure member is an object
+	member = shared.utility.getMember(client, member);
 
-//LevelUp
-//client - discord.js client
-//member - member to get the level up
-exports.LevelUp = function(client, member) { //NOTE: why is this called separately?
-	//handle member strings
-	if (typeof(member) === "string") {
-		//get the member
-		let user = client.users.find(item => item.username === member || item.id === member);
-		let guild = client.guilds.get(process.env.SANCTUM_ID);
-		member = guild.members.get(user.id);
-	}
-
-	//if the bot tries to level someone without the correct role, return
-	if (client.user.username == process.env.GROUP_A_LEADER_NAME && !member.roles.has(process.env.GROUP_A_ROLE)) return;
-	if (client.user.username == process.env.GROUP_B_LEADER_NAME && !member.roles.has(process.env.GROUP_B_ROLE)) return;
-	if (client.user.username == process.env.GROUP_C_LEADER_NAME && !member.roles.has(process.env.GROUP_C_ROLE)) return;
-
-	let response = String(dataRequest.SendServerData("getLevelUp", member.user.id));
+	let response = String(shared.dataRequest.sendServerData("getLevelUp", null, member.user.id));
 	let responseArray = response.split(",");
 
 	let responseMessage = responseArray[0];
 	let level = Math.floor(parseFloat(responseArray[1]));
 	let statPoints = parseFloat(responseArray[2]);
-
-	let rankUp = exports.RankUp(client, member, level);
+	let chests = parseFloat(responseArray[3]);
+	let rankUp = exports.rankUp(client, member, level);
 
 	if (rankUp == "rankUp") {
-		return [rankUp, level, statPoints];
+		return [rankUp, level, statPoints, chests];
 	} else if (responseMessage === "levelup") {
-		return ["levelUp", level, statPoints];
+		return ["levelUp", level, statPoints, chests];
 	} else {
-		return ["", level, statPoints];
+		return ["", level, statPoints, chests];
 	}
 }
 
-//GetLevelUp
-//client - discord.js client
-//member - member to get the upgrade
-//level - level of the member
-exports.RankUp = async function(client, member, level) {
-	//get the guild
+/**
+ * @param  {object} client - Discord client
+ * @param  {object|string} member - Discord member or user ID
+ * @param  {number} level - Level of member
+ */
+exports.rankUp = async function(client, member, level) {
+	// Get the guild
 	let guild = client.guilds.get(process.env.SANCTUM_ID);
 
-	//handle member strings
-	if (typeof(member) === "string") {
-		//get the member
-		let user = client.users.find(item => item.username === member || item.id === member);
-		member = guild.members.get(user.id);
-	}
+	// Handle member strings
+	member = shared.utility.getMember(client, member);
 
-	//Snapping the level variable
+	// Snapping the level variable
 	if (level < process.env.RANK_2_THRESHOLD) {
 		level = process.env.RANK_1_THRESHOLD;
 	} else
@@ -75,33 +60,35 @@ exports.RankUp = async function(client, member, level) {
 		level = process.env.RANK_3_THRESHOLD;
 	}
 
-	//Get the new rank
+	// Get the new rank
 	let levelRole = guild.roles.find(role => role.name === `LVL ${level}+`); //I don't like constant strings
 
-	//set the new level
+	// Set the new level
 	if (!levelRole) {
 		throw "levelRole not found";
 	}
 
-	if (member.roles.has(levelRole.id)) { //member has this role already
+	// Return if member has this role already
+	if (member.roles.has(levelRole.id)) { 
 		return "";
 	}
 
-	//the ranks as roles
+	// The ranks as roles
 	let ranks = [
 		guild.roles.find(role => role.name === process.env.RANK_1),
 		guild.roles.find(role => role.name === process.env.RANK_2),
 		guild.roles.find(role => role.name === process.env.RANK_3)
 	]
 
-	//remove all existing roles
-	for(let i = 0; i < ranks.length; i++) {
+	// Remove all existing roles
+	// TODO: INEFFICIENT, NEEDED TO FIGURE OUT MASS REMOVING ROLE FOR DISCORD.JS SOMETIME
+	for (let i = 0; i < ranks.length; i++) {
 		member.removeRole(ranks[i].id);
 	}
 
-	//this will enable the new rooms
+	// This will enable the new rooms
 	member.addRole(levelRole);
 
-	//return the result
+	// Returns the result
 	return "rankUp";
 }
