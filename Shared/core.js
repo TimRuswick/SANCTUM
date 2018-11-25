@@ -21,7 +21,7 @@ exports.processGameplayCommands = function(client, message, dialog) {
 			let checkInResponse = String(dataRequest.sendServerData("checkin", checkinAmount, message.author.id));
 			if (checkInResponse === "1") {
 				message.channel.send(message.author + " " + dialog("checkin", checkinAmount));
-				shared.progression.addXP(message.author, 1); //1XP
+				shared.progression.addXP(message.author.id, 1); //1XP
 				exports.handleLevelUp(client, message.member, message.channel, dialog);
 			} else {
 				message.channel.send(dialog("checkinLocked", message.author.id, checkInResponse));
@@ -110,11 +110,12 @@ exports.processFactionChangeAttempt = function(client, message, factionRole, dia
 					break;
 				case "createdUser":
 					let channel = shared.utility.getChannel(client, shared.factions.getFactionChannel(factionRole));
-					channel.send(message.author + " " + dialog("newUserPublicMessage", shared.factions.getFactionName(factionRole), shared.factions.getFactionChannel(factionRole)));
-					shared.messaging.sendDM(client, message.author, dialog("newUserPrivateMessage", dialog("newUserPrivateMessageRemark" + factionShorthand)));
+					channel.send(message.author + " " + dialog("newUserPublicMessage", shared.factions.getFactionName(factionRole), shared.factions.getFactionChannel(factionRole, true)));
+					message.author.send(dialog("newUserPrivateMessage", dialog("newUserPrivateMessageRemark" + factionShorthand), process.env.DEADLANDS_CHANNEL_ID));
 					break;
 				case "joined":
-					message.channel.send(message.author + " " + dialog("join" + factionShorthand))
+					let factionChannelID = shared.factions.getFactionChannel(factionRole, true);
+					shared.utility.getChannel(client, factionChannelID).send(message.author + " " + dialog("join" + factionShorthand))
 					.then(msg => {
 						if (message.channel.id === process.env.GATE_CHANNEL_ID)
 							msg.delete(10000)
@@ -131,9 +132,9 @@ exports.processFactionChangeAttempt = function(client, message, factionRole, dia
 
 /**
  * Processes !stats command
- * @param  {object} client
- * @param  {object|string} member
- * @param  {object|string} channel
+ * @param  {object} client - Discord client
+ * @param  {object|string} member - Discord member object or ID
+ * @param  {object|string} channel - Discord channel object or ID
  * @param  {any} dialog - Dialog function
  */
 exports.processStatsCommand = function(client, member, channel, dialog) {
@@ -149,10 +150,6 @@ exports.getStats = function(userID) {
 	// Grabs all parameters from server
 	let userStatsResponse = String(dataRequest.loadServerData("userStats", userID)).split(",");
 	
-	if (userStatsResponse[0] == "failure") {
-		throw "Server returned an error to userStats request! (returned 'failure' for userStatsResponse[0])";
-	}
-
 	let response	 = userStatsResponse[0];
 	let strength     = parseFloat(userStatsResponse[1]);
 	let speed        = parseFloat(userStatsResponse[2]);
@@ -181,7 +178,7 @@ exports.getStats = function(userID) {
 		levelPercent: levelPercent,
 		statPoints: statPoints,
 		chests: chests,
-	};
+	}
 }
 
 /**
@@ -212,19 +209,29 @@ exports.getMaterials = function(userID) {
 }
 
 exports.getMaterialsText = function(client, materials) {
+	let materialsArray = [];
 	let materialsText = "";
 
 	// Materials
 	if (materials.response == "success") {
 		if (materials.totalQuantity > 0) {
-			if (materials.scrap > 0) {        materialsText += `${shared.utility.getEmote(client, "mscrap")} **${materials.scrap}**`; }
-			if (materials.common > 0) {       materialsText += ` | ${shared.utility.getEmote(client, "mcloth")} **${materials.common}**`; }
-			if (materials.uncommon > 0) {     materialsText += ` | ${shared.utility.getEmote(client, "mmetal")} **${materials.uncommon}**`; }
-			if (materials.rare > 0) {         materialsText += ` | ${shared.utility.getEmote(client, "melectronics")} **${materials.rare}**`; }
-			if (materials.ultrarare > 0) {    materialsText += ` | ${shared.utility.getEmote(client, "mgem")} **${materials.ultrarare}**`; }
-		} else {console.log("failure2");}
-	} else {console.log("failure");}
+			if (materials.scrap > 0) {        materialsArray.push(`${shared.utility.getEmote(client, "mscrap")} **${materials.scrap}**`); }
+			if (materials.common > 0) {       materialsArray.push(`${shared.utility.getEmote(client, "mcloth")} **${materials.common}**`); }
+			if (materials.uncommon > 0) {     materialsArray.push(`${shared.utility.getEmote(client, "mmetal")} **${materials.uncommon}**`); }
+			if (materials.rare > 0) {         materialsArray.push(`${shared.utility.getEmote(client, "melectronics")} **${materials.rare}**`); }
+			if (materials.ultrarare > 0) {    materialsArray.push(`${shared.utility.getEmote(client, "mgem")} **${materials.ultrarare}**`); }
+		} else {console.log("Materials: failure2");}
+	} else {console.log("Materials: failure");}
 
+	// Parses array into string
+	for (let i = 0; i < materialsArray.length; i++) {
+		const element = materialsArray[i];
+		if (i !== 0) materialsText += " | ";
+		materialsText += element;
+	}
+
+	// Makes sure the string's length isn't 0
+	if (materialsText.length < 1) materialsText = `You don't have any materials currently.`;
 	return materialsText;
 }
 
@@ -248,6 +255,7 @@ exports.printStats = function(client, member, channel) {
 	let cannisterText = `${shared.utility.getEmote(client, "cannister")} **${stats.statPoints}**`;
 	let cypherCrateText = `${shared.utility.getEmote(client, "cyphercrate")} **${stats.chests}**`;
 	let userStats = "```" + `STR: ${stats.strength} | SPD: ${stats.speed} | STAM: ${stats.stamina}/${stats.maxStamina} | HP: ${stats.health}/${stats.maxHealth}` + "```";
+
 	let materialsText = exports.getMaterialsText(client, materials);
 
 	// Says level is maxed out if it is LVL 30+
@@ -262,9 +270,12 @@ exports.printStats = function(client, member, channel) {
 		.setColor(member.displayColor)
 		.setDescription(`${levelText} ${levelProgress} | ${crystalText} | ${cannisterText} | ${cypherCrateText}`)
 		.addField("Stats", userStats)
-		.addField("Materials", materialsText)
 		.setFooter(`Commands: ${shared.utility.getFooterCommands(commandArray, '!stats')}`);
 
+	if (materials.response == "success" && materials.totalQuantity > 0) {
+		embed.addField("Materials", materialsText);
+	}
+	
 	channel.send({ embed });
 }
 
@@ -281,11 +292,11 @@ exports.handleLevelUp = function(client, member, channel, dialog) {
 	channel = shared.utility.getChannel(client, channel);
 
 	// Sees if the user is supposed to level up
-	let [levelUpResponse, level, statPoints, chests] = shared.progression.checkLevel(client, member);
+	let [levelUpResponse, level, statPoints, chests, addedChest] = shared.progression.checkLevel(client, member);
 	
 	// Handle levelling up
 	if (levelUpResponse === "levelUp" || levelUpResponse === "RankUp") {
-		if (level >= process.env.RANK_3_THRESHOLD) {
+		if (level >= process.env.RANK_3_THRESHOLD && addedChest === 'addedChest') {
 			shared.messaging.sendMessage(client, member.user, channel, 
 				dialog("levelUpCap", 
 					shared.utility.getEmote(client, "level"), level, 
@@ -295,8 +306,8 @@ exports.handleLevelUp = function(client, member, channel, dialog) {
 		} else {
 			shared.messaging.sendMessage(client, member.user, channel, 
 				dialog("levelUp", 
-					level, dialog("levelUpRemark"),
-					shared.utility.getEmote(client, "cannister"), statPoints
+					shared.utility.getEmote(client, "level"), level, 
+					dialog("levelUpRemark"), shared.utility.getEmote(client, "cannister"), statPoints
 				)
 			);
 		}

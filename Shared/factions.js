@@ -36,19 +36,22 @@ exports.getFactionName = function(factionRole) {
 /**
  * @param  {} factionRoleID - Discord role ID of Sanctum faction
  */
-exports.getFactionChannel = function(factionRoleID) {
+exports.getFactionChannel = function(factionRoleID, isChatChannel) {
 	//factionRole must be a faction role
 	if (!exports.checkFaction(factionRoleID)) {
 		throw "factionRole is not a faction!";
 	}
 
 	if (factionRoleID === process.env.GROUP_A_ROLE) {
+		if (isChatChannel) return process.env.GROUP_A_CHAT_ID;
 		return process.env.GROUP_A_CHANNEL_ID;
 	}
 	if (factionRoleID === process.env.GROUP_B_ROLE) {
+		if (isChatChannel) return process.env.GROUP_B_CHAT_ID;
 		return process.env.GROUP_B_CHANNEL_ID;
 	}
 	if (factionRoleID === process.env.GROUP_C_ROLE) {
+		if (isChatChannel) return process.env.GROUP_C_CHAT_ID;
 		return process.env.GROUP_C_CHANNEL_ID;
 	}
 }
@@ -78,7 +81,7 @@ exports.changeFaction = async function(client, factionRole, channel, member, byp
 	}
 
 	// Creates a new user (returns "userAlreadyExists" if already exists)
-	var newUserResponse = String(shared.dataRequest.sendServerData("newUser", member.user.id, "New user."));
+	var newUserResponse = String(shared.dataRequest.sendServerData("newUser", "New user.", member.user.id));
 
 	// Joins the new faction
 	await member.removeRoles([
@@ -89,7 +92,7 @@ exports.changeFaction = async function(client, factionRole, channel, member, byp
 	await member.addRole(factionRole);
 
 	//send the server the info (for logging)
-	shared.dataRequest.sendServerData("conversion", member.user.id, "Converted to " + exports.getFactionName(factionRole));
+	shared.dataRequest.sendServerData("conversion", "Converted to " + exports.getFactionName(factionRole), member.user.id);
 
 	if (newUserResponse === "createdUser") {
 		// Send the private welcoming message

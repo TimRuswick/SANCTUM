@@ -1,7 +1,8 @@
 // Initialize the exports
 exports = module.exports = {};
 
-require("dotenv").config({path: "../.env"});
+const path = require('path');
+require('dotenv').config({path: path.join(__dirname, "../.env")});
 const request = require("sync-request");
 
 /**
@@ -26,7 +27,7 @@ exports.loadServerData = function(dataType, usersID = "") {
 exports.sendServerData = function(dataType, dataToSend = "", usersID = "", dataToSend2 = "") {
 	let link = `${process.env.SERVER_ADDRESS}/sendData.php?pk=${process.env.SERVER_PASS_KEY}&dataType=${dataType}&userid=${usersID}&dataToSend=${dataToSend}&dataToSend2=${dataToSend2}`;
 	let response = request("GET", link);
-	console.log("[sendSData] " + link);
+	console.log("[SendSData] " + link);
 	return response.getBody();
 }
 
@@ -34,6 +35,6 @@ exports.sendServerData = function(dataType, dataToSend = "", usersID = "", dataT
 exports.sendAttackData = function(dataType, dataToSend, dataToSend2 = '') {
 	let link = `${process.env.SERVER_ADDRESS}/sendPostData.php?pk=${process.env.SERVER_PASS_KEY}&dataType=${dataType}&dataToSend=${dataToSend}&dataToSend2=${dataToSend2}`;
     let response = request('GET', link);
-	console.log("[sendAData] " + link);
+	console.log("[SendAData] " + link);
     return response.getBody();
 }

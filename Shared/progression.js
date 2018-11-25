@@ -27,14 +27,15 @@ exports.checkLevel = function(client, member) {
 	let level = Math.floor(parseFloat(responseArray[1]));
 	let statPoints = parseFloat(responseArray[2]);
 	let chests = parseFloat(responseArray[3]);
+	let addedChest = responseArray[4];
 	let rankUp = exports.rankUp(client, member, level);
 
 	if (rankUp == "rankUp") {
-		return [rankUp, level, statPoints, chests];
+		return [rankUp, level, statPoints, chests, addedChest];
 	} else if (responseMessage === "levelup") {
-		return ["levelUp", level, statPoints, chests];
+		return ["levelUp", level, statPoints, chests, addedChest];
 	} else {
-		return ["", level, statPoints, chests];
+		return ["", level, statPoints, chests, addedChest];
 	}
 }
 
