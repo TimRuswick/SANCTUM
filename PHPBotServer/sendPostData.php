@@ -18,11 +18,7 @@ if($privateKey != privateKey()){
 $con = mysqlConnect();
 
 switch ($dataType) {
-
-
 				//gets all dammage from users
-
-
 		case "sendAllAttacks":
 				$message = "";
 				$playerIDs = explode("|", $dataToSend);
@@ -59,6 +55,7 @@ switch ($dataType) {
 											$hostileStrength=stripslashes($a['strength']);
 											$hostileAlive=stripslashes($a['alive']);
 											$hostileFled=stripslashes($a['fled']);
+						$hostileID=stripslashes($a['id']);
 									}
 								}
 
@@ -77,8 +74,6 @@ switch ($dataType) {
 														if ($hitAmount >= $attackerStats[$i]['health']){$hitAmount = $attackerStats[$i]['health'];};
 														$attackerStats[$i]['health'] = $attackerStats[$i]['health'] - $hitAmount;
 														$attackerStats[$i]['hitback'] = $hitAmount;
-														//$q = "UPDATE users SET health = health - $hitAmount WHERE discordUserID = '$userID' LIMIT 1";
-														//$r2 = mysqli_query($con,$q);
 												}
 												$query .= " WHEN ".$attackerStats[$i]['id']." THEN ".$attackerStats[$i]['health'];
 												$queryIDs .= $attackerStats[$i]['id'].",";
@@ -94,7 +89,15 @@ switch ($dataType) {
 															echo json_encode($returnInfo);
 															exit;
 									}
+
+								// Changes dead values for Ravager
+								if ($isDead) {
+									$q = "UPDATE hostiles SET alive = 0 WHERE id = '$hostileID' LIMIT 1";
+									$r2 = mysqli_query($con,$q);
+									//$q = "UPDATE hostiles SET health = 0 WHERE hostileType = '$hostileType' ORDER BY id DESC LIMIT 1";
 								}
+			
+
 								//assemble the end of the query.
 								$query .= " END
 								WHERE discordUserID IN (".substr($queryIDs, 0, -1).");";
@@ -112,7 +115,6 @@ switch ($dataType) {
 			}
 
 		break;
-
 
 		case "lvlinfo":
 				$q = "SELECT xp,lvl FROM users WHERE discordUserID = '$userID';";
@@ -263,9 +265,6 @@ switch ($dataType) {
 				}
 		break;
 
-
-
-
 		case "getHostileData":
 					$q = "SELECT stash,claimID FROM hostiles WHERE alive = 0 AND id = '$dataToSend' LIMIT 1;";
 					$r2 = mysqli_query($con,$q);
@@ -277,10 +276,7 @@ switch ($dataType) {
 						echo $stash.",".$claimID;
 					}
 					exit;
-
 		break;
-
-
 
 		case "getDamageDistribution":
 				//Gets base stats for enemy
@@ -324,12 +320,6 @@ switch ($dataType) {
 				}
 
 		break;
-
-
-
-
-
-
 }
 
 //echo json_encode($array);
@@ -377,24 +367,25 @@ function getEnemyDamage($hostileSpeed,$userSpeed,$hostileStrength){
 
 
 function generateStatFromLevel($level,$stat){
-		$value = 0;
-		if(strtolower($stat) === "str"){
-					$value = (round((((($level + 1) * log10($level + 1)) / (0.02 * ($level + 1))) + 0.6) * 0.4)) -2;
-					$value = round($value + (rand(-$value/10,$value/10)));
-					if($level < 15){$value = round($value * 0.9);};
-		}elseif(strtolower($stat) === "spd"){
-					$value = (round((((($level + 1) * log10($level + 1)) / (0.02 * ($level + 1))) + 0.6) * 0.4)) -2 ; //round(rand(-2,2))
-					$value = round($value + (rand(-$value/10,$value/10)));
-					if($level < 15){$value = round($value * 0.9);};
-		}elseif(strtolower($stat) === "hp"){
-					$value = floor(50 + (30 * $level) + pow($level, 1.5));
-		}elseif(strtolower($stat) === "stash"){
-					$value = (round((((($level + 1) * log10($level + 1)) / (0.02 * ($level + 1))) + 0.6) * 0.1)) ;
-					$value = rand(pow($value, 2.2),pow($value, 2.3));
-					if($level < 15){$value = round($value * 0.7);};
-		}
+	$value = 0;
+	switch (strtolower($stat)) {
+		case "str":
+		case "spd":
+				$value = floor(log($level+1)*9-2.3);//NOTE THIS IS NATURAL LOG NOW, NOT THE BASE 10 LOG
+				$value = round($value + (rand(-$value/10,$value/10)));
+				if($level < 15) { $value = round($value * 0.9); }
+			break;
+		case "hp":
+				$value = floor(50 + (30 * $level) + pow($level, 1.5));
+			break;
+		case "stash":
+				$value = ceil(log($level+1)*2.25-0.43);//NOTE THIS IS NATURAL LOG NOW, NOT THE BASE 10 LOG
+				$value = rand(pow($value, 2.2),pow($value, 2.3));
+				if($level < 15) { $value = round($value * 0.7); }
+			break;
+	}
 
-		return $value;
+	return $value;
 }
 
 	?>

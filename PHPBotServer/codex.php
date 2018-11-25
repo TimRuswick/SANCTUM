@@ -31,6 +31,7 @@ if($privateKey != "123"){
 	        <tr>
 	            <th>ID</th>
 	            <th>Level</th>
+				<th>Stat Points</th>
 	            <th>Crystals</th>
 	            <th>SPD</th>
 	            <th>STR</th>
@@ -42,7 +43,7 @@ if($privateKey != "123"){
 
 <?php
 $con = mysqlConnect();
-$q = "SELECT discordUserID,wallet,speed,health,maxHealth,strength,maxStamina,stamina,lvl FROM users LIMIT 500;";
+$q = "SELECT discordUserID,wallet,speed,health,maxHealth,strength,maxStamina,stamina,lvl,statPoints FROM users LIMIT 500;";
 $r2 = mysqli_query($con,$q);
 if ( $r2 !== false && mysqli_num_rows($r2) > 0 ) {
 	while ( $a = mysqli_fetch_assoc($r2) ) {
@@ -55,11 +56,14 @@ if ( $r2 !== false && mysqli_num_rows($r2) > 0 ) {
 			$maxStamina=stripslashes($a['maxStamina']);
 			$stamina=stripslashes($a['stamina']);
 			$lvl=stripslashes($a['lvl']);
+			$statPoints=stripslashes($a['statPoints']);
+
 			?>
 
 			        <tr>
 			            <td><?php echo $discordUserID; ?></td>
 			            <td><?php echo $lvl; ?></td>
+						<td><?php echo $statPoints; ?></td>
 			            <td><?php echo $wallet; ?></td>
 			            <td><?php echo $speed; ?></td>
 			            <td><?php echo $strength; ?></td>

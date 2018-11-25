@@ -97,7 +97,7 @@ case "lastHostileActive":
 		}
 break;
 case "userStats":
-		$q = "SELECT strength,speed,stamina,health,maxStamina,maxHealth,wallet,xp,lvl,statPoints FROM users WHERE discordUserID = '$userID';";
+		$q = "SELECT strength,speed,stamina,health,maxStamina,maxHealth,wallet,xp,lvl,statPoints,chests FROM users WHERE discordUserID = '$userID';";
 		$r2 = mysqli_query($con,$q);
 		if ( $r2 !== false && mysqli_num_rows($r2) > 0 ) {
 			while ( $a = mysqli_fetch_assoc($r2) ) {
@@ -111,11 +111,12 @@ case "userStats":
 					$xp=stripslashes($a['xp']);
 					$recordedLVL=stripslashes($a['lvl']);
 					$statPoints=stripslashes($a['statPoints']);
+					$chests=stripslashes($a['chests']);
 					$lvlbase = getLevelBase();
 					$lvl = getLevel($xp,$lvlbase);
 					$lvlpercent = getCurrentLevelProgress($xp,$lvl);
 			}
-			echo "success,".$strength.",".$speed.",".$stamina.",".$health.",".$maxStamina.",".$maxHealth.",".$wallet.",".$xp.",".$recordedLVL.",".$lvlpercent.",".$statPoints;
+			echo "success,".$strength.",".$speed.",".$stamina.",".$health.",".$maxStamina.",".$maxHealth.",".$wallet.",".$xp.",".$recordedLVL.",".$lvlpercent.",".$statPoints.",".$chests;
 			exit;
 		} else{
 			echo "failure";

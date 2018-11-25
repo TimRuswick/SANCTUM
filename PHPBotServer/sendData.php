@@ -70,7 +70,7 @@ switch ($dataType) {
 							$q = "INSERT INTO userLog (discordUserID, actionType, actionData)
 							VALUES (" . $userID . ", '" . $dataType . "', 'Checked in for $dataToSend crystals.');";
 							$r2 = mysqli_query($con,$q);
-					echo "available";
+					echo 1;
 					exit;
 				}
 		break;
@@ -127,22 +127,15 @@ switch ($dataType) {
 		break;
 
 		case "transfer":
-				$q = "SELECT discordUserID FROM users WHERE discordUserID = '$dataToSend' LIMIT 1";
-				$r2 = mysqli_query($con,$q);
-				if ( $r2 == false || mysqli_num_rows($r2) == 0 ) {
-					return "failure";
-				} else {
-					$q = "UPDATE users SET wallet = wallet - $dataToSend2 WHERE discordUserID = '$userID' LIMIT 1";
-					$r2 = mysqli_query($con,$q);
-					$q = "UPDATE users SET wallet = wallet + $dataToSend2 WHERE discordUserID = '$dataToSend' LIMIT 1";
-					$r2 = mysqli_query($con,$q);
-
-					$q = "INSERT INTO userLog (discordUserID, actionType, actionData)
-						VALUES (" . $userID . ", '" . $dataType . "', '$userID gave $dataToSend2 crystals to $dataToSend.');";
-					$r2 = mysqli_query($con,$q);
-					echo "success";
-					exit;
-				}
+			$q = "UPDATE users SET wallet = wallet - $dataToSend2 WHERE discordUserID = '$userID' LIMIT 1";
+			$r2 = mysqli_query($con,$q);
+			$q = "UPDATE users SET wallet = wallet + $dataToSend2 WHERE discordUserID = '$dataToSend' LIMIT 1";
+			$r2 = mysqli_query($con,$q);
+			$q = "INSERT INTO userLog (discordUserID, actionType, actionData)
+			VALUES (" . $userID . ", '" . $dataType . "', '$userID gave $dataToSend2 crystals to $dataToSend.');";
+			$r2 = mysqli_query($con,$q);
+			echo 1;
+			exit;
 		break;
 
 		case "attack":
@@ -267,7 +260,7 @@ switch ($dataType) {
 
 							$claimID = floor(rand(1000,9999));
 							$q = "INSERT INTO hostiles (hostileType, maxHealth, health, strength, speed, stash, alive, claimID)
-																	VALUES ('ravager', '$health', '$health', '$strength', '$speed', '$stash', 1, '$claimID');";
+												VALUES ('ravager', '$health', '$health', '$strength', '$speed', '$stash', 1, '$claimID');";
 							$r2 = mysqli_query($con,$q);
 							echo $health.",".$speed.",".$strength.",".$claimID;
 				}
@@ -466,35 +459,35 @@ switch ($dataType) {
 					if($health == $maxHealth){echo "fullHealth";exit;}
 
 					if($health > 0){
-							if($crystals >= $treatmentCost){
-										switch ($treatmentName) {
-												case "TREAT":
-																$newHealth += 15;
-												break;
-												case "TREATV2":
-																$newHealth = $maxHealth*0.15;
-												break;
-												case "PATCH":
-																$newHealth += 50;
-												break;
-												case "PATCHV2":
-																$newHealth = $maxHealth*0.5;
-												break;
-												case "REGEN":
-																$newHealth += 100;
-												break;
-												case "REGENV2":
-																$newHealth = $maxHealth;
-												break;
-												default:
-														echo "cantDoThat";exit;
-												break;
-										}
-											if($newHealth < $health){echo "lessThanYourHealth";exit;}
-											if($newHealth>$maxHealth){$newHealth = $maxHealth;};
-											$q = "UPDATE users SET health = $newHealth,wallet = wallet - $treatmentCost WHERE discordUserID = '$userID' LIMIT 1";
-											$r2 = mysqli_query($con,$q);
-											echo "success,".$newHealth."/".$maxHealth;
+						if($crystals >= $treatmentCost){
+							switch ($treatmentName) {
+								case "TREAT":
+												$newHealth += 15;
+								break;
+								case "TREATV2":
+												$newHealth = $maxHealth*0.15;
+								break;
+								case "PATCH":
+												$newHealth += 50;
+								break;
+								case "PATCHV2":
+												$newHealth = $maxHealth*0.5;
+								break;
+								case "REGEN":
+												$newHealth += 100;
+								break;
+								case "REGENV2":
+												$newHealth = $maxHealth;
+								break;
+								default:
+										echo "cantDoThat";exit;
+								break;
+						}
+							if($newHealth < $health){echo "lessThanYourHealth";exit;}
+							if($newHealth>$maxHealth){$newHealth = $maxHealth;};
+							$q = "UPDATE users SET health = $newHealth,wallet = wallet - $treatmentCost WHERE discordUserID = '$userID' LIMIT 1";
+							$r2 = mysqli_query($con,$q);
+							echo "success,".$newHealth."/".$maxHealth;
 						} else{
 							echo "notEnoughCrystals";
 						}
@@ -547,34 +540,38 @@ switch ($dataType) {
 
 
 		case "addXP":
-				addXp($userID,$dataToSend);
+			echo addXp($userID,$dataToSend);
 		break;
 
 		case "getLevelUp":
-				$levelCap = 30;
-				$levelCapXP = 625;
-				$q = "SELECT xp,lvl,statPoints FROM users WHERE discordUserID = '$userID';";
+				//addXp($userID,$dataToSend);
+				$levelCap = 30;$levelCapXP = 625;
+				$q = "SELECT xp,lvl,statPoints,chests FROM users WHERE discordUserID = '$userID';";
 				$r2 = mysqli_query($con,$q);
-				if ( $r2 && mysqli_num_rows($r2) > 0 ) {
+				if ( $r2 !== false && mysqli_num_rows($r2) > 0 ) {
 							while ( $a = mysqli_fetch_assoc($r2) ) {
 									$xp=stripslashes($a['xp']);
 									$lvl=stripslashes($a['lvl']);
 									$statPoints=stripslashes($a['statPoints']);
+									$chests=stripslashes($a['chests']);
 							}
 							$lvlbase = getLevelBase();
 							$currentLVL = floor(getLevel($xp,$lvlbase));
+							$addedChest = '0';
 							if($currentLVL > $lvl){
 									if($currentLVL > $levelCap){
-											$q = "UPDATE users SET lvl = $levelCap, xp = $levelCapXP WHERE discordUserID = '$userID' LIMIT 1";
+											$chests += 1; $addedChest = 'addedChest';
+											$q = "UPDATE users SET lvl = $levelCap,chests = chests + 1,xp = $levelCapXP WHERE discordUserID = '$userID' LIMIT 1";
 											$r2 = mysqli_query($con,$q);
 									}else{
 											$statPoints += 1;
 											$q = "UPDATE users SET lvl = lvl + 1,statPoints = statPoints + 1 WHERE discordUserID = '$userID' LIMIT 1";
 											$r2 = mysqli_query($con,$q);
+											$lvl = $lvl + 1;
 									}
-									echo "levelup,".$currentLVL.",".$statPoints;
-							} else {
-									echo "xpadded,".$currentLVL.",".$statPoints;
+									echo "levelup,".$lvl.",".$statPoints.",".$chests.",".$addedChest;
+							} else{
+									echo "xpadded,".$currentLVL.",".$statPoints.",".$addedChest;
 							}
 				}
 

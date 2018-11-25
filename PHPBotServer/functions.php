@@ -6,23 +6,22 @@ function privateKey(){
 }
 
 function throwError($errorName){
-		switch ($errorName) {
-    case "invalidPrivateKey":
-        return "Sorry, this didnt work. Admins used an invalid key. Bug them about it!";
-        break;
-    case 1:
-        echo "i equals 1";
-        break;
-    case 2:
-        echo "i equals 2";
-        break;
-		}
+	switch ($errorName) {
+		case "invalidPrivateKey":
+			return "Sorry, this didnt work. Admins used an invalid key. Bug them about it!";
+			break;
+		case 1:
+			echo "i equals 1";
+			break;
+		case 2:
+			echo "i equals 2";
+			break;
+	}
 }
 
 
 
 function constants($tag){
-
 		//Base Domain Name
 		if ($tag == 'baseurl'){ return "http://gdu.io/"; }
 
@@ -31,7 +30,6 @@ function constants($tag){
 
 		//Turns on PHP errors
 		if ($tag == 'debugmode'){ return true; }
-
 }
 
 
@@ -182,7 +180,7 @@ function addhttp($url) {
 function mysqlConnect() {
 		$dbhost = 'localhost';
 		$dbusername = 'root';
-		$dbpassword = '<REDACTED>';
+		$dbpassword = '';
 		$dbtable = 'discordbot';
 
 		$userDB = 'user';
