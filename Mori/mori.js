@@ -1,5 +1,6 @@
 // .env Variables
-require('dotenv').config({path: '../.env'});
+const path = require('path');
+require('dotenv').config({path: path.join(__dirname, "../.env")});
 
 // Node Modules
 const Discord = require('discord.js');
@@ -7,9 +8,9 @@ const client = new Discord.Client();
 const cron = require('node-cron');
 
 // Bot Modules (stores http requests & random functions respectively)
-const dataRequest = require('../modules/dataRequest');
-const calcRandom = require('../modules/calcRandom');
-const channelProcessor = require('../modules/channelProcessor');
+const shared = require('../Shared/shared');
+
+const playingActivity = '!heal | BioMed Specialist.';
 
 var medItems = [0, 1, 2];
 var availableTreatments = [];
@@ -20,13 +21,13 @@ const treatments = [
     ['TREAT','5','15','Heals 15HP immediately. Must have more than 0HP.'],
     ['TREATV2','7','%15','Heals to 15% HP immediately. Must have more than 0HP.'],
     */
-    ['PATCH','10','50','Heals 50HP immediately. Must have more than 0HP.'],
-    ['PATCHV2','15','%50','Heals to 50% HP immediately. Must have more than 0HP.'],
-    ['REGEN','20','100','Heals 100HP immediately. Must have more than 0HP.'],
-    ['REGENV2','25','%100','Heals all HP to maximum immediately. Must have more than 0HP.'],
-    ['REVIVE','20','25','Brings a traveler back from a KO (0HP) to 25HP immediately.'],
-    ['REVIVEV2','25','%50','Brings a traveler back from a KO (0HP) to 50% HP immediately.'],
-    ['REVIVEV3','30','%100','Brings a traveler back from a KO (0HP) to 100% HP immediately.']
+    ['PATCH','5','50','Heals 50HP immediately. Must have more than 0HP.'],
+    ['PATCHV2','8','%50','Heals to 50% HP immediately. Must have more than 0HP.'],
+    ['REGEN','10','100','Heals 100HP immediately. Must have more than 0HP.'],
+    ['REGENV2','13','%100','Heals all HP to maximum immediately. Must have more than 0HP.'],
+    ['REVIVE','15','25','Brings a traveler back from a KO (0HP) to 25HP immediately.'],
+    ['REVIVEV2','18','%50','Brings a traveler back from a KO (0HP) to 50% HP immediately.'],
+    ['REVIVEV3','20','%100','Brings a traveler back from a KO (0HP) to 100% HP immediately.']
 ];
 
 // The ready event is vital, it means that your bot will only start reacting to information
@@ -43,7 +44,7 @@ client.on('ready', async () => {
     // You can set status to 'online', 'invisible', 'away', or 'dnd' (do not disturb)
     client.user.setStatus('online');
     // Sets your "Playing"
-    client.user.setActivity('!heal | BioMed Specialist.');
+    client.user.setActivity(playingActivity);
     console.log(`Connected! \
     \nLogged in as: ${client.user.username} - (${client.user.id})`);
 
@@ -53,7 +54,7 @@ client.on('ready', async () => {
 //Revives everyone every morning at 7am PST (server time dependant).
 cron.schedule('0 7 * * *', function() {
     console.log('Reviving');
-    dataRequest.sendServerData("reviveAll",0);
+    shared.dataRequest.sendServerData("reviveAll",0);
   
     var dialogOptions = [
       'Ahhh. Just finished reviving all of our fellow travelers.',
@@ -71,9 +72,9 @@ cron.schedule('0 7 * * *', function() {
   
     client.channels.get(process.env.TAVERN_CHANNEL_ID).startTyping();
     setTimeout(function() {
-        sendMessage(process.env.TAVERN_CHANNEL_ID, dialogOptions[randomNumber]);
+        shared.messaging.sendMessage(client, process.env.TAVERN_CHANNEL_ID, dialogOptions[randomNumber]);
         client.channels.get(process.env.TAVERN_CHANNEL_ID).stopTyping(true);
-    }, calcRandom.random(2500,6000));
+    }, shared.utility.random(2500,6000));
     resetInventory(itemCount);
 });
 
@@ -82,7 +83,7 @@ client.on('message', async message => {
     // Ignores ALL bot messages
     if (message.author.bot) return;
     // Message has to be in Outskirts (should be edited later)
-    if (!channelProcessor.isBotChannel(message.channel.id)) return;
+    if (!shared.messaging.isFactionBotspam(message.channel.id)) return;
     // Has to be (prefix)command
     if (message.content.indexOf (process.env.PREFIX) !== 0) return;
 
@@ -90,24 +91,25 @@ client.on('message', async message => {
     // - Some tutorial dude on the internet
     const args = message.content.slice(process.env.PREFIX.length).trim().split(/ +/g);
     const command = args.shift().toLowerCase();
-
+    
     switch (command) {
         case "reset":
-            if (isAdmin(message.author.id))
+            if (shared.utility.isAdmin(message.author.id, message.guild)) {
+                // Message for prototyping
+                //message.channel.send(`${message.author} Alright master. I'll indulge myself of getting *different* ways to heal you. It's not like it's hard or anything to get these materials to do it in this bare wasteland, you know.\n\n***RESET INVENTORY FOR DEVELOPER/ADMIN***`); 
                 resetInventory(3);
+            }
         break;
         case "heal":
             if (!args[0]) {
-                // Grabs all parameters from server
-                var attacker = String(dataRequest.loadServerData("userStats",message.author.id));
-                var attackerWallet = parseFloat(attacker.split(",")[6]);    // Crystals
+                // Grabs parameters from server
+                var stats = shared.core.getStats(message.author.id);
                 
                 var intro = `${message.author} Here's what I've got at the moment. My prices are based on availability, `
                     + `it's hard to find stuff these days.`;
                 var newMessage = "";
                 for (var i = 0; i < availableTreatments.length; i++) {
-                    //newMessage += availableTreatments[i][0] + " - **" + availableTreatments[i][1] + "**<:crystals:460974340247257089>\n```" + availableTreatments[i][3] + "```\n";
-                    newMessage += `${availableTreatments[i][0]} - <:crystals:460974340247257089> **${availableTreatments[i][1]}**\n` + "```" + availableTreatments[i][3] + "```\n";
+                    newMessage += `${availableTreatments[i][0]} - ${shared.utility.getEmote(client, "crystals")} **${availableTreatments[i][1]}**\n` + "```" + availableTreatments[i][3] + "```\n";
                 }
                 const keepersOfTheCityColor = client.guilds.get(process.env.SANCTUM_ID).roles.find(role => role.name === "Keepers of the City").color;
                 const embed = new Discord.RichEmbed()
@@ -115,11 +117,10 @@ client.on('message', async message => {
 					.setColor(keepersOfTheCityColor)
 					.setTitle("BioTech Healing")
                     .setDescription(newMessage)
-                    .setFooter(`${message.member.displayName}, you have ${attackerWallet} crystals. Use !heal [OPTION] to buy.`)
-                //sendMessage(message.channel.id, newMessage);
+                    .setFooter(`${message.member.displayName}, you have ${stats.wallet} crystals. Use !heal [OPTION] to buy.`, message.author.avatarURL)
+
                 message.channel.send(intro, embed);
             } else {
-                //4815
                 var purchase = args[0].toUpperCase();
                 var treatmentCost = 0;
                 var treatmentName = '';
@@ -128,58 +129,59 @@ client.on('message', async message => {
                     if (availableTreatments[i][0] === purchase) {
                         treatmentAvailable = true;
                         treatmentName = availableTreatments[i][0];
-                        //treatmentCost = availableTreatments[i][1];
+                        treatmentCost = availableTreatments[i][1];
                         break;
                     }
                 }
                 if (treatmentAvailable) {
-                    var healResponse = String(dataRequest.sendServerData("heal", treatmentCost, message.author.id, treatmentName));
+                    var healResponse = String(shared.dataRequest.sendServerData("heal", treatmentCost, message.author.id, treatmentName));
                     var response = String(healResponse.split(",")[0]);
                     var health = String(healResponse.split(",")[1]);
                     switch (response) {
                         case "success":
-                            sendMessage(message.channel.id, "<@" + message.author.id + "> I\'ve applied a " + purchase + " via nanotech .\n**-" + treatmentCost + "**<:crystals:460974340247257089> | **" + health + "**HP." );
-                        break;
+                            message.channel.send(`${message.author} I\'ve applied a ${purchase} via nanotech.\n${shared.utility.getEmote(client, "crystals")} **-${treatmentCost}** | **${health}** HP.`);
+                            break;
                         case "notEnoughCrystals":
-                            sendMessage(message.channel.id, ":x: <@" + message.author.id + "> Sorry, looks like you don\'t have the funds for that." );
-                        break;
+                            message.channel.send(`:x: ${message.author} Sorry, looks like you don\'t have the funds for that.`);
+                            break;
                         case "cantDoThat":
-                            sendMessage(message.channel.id, ":x: <@" + message.author.id + "> Sorry, you don\'t meet the requirements for this procedure." );
-                        break;
+                            message.channel.send(`:x: ${message.author} Sorry, you don\'t meet the requirements for this procedure.`);
+                            break;
                         case "youreKnockedOut":
-                            sendMessage(message.channel.id, ":x: <@" + message.author.id + "> You\'re currently knoecked out (0HP). You require a revive procdure to heal immediately, or you can wait until 7 AM UTC when I revive everyone." );
-                        break;
+                            message.channel.send(`:x: ${message.author} You\'re currently knoecked out (0HP). You require a revive procdure to heal immediately, or you can wait until 7 AM UTC when I revive everyone.`);
+                            break;
                         case "lessThanYourHealth":
-                            sendMessage(message.channel.id, ":x: <@" + message.author.id + "> Doing that procedure would put you at less than your current HP." );
-                        break;
+                            message.channel.send(`:x: ${message.author} Doing that procedure would put you at less than your current HP.`);
+                            break;
                         case "fullHealth":
-                            sendMessage(message.channel.id, ":x: <@" + message.author.id + "> Looks like you\'re already full health. Why would you want to heal?" );
-                        break;
+                            message.channel.send(`:x: ${message.author} Looks like you\'re already full health. Why would you want to heal?`);
+                            break;
                         case "failure":
-                            sendMessage(message.channel.id, ":x: <@" + message.author.id + "> Sorry, not sure I understand what procedure you\'d like to purchase." );
-                        break;
+                            message.channel.send(`:x: ${message.author} Sorry, not sure I understand what procedure you\'d like to purchase.`);
+                            break;
                     }
                 } else{
-                    sendMessage(message.channel.id, ":x: <@" + message.author.id + "> I don\'t have that type of procedure available." );
+                    message.channel.send(`:x: ${message.author} I don\'t have that type of procedure available.`);
                 }
             }
         break;
     }
 });
 
+// Handles errors
 client.on('error', console.error);
 
-// Gets if user has an Overseers rank
-function isAdmin(userID) {
-    var guild = client.guilds.get(process.env.SANCTUM_ID);
-    return guild.members.get(userID).roles.find(role => role.name === "Overseers");
-}
+// Testing a bug-fix for when Discord doesn't recover Playing status
+client.on('resume', () => {
+    console.log("RESUME: setting playing activity to " + playingActivity);
+    client.user.setActivity(playingActivity);
+});
 
 function resetInventory(itemCount) {
     console.log("\nResetting inventory...");
     medItems = [];
     availableTreatments = [];
-    var treatmentsClone = arrayClone(treatments);
+    var treatmentsClone = shared.utility.cloneArray(treatments);
     var tempnum = 0;
     var i = 0;
     // DEBUG
@@ -206,67 +208,22 @@ function resetInventory(itemCount) {
         //console.log(">>> MedItems: " + treatments[medItems[i]] + "");
         // Older Calculations
         var multiple = parseFloat(Math.floor(tempnum / 6));
-        if (calcRandom.gamble(50)) {
+        if (shared.utility.randomPercent(50)) {
             availableTreatments[i][1] = tempnum + multiple;
         } else {
             availableTreatments[i][1] = tempnum - multiple;
         }
 
         // Specifically for Treat
-        availableTreatments[i][1] += calcRandom.random(-3, 3);
+        availableTreatments[i][1] += shared.utility.random(-1, 2);
 
         console.log(availableTreatments[i][0] + " | Base Cost: " + tempnum + " | HP: " + availableTreatments[i][2] + " | Modifier: " + multiple + " | Final: " + availableTreatments[i][1]);
-        
-        message = availableTreatments[i][0] + " - **" + availableTreatments[i][1] + "**<:crystals:460974340247257089>\n```" + availableTreatments[i][3] + "```\n";
-        //console.log(message);
     }
 }
   
 function sortNumber(a,b) {
     return a - b;
 }
-
-// Send message handler
-function sendMessage(userID, channelID, message) {
-    // Handle optional first argument (so much for default arugments in node)
-    if (message === undefined) {
-        message = channelID;
-        channelID = userID;
-        userID = null;
-    }
-
-    // Utility trick (@userID with an optional argument)
-    if (userID != null) {
-        message = "<@" + userID + "> " + message;
-    }
-    
-    // Sends message (needs client var, therefore I think external script won't work)
-    client.channels.get(channelID).send(message);
-}
-
-/*
-This function is for fixing a bug where an array gets edited, and possibly 
-causing negative numbers due to my calcRandom +2 -2 change. This will not
-work with arrays containing objects (eg. JSON data).
-*/
-// https://blog.andrewray.me/how-to-clone-a-nested-array-in-javascript/
-function arrayClone(arr) {
-    var i, copy;
-
-    if( Array.isArray( arr ) ) {
-        copy = arr.slice( 0 );
-        for( i = 0; i < copy.length; i++ ) {
-            copy[ i ] = arrayClone( copy[ i ] );
-        }
-        return copy;
-    } else if( typeof arr === 'object' ) {
-        throw 'Cannot clone array containing an object!';
-    } else {
-        return arr;
-    }
-
-}
-
 
 // Log our bot in (change the token by looking into the .env file)
 client.login(process.env.MORI_TOKEN);

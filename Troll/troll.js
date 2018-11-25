@@ -1,5 +1,6 @@
 // .env Variables
-require('dotenv').config({path: '../.env'});
+const path = require('path');
+require('dotenv').config({path: path.join(__dirname, "../.env")});
 
 // Node Modules
 const Discord = require('discord.js');
@@ -7,8 +8,7 @@ const client = new Discord.Client();
 const cron = require('node-cron');
 
 // Bot Modules (stores http requests & random functions respectively)
-const dataRequest = require('../modules/dataRequest');
-const calcRandom = require('../modules/calcRandom');
+const shared = require('../Shared/shared');
 var attacked = 0;
 
 // Playing activities state machine
@@ -33,7 +33,7 @@ client.on('ready', async () => {
 
     // You can set status to 'online', 'invisible', 'away', or 'dnd' (do not disturb)
     client.user.setStatus('online');
-    ListenDataActivity();
+    listenDataActivity();
 
     //client.user.setActivity('sCRIBe of the Codex');
     console.log(`Connected! \
@@ -166,7 +166,7 @@ client.on('message', async message => {
                     newMessage = ":x: <@" + message.author.id + "> YOU WANNA BUY ***WHO*** A ***WHAT*** NOW?";
                 }
             }
-            sendMessage(message.channel.id, newMessage);
+            message.channel.send(newMessage);
         break;
         case "check":
             if (message.channel.id == process.env.TEST_CHANNEL_ID) return;
@@ -282,22 +282,21 @@ cron.schedule('*/20 * * * *', function() {
 
 // Every 15 minutes
 cron.schedule('*/15 * * * *', () => {
-    var random = calcRandom.random(0, 2);
+    var random = shared.utility.random(0, 2, true);
     switch (random) {
         case 0:
-            GetDataActivity();
+            getDataActivity();
             break;
         case 1:
-            ListenDataActivity();
+            listenDataActivity();
             break;
         case 2:
-            WatchingRavagersActivity();
+            watchingRavagersActivity();
             break;
     }
-
 });
 
-function GetDataActivity() {
+function getDataActivity() {
     // Sets your "Playing"
     client.user.setActivity("Collecting data.", {
         type: "PLAYING"
@@ -307,7 +306,7 @@ function GetDataActivity() {
     activityState = ActivityEnumState.GetDataActivity;
 }
 
-function ListenDataActivity() {
+function listenDataActivity() {
     // Sets your "Playing"
     client.user.setActivity("something interesting.", {
         type: "LISTENING"
@@ -317,7 +316,7 @@ function ListenDataActivity() {
     activityState = ActivityEnumState.ListenDataActivity;
 }
 
-function WatchingRavagersActivity() {
+function watchingRavagersActivity() {
     // Sets your "Playing"
     client.user.setActivity("for Ravager positions.", {
         type: "WATCHING"
@@ -325,42 +324,6 @@ function WatchingRavagersActivity() {
         .catch(console.error);
 
     activityState = ActivityEnumState.WatchingRavagersActivity;
-}
-
-function StreamingSanctumActivity() {
-    // Sets your "Playing"
-    client.user.setActivity("developing Sanctum.", {
-        type: "STREAMING",
-        url: "https://www.twitch.tv/timruswick"
-    }).then(presence => console.log(`Activity set to ${presence.game ? presence.game.name : 'none'}`))
-        .catch(console.error);
-
-    activityState = ActivityEnumState.StreamingSanctumActivity;
-}
-
-// Async Waiting
-function sleep(time) {
-    return new Promise((resolve, reject) => {
-        setTimeout(resolve, time);
-    });
-}
-
-// Send message handler
-function sendMessage(userID, channelID, message) {
-    // Handle optional first argument (so much for default arugments in node)
-    if (message === undefined) {
-        message = channelID;
-        channelID = userID;
-        userID = null;
-    }
-
-    // Utility trick (@userID with an optional argument)
-    if (userID != null) {
-        message = "<@" + userID + "> " + message;
-    }
-    
-    // Sends message (needs client var, therefore I think external script won't work)
-    client.channels.get(channelID).send(message);
 }
 
 // Log our bot in (change the token by looking into the .env file)

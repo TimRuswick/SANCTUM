@@ -1,0 +1,28 @@
+{
+  "name": "sanctum",
+  "version": "1.0.0",
+  "description": "An open-source Discord MMO, where you slay Ravagers, buy drinks, and shame the other factions. Probably.",
+  "main": "index.js",
+  "dependencies": {
+    "dotenv": "^6.1.0",
+    "pm2": "^3.2.2"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TimRuswick/SANCTUM.git"
+  },
+  "keywords": [
+    "discord",
+    "mmo",
+    "enemies"
+  ],
+  "author": "Sanctum Developers",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/TimRuswick/SANCTUM/issues"
+  },
+  "homepage": "https://github.com/TimRuswick/SANCTUM#readme"
+}

@@ -7,8 +7,8 @@ const client = new Discord.Client();
 const cron = require('node-cron');
 
 // Bot Modules
-const dataRequest = require('../modules/dataRequest');
-const calcRandom = require('../modules/calcRandom');
+const dataRequest = require('../Shared/dataRequest');
+const shared = require('../Shared/shared');
 const PlayerClass = require('./playerClass');
 const DungeonClass = require('./dungeonClass');
 
@@ -54,17 +54,17 @@ class DungeonRaidInstance {
         this.room = room;
         this.mode = DungeonModes.DEMOCRACY;
         this.players = [];
-        this.location;
+        this.location = {};
         this.state = DungeonState.WAITING_FOR_USERS;
-        this.dialogObj;
+        this.dialogObj = {};
         this.reroutedRooms = [];
         this.items = [];
-        this.isTyping;
-        this.timer;
-        this.startTimer;
+        this.isTyping = false;
+        this.timer = 0;
+        this.startTimer = 0;
         this.crystalsGained = 0;
-        this.directionalCollector;
-        this.directionalMessageID;
+        this.directionalCollector = undefined;
+        this.directionalMessageID = undefined;
     }
 }
 
@@ -97,9 +97,9 @@ client.on('message', async message => {
     if (message.author.bot) return;
     // Message has to be in test or hell's gate
     if (!(message.channel.id !== process.env.TEST_CHANNEL_ID || message.channel.id !== process.env.HELLS_GATE_CHANNEL_ID)) {
-            const args = message.content.slice(process.env.PREFIX.length).trim().split(/ +/g);
-            const command = args.shift().toLowerCase();
-            if (command !== "party") return;
+        const args = message.content.slice(process.env.PREFIX.length).trim().split(/ +/g);
+        const command = args.shift().toLowerCase();
+        if (command !== "party") return;
     };
     // Has to be (prefix)command
     if (message.content.indexOf(process.env.PREFIX) !== 0) return;
@@ -585,7 +585,7 @@ async function pickupItem(playerDungeon, newCommand, author, items) {
         var amount = 1;
         // Generates random number if array
         if (Array.isArray(items[i].amount))
-            amount = calcRandom.random(items[i].amount[0], items[i].amount[1]);
+            amount = shared.utility.random(items[i].amount[0], items[i].amount[1]);
         // Treats it as an int instead
         else {
             // If amount variables exists, set it to so
@@ -629,7 +629,7 @@ async function pickupItem(playerDungeon, newCommand, author, items) {
 
 // Lock picks a chest
 async function lockpickChest(playerDungeon, newCommand, author, newMessage, embedData) {
-    var random = calcRandom.gamble(50);
+    var random = shared.utility.randomPercent(50);
     var channel = client.channels.get(playerDungeon.room.channel);
     var successMessage = `:lock_with_ink_pen: **You have successfully lockpicked the chest!** The party has saved a key.`;
     var failedMessage  = `:lock_with_ink_pen: **The unlock has failed.** Better luck next time!`;
@@ -754,7 +754,7 @@ async function openChest(playerDungeon, newCommand, author, useKey, newMessage, 
 
 // Lockpicks door (lockpickChest IS VERY SIMILAR)
 async function lockpickDoor(playerDungeon, newCommand, author, newMessage, embedData) {
-    var random = calcRandom.gamble(50);
+    var random = shared.utility.randomPercent(50);
     var channel = client.channels.get(playerDungeon.room.channel);
     var successMessage = `:lock_with_ink_pen: **You have successfully lockpicked the door!** The party has saved a key.`;
     var failedMessage  = `:lock_with_ink_pen: **The unlock has failed.** Better luck next time!`;
@@ -923,8 +923,8 @@ async function lootChest(playerDungeon, newCommand, author, newMessage, embedDat
     var openMessage = `:unlock: **You obtained :wind_blowing_face: Air!** This item will be distributed through the party at random.`;
     // Generates a random item drop group
     //console.log(JSON.stringify(newCommand, null, 4));
-    var randomDropGroup = calcRandom.random(0, newCommand.objects.length - 1);
-    var randomItemGroup = calcRandom.random(0, newCommand.objects[randomDropGroup].length - 1)
+    var randomDropGroup = shared.utility.random(0, newCommand.objects.length - 1);
+    var randomItemGroup = shared.utility.random(0, newCommand.objects[randomDropGroup].length - 1)
 
     /*
     console.log("newCommand.objects: " + JSON.stringify(newCommand.objects, null, 4));
@@ -940,7 +940,7 @@ async function lootChest(playerDungeon, newCommand, author, newMessage, embedDat
     switch (randomItem.name) {
         case "crystals":
             if (randomItem["amount"]) {
-                var amount = calcRandom.random(randomItem["amount"][0], randomItem["amount"][1]);
+                var amount = shared.utility.random(randomItem["amount"][0], randomItem["amount"][1]);
                 openMessage = `:unlock: **You obtained <:crystals:460974340247257089> ${amount * playerDungeon.players.length} Crystals!** This item will be distributed through the party evenly.`;
                 addCrystalsToPartyMember(playerDungeon, amount);
             }
@@ -1055,7 +1055,7 @@ async function NewDungeonSequence(channel) {
     console.log('Attempting to start a raid!');
 
     // If bot summoning for a dungeon is free
-    var newRoomID = rooms.rooms[calcRandom.random(0, rooms.rooms.length - 1)];  // calcRandom.random is inclusive for low + high
+    var newRoomID = rooms.rooms[shared.utility.random(0, rooms.rooms.length - 1)];  // shared.utility.random is inclusive for low + high
     console.log(newRoomID);
     var newRoom = rooms[newRoomID] 
 
@@ -1187,7 +1187,7 @@ async function BotActive(dungeon) {
         client.channels.get(dungeon.room.channel).send(`**<#${dungeon.room.channel}>** got closed behind us. I guess we should start venturing deeper.` +
             `\nUse **!help ${client.user}** to get all the commands you are able to use here, if you need anythin'.`);
 
-        client.user.setStatus('away');
+        client.user.setStatus('idle');
         
         dungeon.state = DungeonState.INSIDE_DUNGEON;
     } else {
@@ -1303,7 +1303,7 @@ async function typingDialog(playerDungeon, newCommand, author, newMessage) {
                     firstTime = true;
                 }
                 temp = element.text.replace("${leader}", author);
-                var waitTimerRange = calcRandom.random(element.waitBegin - range, element.waitBegin + range);
+                var waitTimerRange = shared.utility.random(element.waitBegin - range, element.waitBegin + range);
 
                 // Debug purposes only
                 //waitTimerRange = 10;
@@ -1334,7 +1334,7 @@ async function reactionOptions(playerDungeon, newCommand, author, newMessage) {
 
         // Embed and text varients
         if (!newCommand.embed) {
-            waitTimerRange = calcRandom.random(newCommand.optionsDescription.waitBegin - range, newCommand.optionsDescription.waitBegin + range);
+            waitTimerRange = shared.utility.random(newCommand.optionsDescription.waitBegin - range, newCommand.optionsDescription.waitBegin + range);
             newMessage = await sendTypingMessage(channel, newCommand.optionsDescription.text, waitTimerRange)
         }
         else {
@@ -1384,12 +1384,11 @@ async function reactionOptions(playerDungeon, newCommand, author, newMessage) {
                         if (playerDungeon.dialogObj[element.command] && playerDungeon.dialogObj[element.command].command) {
                             typingDialog(playerDungeon, playerDungeon.dialogObj[element.command], author, newMessage);
                             console.log("Using grab object if exists");
-                            hasAlreadyTriggered = true;
                         }
                     }
                 });
             }
-            customCommandEmoteProcessor(playerDungeon, newCommand, author, returnElement, newMessage, reaction);
+            customCommandEmoteProcessor(playerDungeon, newCommand, author, returnElement, newMessage);
             endedOnReact = true;
             collector.stop();
 
@@ -1465,7 +1464,7 @@ cron.schedule('30 */3 * * *', function() {
 
 // Join Message
 function joinMessage(user, channel, room) {
-    var newDungeon;
+    var newDungeon = {};
     var firstUserGiveLeader = false;
     dungeonCollection.forEach(element => {
         if (element.room === room) newDungeon = element;
@@ -1597,7 +1596,7 @@ async function leaveMessage(message) {
             dungeonPlayer.playerDungeon.players = dungeonPlayer.playerDungeon.players.filter(obj => obj.userID !== message.author.id)
 
             // Chooses random leader if leader left
-            console.log("Is there a leader: " + dungeonPlayer.playerDungeon.players.find(l => l.leader) === true);
+            console.log("Is there a leader: " + dungeonPlayer.playerDungeon.players.find(l => l.leader) !== undefined);
             if (dungeonPlayer.playerDungeon.players.find(l => l.leader) === undefined) {
                 for (let i = 0; i < dungeonPlayer.playerDungeon.players.length; i++) {
                     const element = dungeonPlayer.playerDungeon.players[i];
@@ -1787,7 +1786,7 @@ async function sendInventory(playerDungeon, pageNum) {
     // Checks if page number is valid
     if (pageNum + 1 > groupedArr.length) {
         // If it's longer than actual length, but isn't just an empty inventory
-        if (!groupedArr.length === 0) return;  
+        if (groupedArr.length === 0) return;  
     }
 
     // Grabs item in loop, parses it, then adds it to "items" variable
@@ -2036,8 +2035,8 @@ function promoteCommander(author, mentionedMember, leader, channelID) {
         else 
             sendMessage(channelID, `:x: ${author} **Command denied.** You need to be a leader in order to **!promote** others.`);
     } else {
-        temp = author + " !promote (!pr)\n```If you're the leader, you can promote others to be a commander with you in order to move around.```"
-        sendMessage(channelID, temp);
+        let temp = author + " !promote (!pr)\n```If you're the leader, you can promote others to be a commander with you in order to move around.```"
+        client.channels.get(channelID).send(temp);
     }
 }
 
@@ -2064,7 +2063,7 @@ function demoteCommander(author, mentionedMember, leader, channelID) {
         else 
             sendMessage(channelID, `:x: ${author} **Command denied.** You need to be a leader in order to **!demote** others.`);
     } else {
-        temp = author + " !demote (!de)\n```If you're the leader, you can demote others if needed if they are a commander.```"
+        var temp = author + " !demote (!de)\n```If you're the leader, you can demote others if needed if they are a commander.```"
         sendMessage(channelID, temp);
     }
 }
@@ -2074,8 +2073,8 @@ async function transferLeader(message, toUser) {
     // From and to user transfer
     if (toUser === undefined) return message.channel.send(`${message.author} I don't know that user, please try again with someone I can recognize, thanks.`);
 
-    fromUser = getDungeonPlayer(message.author.id);
-    newUser = getDungeonPlayer(toUser.id);
+    let fromUser = getDungeonPlayer(message.author.id);
+    let newUser = getDungeonPlayer(toUser.id);
 
     if (newUser.playerDungeon !== undefined && fromUser.playerDungeon !== undefined 
         && newUser.playerDungeon === fromUser.playerDungeon && fromUser.player.leader

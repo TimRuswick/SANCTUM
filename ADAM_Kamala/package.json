@@ -1,20 +1,16 @@
 {
-  "name": "nodejs-elasticbeanstalk",
+  "name": "sanctum-kamala",
   "version": "1.0.0",
-  "description": "",
-  "main": "server.js",
+  "description": "The faction leader of Obsidian Technologies.",
+  "main": "adam-kamala.js",
   "scripts": {
-    "start": "forever -o forever.log -e error.log start adam-kamala.js",
-    "restart": "forever -o forever.log -e error.log restart adam-kamala.js",
-    "stop": "forever stop adam-kamala.js",
-    "node": "node adam-kamala.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Sanctum Developers",
+  "license": "MIT",
   "dependencies": {
     "discord.js": "^11.4.2",
     "dotenv": "^6.1.0",
-    "forever": "^0.15.3",
     "node-cron": "^1.2.1"
   }
 }

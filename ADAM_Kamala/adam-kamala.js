@@ -1,19 +1,19 @@
 // .env Variables
-require('dotenv').config({path: '../.env'});
+const path = require('path');
+require('dotenv').config({path: path.join(__dirname, "../.env")});
 
 // Node Modules
-let discord = require('discord.js');
-let client = new discord.Client();
+const Discord = require('discord.js');
+const client = new Discord.Client();
 
 // Bot Modules
-let core = require("../ADAM/core");
 let npcSettings = require('./npcSettings');
 let shared = require("../Shared/shared");
 
-//dialog system
-let dialog = shared.GenerateDialogFunction(require("./dialog.json"));
+// Dialog system
+let dialog = shared.utility.generateDialogFunction(require("./dialog.json"));
 
-//dialog decorator
+// Dialog decorator
 dialog = function(baseDialog) {
 	return function(key, ...data) {
 		if ( (key === "help" || key === "lore") && typeof(data[0]) !== "undefined") {
@@ -26,14 +26,11 @@ dialog = function(baseDialog) {
 		let result = baseDialog(key, ...data);
 
 		if (result === "") {
-			return dialog("noResult", key);
+			return; //dialog("noResult", key);
 		}
 		return result;
 	}
 }(dialog);
-
-//handle errors
-client.on('error', console.error);
 
 // The ready event is vital, it means that your bot will only start reacting to information from discord _after_ ready is emitted
 client.on('ready', async () => {
@@ -62,70 +59,89 @@ client.on('ready', async () => {
 // Create an event listener for messages
 client.on('message', async message => {
 	// Ignores ALL bot messages
-	if (message.author.bot) {
-		return;
-	}
+	if (message.author.bot) return;
 
-	//skip the statis channel
-	if (message.channel.id === process.env.STASIS_CHANNEL_ID) {
-		return;
-	}
+	// Skips the stasis channel
+	if (message.channel.id === process.env.STASIS_CHANNEL_ID) return;
 
 	// Has to be (prefix)command
-	if (message.content.indexOf(process.env.PREFIX) !== 0) {
-		return;
-	}
+	if (message.content.indexOf(process.env.PREFIX) !== 0) return;
+	
+	if (processBasicCommands(client, message)) return;
 
-	if (processBasicCommands(client, message)) {
-		return;
-	}
+	// Check if can continue (used primarily by the faction leaders)
+	if (!shared.utility.checkValidDisplay(client, shared.utility.getMember(client, message.author.id), message.channel, false, npcSettings)) return;
 
-	//check if can continue (used primarily by the faction leaders)
-	if (!shared.CheckValidDisplay(client, message.member, message.channel)) {
-		return;
-	}
+	if (processBotChannelCommands(client, message)) return;
 
-	//handle gameplay commands
-	if (core.ProcessGameplayCommands(client, message, dialog)) {
-		return;
+	// Handles gameplay commands (!stats, !checkin, etc.)
+	if (shared.core.processGameplayCommands(client, message, dialog)) return;
+});
+
+// Handles errors
+client.on('error', console.error);
+
+// Testing a bug-fix for when Discord doesn't recover Playing status
+client.on('resume', () => {
+    console.log("RESUME: setting playing activity to...");
+    if (npcSettings.activity) {
+		client.user.setActivity(npcSettings.activity, { type: npcSettings.type })
+			//DEBUGGING
+			.then(presence => console.log("Activity set to " + (presence.game ? presence.game.name : 'none')) )
+			.catch(console.error);
 	}
 });
 
-//Log our bot in
+// Log our bot in (change the token by looking into the .env file)
 client.login(npcSettings.token);
 
 function processBasicCommands(client, message) {
-	// "This is the best way to define args. Trust me."
-	// - Some tutorial dude on the internet
-	let args = message.content.slice(process.env.PREFIX.length).trim().split(/ +/g);
-	let command = args.shift().toLowerCase();
+	let [command, args, guild] = shared.utility.getCommandArgsGuild(client, message);
 
 	switch (command) {
 		case "ping":
-			if (shared.IsAdmin(client, message.author)) {
-				shared.SendPublicMessage(client, message.author, message.channel, "PONG!");
+			if (shared.utility.isAdmin(message.author.id, guild)) {
+				message.reply("Pong!");
 			}
 			return true;
-
-		case "obsidian":
-			return core.ProcessFactionChangeAttempt(client, message, process.env.GROUP_A_ROLE, dialog, "Obsidian");
-
-		//ADAM and the faction leaders print the intros in the gate
-		case "introobsidian":
-			if (shared.IsAdmin(client, message.author) && message.channel.id == process.env.GATE_CHANNEL_ID) {
-				shared.SendPublicMessage(client, client.channels.get(process.env.GATE_CHANNEL_ID), dialog("introObsidian", process.env.GROUP_A_ROLE));
+		case npcSettings.factionShorthand.toLowerCase():
+			// Failsafe in case the user leaves the server and joins again
+			// This will bypass the faction join cooldown, so they can join a faction again once they leave
+			// TODO: Read faction alliances and re-join them back in there possibly
+			var bypassConversionLimit = false;
+			if (message.channel.id === process.env.GATE_CHANNEL_ID || message.channel.id === process.env.TEST_CHANNEL_ID) {
+				bypassConversionLimit = true;
+			}
+			if (message.channel.id === process.env.STASIS_CHANNEL_ID) return;
+			return shared.core.processFactionChangeAttempt(client, message, npcSettings.role, dialog, npcSettings.factionShorthand, bypassConversionLimit);
+		
+		// ADAM and the faction leaders print the intros in the gate
+		case `intro${npcSettings.factionShorthand.toLowerCase()}`:
+			if (shared.utility.isAdmin(message.author.id, guild) && message.channel.id == process.env.GATE_CHANNEL_ID) {
+				client.channels.get(process.env.GATE_CHANNEL_ID).send(dialog(`intro${npcSettings.factionShorthand}`, npcSettings.role));
 				message.delete(1000);
 			}
 			return true;
+	}
 
+	return false;
+}
+
+function processBotChannelCommands(client, message) {
+	let [command, args, guild] = shared.utility.getCommandArgsGuild(client, message);
+	switch (command) {
 		case "help":
 		case "lore":
-			//skip the gate channel
+			// Skip the gate channel
 			if (message.channel.id === process.env.GATE_CHANNEL_ID) {
 				return true;
 			}
 
-			shared.SendPublicMessage(client, message.author, message.channel, dialog(command, args[0]));
+			let moddedArgs = args[0];
+			let userMentions = message.mentions.users;
+			if (userMentions.size > 0) moddedArgs = shared.utility.getMember(client, userMentions.first().id).displayName;
+			let newDialog = dialog(command, moddedArgs);
+			if (newDialog) message.channel.send(message.author + " " + newDialog);
 			return true;
 	}
 

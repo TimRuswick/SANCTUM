@@ -1,15 +1,14 @@
 // .env Variables
-require('dotenv').config({path: '../.env'});
+const path = require('path');
+require('dotenv').config({path: path.join(__dirname, "../.env")});
 
 // Node Modules
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const cron = require('node-cron');
-const request = require('sync-request');
 
 // Bot Modules
-const dataRequest = require('../modules/dataRequest');
-const calcRandom = require('../modules/calcRandom');
+const shared = require('../Shared/shared');
 
 // State Machine
 var ReyEnumState = {
@@ -17,6 +16,8 @@ var ReyEnumState = {
     SCAVENGING: 1
 }
 var reyState = ReyEnumState.WAITING;
+
+const playingActivity = "!scavenge | Scavenging...";
 
 // The ready event is vital, it means that your bot will only start reacting to information
 // from Discord _after_ ready is emitted
@@ -30,7 +31,7 @@ client.on('ready', async () => {
     }
 
     client.user.setStatus('invisible');
-    client.user.setActivity('');
+    client.user.setActivity(playingActivity);
     console.log(`Connected! \
     \nLogged in as: ${client.user.username} - (${client.user.id})`);
 });
@@ -49,71 +50,72 @@ client.on('message', async message => {
     // - Some tutorial dude on the internet
     const args = message.content.slice(process.env.PREFIX.length).trim().split(/ +/g);
     const command = args.shift().toLowerCase();
-    
+    const guild = client.guilds.get(process.env.SANCTUM_ID);
+
     switch (command) {
-        case "scavenge":
-            scavengeMessage(message);
+        case "rey":
+            switch (args[0]) {
+                case "summon":
+                case "s":
+                    if (shared.utility.isAdmin(message.author.id, guild))
+                        reySpawnTimer(process.env.OUTSKIRTS_CHANNEL_ID, true);
+                    break;
+                case "vanish":
+                case "v":
+                    if (shared.utility.isAdmin(message.author.id, guild))
+                        reyTurnOffline(process.env.OUTSKIRTS_CHANNEL_ID);
+                    break;
+            }
             break;
+        case "scavenge":
         case "s":
             scavengeMessage(message);
             break;
         case "materials":
-            materialsMessage(message, args);
-            break;
         case "m":
             materialsMessage(message, args);
-            break;
-        case "summon":
-            if (isAdmin(message.author.id))
-                ReySpawnTimer(process.env.OUTSKIRTS_CHANNEL_ID);
-            break;
-        case "vanish":
-            if (isAdmin(message.author.id))
-                ReyTurnOffline(process.env.OUTSKIRTS_CHANNEL_ID);
             break;
     }
 });
 
+// Handles errors
 client.on('error', console.error);
+
+// Testing a bug-fix for when Discord doesn't recover Playing status
+client.on('resume', () => {
+    console.log("RESUME: setting playing activity to " + playingActivity);
+    client.user.setActivity(playingActivity);
+});
 
 function scavengeMessage(message) {
     if (reyState == ReyEnumState.SCAVENGING) {
         scavenge(message.author.id, message.channel.id);
     } else {
         // Tell that Rey is out of the city
-        message.reply("I'm out of the city for a while. I'll be back later!");
+        message.reply("I'm outta the city for a while, now. I'll be back later!");
     }
 }
 
 function materialsMessage(message, args) {
     if (args[0] === undefined) {
-        var scavengeResponse = String(dataRequest.loadServerData("artifactsGet", message.author.id));
-        var items = scavengeResponse.split(",");
-        var response = items[0];
-        var ultrarare = parseFloat(items[1]);
-        var rare = parseFloat(items[2]);
-        var uncommon = parseFloat(items[3]);
-        var common = parseFloat(items [4]);
-        var scrap = parseFloat(items[5]);
-        var totalQuantity = ultrarare + rare + uncommon + common + scrap;
+        var materials = shared.core.getMaterials(message.author.id);
 
-        if (response == "success"){
-            if (totalQuantity > 0) {
-                var messageContent = "<@" + message.author.id + "> ***Here\'s what you found so far:***\n\n";
-                if (scrap > 0) { messageContent += "<:scrap:463436564379336715> **" + scrap + "**\t\t"; }
-                if (common > 0) { messageContent += "<:mcloth:462682568483930123> **" + common + "**\t\t"; }
-                if (uncommon > 0) { messageContent += "<:mmetal:462682568920137728> **" + uncommon + "**\t\t"; }
-                if (rare > 0) { messageContent += "<:melectronics:462682568911749120> **" + rare + "**\t\t"; }
-                if (ultrarare > 0) { messageContent += "<:mgem:462450060718768148> **" + ultrarare + "**\n\n"; }
-                sendMessage(message.channel.id, messageContent);
+        if (materials.response == "success"){
+            if (materials.totalQuantity > 0) {
+                var messageContent = `${message.author} ***Here's what you found so far...***`;
+                const embed = shared.utility.embedTemplate(client, client.user.id)
+                    .setTitle("Materials")
+                    .setDescription(shared.core.getMaterialsText(client, materials))
+                    .setFooter(`${message.member.displayName}, you got ${materials.totalQuantity} materials total.`, message.author.avatarURL)
+                message.channel.send(messageContent, {embed});
             } else {
-                sendMessage(message.channel.id, ":x: <@" + message.author.id + "> Looks like you don\'t have any materials yet. Help me out on a ***!scavenge***.");
+                message.channel.send(`:x: ${message.author} Looks like you don't have any materials yet. Help me out on a ***!scavenge***.`);
             }
         } else {
-            sendMessage(message.channel.id, ":x: <@" + message.author.id + "> Sorry, something went wrong. Give me a minute.");
+            message.channel.send(`:x: ${message.author} Sorry, something went wrong. Give me a minute.`);
         }
     } else {
-        sendMessage(message.channel.id, ":x: <@" + message.author.id + "> Sorry, not sure what you want me to do.");
+        message.channel.send(`:x: ${message.author} Sorry, not sure what you want me to do.`);
     }
 }
 
@@ -121,80 +123,51 @@ function materialsMessage(message, args) {
 cron.schedule('0 */2 * * *', function() {
     console.log('Running 2 hourly process...');
     if (reyState == ReyEnumState.WAITING) {
-        ReySpawnTimer(process.env.OUTSKIRTS_CHANNEL_ID); 
+        reySpawnTimer(process.env.OUTSKIRTS_CHANNEL_ID); 
     }
 });
 
-// Gets if user has an Overseers rank
-function isAdmin(userID) {
-    var guild = client.guilds.get(process.env.SANCTUM_ID);
-    return guild.members.get(userID).roles.find(role => role.name === "Overseers");
-}
-
-// Async Waiting
-function sleep(time) {
-    return new Promise((resolve, reject) => {
-        setTimeout(resolve, time);
-    });
-}
-
-// https://stackoverflow.com/questions/3733227/javascript-seconds-to-minutes-and-seconds
-function fmtMSS(s){   // accepts seconds as Number or String. Returns m:ss
-    return( s -         // take value s and subtract (will try to convert String to Number)
-            ( s %= 60 ) // the new value of s, now holding the remainder of s divided by 60 
-                        // (will also try to convert String to Number)
-          ) / 60 + (    // and divide the resulting Number by 60 
-                        // (can never result in a fractional value = no need for rounding)
-                        // to which we concatenate a String (converts the Number to String)
-                        // who's reference is chosen by the conditional operator:
-            9 < s       // if    seconds is larger than 9
-            ? ':'       // then  we don't need to prepend a zero
-            : ':0'      // else  we do need to prepend a zero
-          ) + s ;       // and we add Number s to the string (converting it to String as well)
-}
-
 // Rey spawn timer
-async function ReySpawnTimer(channel) {
+async function reySpawnTimer(channel, bypassStartTimer) {
     // Random from 6 sec up to 15 min
-    var startTime = calcRandom.random(6000, 20 * 60 * 1000);
-    console.log(`Waiting for ${fmtMSS(Math.trunc(startTime / 1000))} min. for summon.`);
-    await sleep(startTime);
-
+    if (!bypassStartTimer) {
+        var startTime = shared.utility.random(6000, 20 * 60 * 1000);
+        console.log(`Waiting for ${shared.utility.formatMSS(Math.trunc(startTime / 1000))} min. for summon.`);
+        await shared.utility.sleep(startTime);
+    }
     client.user.setStatus('online');
-    client.user.setActivity('Scavenging...');
+    client.user.setActivity(playingActivity);
 
     const useEmbed = true;
 
     if (!useEmbed)
-        sendMessage(channel, `***Hey y\'all! Let's scavenge us some materials!***\
+        shared.messaging.sendMessage(client, channel, `***Hey y\'all! Let's scavenge us some materials!***\
         \nUse !scavenge to get some materials.`);
     else {
-        const reyBot = client.guilds.get(process.env.SANCTUM_ID).members.get(client.user.id);
         const dialog = "***Hey y'all! Let's scavenge us some materials!***";
-        const embed = new Discord.RichEmbed()
-            .setAuthor(reyBot.displayName, reyBot.user.avatarURL)
-            .setColor(reyBot.displayColor)
-            .setTitle("Scavenging")
-            .setDescription(`Use **!scavenge** to get some materials.`)
-            .addField("Cost", `> <:crystals:460974340247257089> **Crystals** [3x]\n> **1 STAM**`)
+        const crystals = shared.utility.getEmote(client, "crystals");
 
-        client.channels.get(channel).send(dialog, embed);
+        const embed = shared.utility.embedTemplate(client, client.user.id)
+            .setTitle("Scavenging")
+            .setDescription(`Spend ${crystals} **3** and \`1 STAM\`, y'all might find some cool things!`)
+            .setFooter(`Use !scavenge to start digging.`)
+        client.channels.get(channel).send(dialog, {embed});
     }
 
     reyState = ReyEnumState.SCAVENGING;
 
     // Start time plus another 6 - 10 min
     //var leaveTime = startTime + (2 * 60 * 1000); // Debug 2 Minute Mode
-    var leaveTime  = calcRandom.random(6 * 60 * 1000, 10 * 60 * 1000);
-    await sleep(leaveTime);
+    var leaveTime  = shared.utility.random(6 * 60 * 1000, 10 * 60 * 1000);
+    await shared.utility.sleep(leaveTime);
 
-    sendMessage(channel, "Getting ready to pack up here, I think we found enough.\n\n:warning: ***LAST CALL!***");
-    await sleep(30000);
-    ReyTurnOffline(channel);
+    shared.messaging.sendMessage(client, channel, "Getting ready to pack up here, I think we found enough.\n\n:warning: ***LAST CALL!***");
+    await shared.utility.sleep(30000);
+    reyTurnOffline(channel);
 }
 
-function ReyTurnOffline(channel) {
-    sendMessage(channel, `Alright ladies and gents... I'm out of here. Nice finding stuff with y'all! \
+function reyTurnOffline(channel) {
+    shared.messaging.sendMessage(client, channel, `Alright ladies and gents... I'm out of here. Nice finding stuff with y'all! \
     \n\n:v: ***HEADS BACK TO THE CITY***`);
     client.user.setStatus('invisible');
     client.user.setActivity('');
@@ -203,17 +176,14 @@ function ReyTurnOffline(channel) {
 
 // Scavenge logic
 function scavenge(userID, channelID) {
-    var attacker = String(dataRequest.loadServerData("userStats", userID));
-    var attackerStamina = parseFloat(attacker.split(",")[2]);
-    var attackerHealth = parseFloat(attacker.split(",")[3]);
-    var attackerWallet = parseFloat(attacker.split(",")[6]);
+    var stats = shared.core.getStats(userID);
 
     var staminaCost = 1;
     var crystalCost = 3;
-    if (attackerHealth > 0) {
-        if (attackerStamina >= staminaCost) {
-            if (attackerWallet >= crystalCost) {
-                var scavengeResponse = String(dataRequest.sendServerData("scavenge", staminaCost, userID, crystalCost));
+    if (stats.health > 0) {
+        if (stats.stamina >= staminaCost) {
+            if (stats.wallet >= crystalCost) {
+                var scavengeResponse = String(shared.dataRequest.sendServerData("scavenge", staminaCost, userID, crystalCost));
                 var items = scavengeResponse.split(",");
                 var response = parseFloat(items[0]);
                 var ultrarare = parseFloat(items[1]);
@@ -236,43 +206,24 @@ function scavenge(userID, channelID) {
                 ];
 
                 var randomNumber = Math.floor(Math.random() * dialogOptions.length);
-                var message = "<@" + userID + "> \t\t";
-                message += "<:crystals:460974340247257089> **-" + crystalCost + "**\t\t"
-                if (scrap > 0) { message += "<:scrap:463436564379336715>  **+" + scrap + "**\t\t"; }
-                if (common > 0) { message += "<:mcloth:462682568483930123> **+" + common + "**\t\t"; }
-                if (uncommon > 0) { message += "<:mmetal:462682568920137728> **+" + uncommon + "**\t\t"; }
-                if (rare > 0) { message += "<:melectronics:462682568911749120> **+" + rare + "**\t\t"; }
-                if (ultrarare > 0) { message += "<:mgem:462450060718768148> **+" + ultrarare + "**\n\n"; }
-                message += "\n***" + dialogOptions[randomNumber] + "*** \n"
-                sendMessage(channelID, message);
+                var message = `<@${userID}> \t\t`;
+                message += `${shared.utility.getEmote(client, "crystals")} **-${crystalCost}**\t\t`
+                if (scrap > 0) { message += `${shared.utility.getEmote(client, "mscrap")} **+${scrap}**\t\t`; }
+                if (common > 0) { message += `${shared.utility.getEmote(client, "mcloth")} **+${common}**\t\t`; }
+                if (uncommon > 0) { message += `${shared.utility.getEmote(client, "melectronics")} **+${uncommon}**\t\t`; }
+                if (rare > 0) { message += `${shared.utility.getEmote(client, "mmetal")} **+${rare}**\t\t`; }
+                if (ultrarare > 0) { message += `${shared.utility.getEmote(client, "mgem")} **+${ultrarare}**\t\t`; }
+                message += `\n***${dialogOptions[randomNumber]}***`;
+                shared.messaging.sendMessage(client, channelID, message);
             } else {
-                sendMessage(channelID, ":x: <@" + userID + "> You don\'t have enough crystals to sustain you while you\'re out. Bad idea.");
+                shared.messaging.sendMessage(client, channelID, `:x: <@${userID}> You don't have enough crystals to sustain you while you're out. Bad idea.`);
             }
         } else {
-            sendMessage(channelID, ":x: <@" + userID + "> You don\'t have enough stamina for that right now. You should probably get some rest.");
+            shared.messaging.sendMessage(client, channelID, `:x: <@${userID}> You don't have enough stamina for that right now. You should probably get some rest.`);
         }
     } else {
-        sendMessage(channelID, ":x: <@" + userID + "> You\'re in really bad shape... You should go see <@461294299515191306> before you go on a scavenge.");
+        shared.messaging.sendMessage(client, channelID, `:x: <@${userID}> You're in really bad shape... You should go see <@${process.env.MORI_ID}> before you go on a scavenge.`);
     }
-}
-
-
-// Send message handler
-function sendMessage(userID, channelID, message) {
-    // Handle optional first argument (so much for default arugments in node)
-    if (message === undefined) {
-        message = channelID;
-        channelID = userID;
-        userID = null;
-    }
-
-    // Utility trick (@userID with an optional argument)
-    if (userID != null) {
-        message = "<@" + userID + "> " + message;
-    }
-    
-    // Sends message (needs client var, therefore I think external script won't work)
-    client.channels.get(channelID).send(message);
 }
 
 // Log our bot in

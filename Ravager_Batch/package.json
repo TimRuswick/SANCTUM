@@ -1,8 +1,8 @@
 {
-  "name": "sanctum-mori",
+  "name": "sanctum-ravager-batch",
   "version": "1.0.1",
-  "description": "Sanctum's BioMed Specialist, who heals and revives travelers.",
-  "main": "mori.js",
+  "description": "The enemy of the city, which players !attack to earn crystals.",
+  "main": "ravager.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

@@ -1,20 +1,20 @@
 // .env Variables
-require('dotenv').config({path: '../.env'});
+const path = require('path');
+require('dotenv').config({path: path.join(__dirname, "../.env")});
 
 // Node Modules
-let discord = require('discord.js');
-let client = new discord.Client();
-let cron = require('node-cron');
+const Discord = require('discord.js');
+const client = new Discord.Client();
+const cron = require('node-cron');
 
 // Bot Modules
-let core = require("./core");
-let npcSettings = require('./npcSettings');
-let shared = require("../Shared/shared");
+const npcSettings = require('./npcSettings');
+const shared = require("../Shared/shared");
 
-//dialog system
-let dialog = shared.GenerateDialogFunction(require("./dialog.json"));
+// Dialog system
+let dialog = shared.utility.generateDialogFunction(require("./dialog.json"));
 
-//dialog decorator
+// Dialog decorator
 dialog = function(baseDialog) {
 	return function(key, ...data) {
 		if ( (key === "help" || key === "lore") && typeof(data[0]) !== "undefined") {
@@ -33,10 +33,8 @@ dialog = function(baseDialog) {
 	}
 }(dialog);
 
-//handle errors
-client.on('error', console.error);
-
-// The ready event is vital, it means that your bot will only start reacting to information from discord _after_ ready is emitted
+// The ready event is vital, it means that your bot will only start reacting to information
+// from Discord _after_ ready is emitted
 client.on('ready', async () => {
 	// Generates invite link
 	try {
@@ -58,43 +56,47 @@ client.on('ready', async () => {
 	}
 
 	console.log("Logged in as: " + client.user.username + " - " + client.user.id);
-
-	//ADAM updates stamina (1) and health by 1% every 2 min.
-	cron.schedule('*/2 * * * *', () => {
-		console.log('Updating STAMINA every 2 min.');
-		shared.SendServerData("updateStamina");
-	});
 });
 
 // Create an event listener for messages
 client.on('message', async message => {
 	// Ignores ALL bot messages
-	if (message.author.bot) {
-		return;
-	}
+	if (message.author.bot) return;
 
-	//skip the statis channel
-	if (message.channel.id === process.env.STASIS_CHANNEL_ID) {
-		return;
-	}
+	// Skips the stasis channel
+	if (message.channel.id === process.env.STASIS_CHANNEL_ID) return;
 
-	//ADAM only - handle the gate
-	if (processGateCommands(message)) {
-		return;
-	}
+	// ADAM only - handle the gate
+	if (processGateCommands(message)) return;
 
 	// Has to be (prefix)command
-	if (message.content.indexOf(process.env.PREFIX) !== 0) {
-		return;
-	}
+	if (message.content.indexOf(process.env.PREFIX) !== 0) return;
 
-	if (processBasicCommands(client, message)) {
-		return;
+	if (processBasicCommands(client, message)) return;
+});
+
+// Handles errors
+client.on('error', console.error);
+
+// Testing a bug-fix for when Discord doesn't recover Playing status
+client.on('resume', () => {
+	// Sets your "Playing"
+	if (npcSettings.activity) {
+		client.user.setActivity(npcSettings.activity, { type: npcSettings.type })
+			//DEBUGGING
+			.then(presence => console.log("[RESUME] Activity set to " + (presence.game ? presence.game.name : 'none')) )
+			.catch(console.error);
 	}
 });
 
-//Log our bot in
+// Log our bot in (change the token by looking into the .env file)
 client.login(npcSettings.token);
+
+// ADAM updates stamina (1) and health by 1% every 2 min.
+cron.schedule('*/2 * * * *', () => {
+	console.log('Updating STAMINA every 2 min.');
+	shared.dataRequest.sendServerData("updateStamina");
+});
 
 function processGateCommands(message) {
 	// If it's not the gate
@@ -103,55 +105,60 @@ function processGateCommands(message) {
 	}
 
 	//TODO: parse function for commands to hide these ugly lines
-	let args = message.content.slice(process.env.PREFIX.length).trim().split(/ +/g);
-	let command = args.shift().toLowerCase();
+	const args = message.content.slice(process.env.PREFIX.length).trim().split(/ +/g);
+	const command = args.shift().toLowerCase();
 
-	//WARNING: string constants used here
-
-	//if laying out the intro
+	// WARNING: string constants used here
+	// If laying out the intro
 	if (command.substr(0, 5) === "intro") {
 		return false;
 	}
 
-	//if they haven't chosen a faction
+	// If they haven't chosen a faction
 	if (!(command === "obsidian" || command === "genesis" || command === "hand")) {
 		message.reply("Please choose one of the factions by typing your desired faction shown above (!obsidian, !genesis, or !hand).")
 			.then(msg => msg.delete(10000)) //remove the error message
 			.catch(console.error);
 	}
 
-	message.delete(100); //remove the user's input to keep the gate clean
+	message.delete(100); // Remove the user's input to keep #the-gate clean
 	return true;
 }
 
 function processBasicCommands(client, message) {
 	// "This is the best way to define args. Trust me."
 	// - Some tutorial dude on the internet
-	let args = message.content.slice(process.env.PREFIX.length).trim().split(/ +/g);
-	let command = args.shift().toLowerCase();
+	const args = message.content.slice(process.env.PREFIX.length).trim().split(/ +/g);
+	const command = args.shift().toLowerCase();
+	const guild = client.guilds.get(process.env.SANCTUM_ID);
 
 	switch (command) {
 		case "ping":
-			if (shared.IsAdmin(client, message.author)) {
-				shared.SendPublicMessage(client, message.author, message.channel, "PONG!");
+			if (shared.utility.isAdmin(message.author.id, guild)) {
+				message.reply("Pong!");
 			}
 			return true;
 
-		//ADAM and the faction leaders print the intros in the gate
-		//TODO: prune the unneeded intros from each bot
+		// ADAM and the faction leaders print the intros in the gate
+		// TODO: prune the unneeded intros from each bot
 		case "intro":
-			if (shared.IsAdmin(client, message.author) && message.channel.id == process.env.GATE_CHANNEL_ID) {
-				shared.SendPublicMessage(client, client.channels.get(process.env.GATE_CHANNEL_ID), dialog("intro"));
+			if (shared.utility.isAdmin(message.author.id, guild) && message.channel.id == process.env.GATE_CHANNEL_ID) {
+				shared.messaging.sendMessage(client, client.channels.get(process.env.GATE_CHANNEL_ID), dialog("intro"));
 				message.delete(1000);
 			}
 			return true;
 
 		case "introend":
-			if (shared.IsAdmin(client, message.author) && message.channel.id == process.env.GATE_CHANNEL_ID) {
-				shared.SendPublicMessage(client, client.channels.get(process.env.GATE_CHANNEL_ID), dialog("introEnd"));
+			if (shared.utility.isAdmin(message.author.id, guild) && message.channel.id == process.env.GATE_CHANNEL_ID) {
+				shared.messaging.sendMessage(client, client.channels.get(process.env.GATE_CHANNEL_ID), dialog("introEnd"));
 				message.delete(1000);
 			}
 			return true;
+			
+		case "xp":
+			if (!shared.utility.isAdmin(message.author.id, guild)) return;
+			shared.progression.addXP(message.author.id, shared.utility.parsePageNumFromArgs(args[0]));
+			break;
 	}
 
 	return false;

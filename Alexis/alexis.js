@@ -1,13 +1,13 @@
 // .env Variables
-require('dotenv').config({path: '../.env'});
+const path = require('path');
+require('dotenv').config({path: path.join(__dirname, "../.env")});
 
 // Node Modules
 const Discord = require('discord.js');
 const client = new Discord.Client();
 
 // Bot Modules (stores http requests & random functions respectively)
-const dataRequest = require('../modules/dataRequest');
-const calcRandom = require('../modules/calcRandom');
+const shared = require('../Shared/shared');
 
 // Drinks
 const drinks = [
@@ -19,10 +19,10 @@ const drinks = [
     // https://en.wikipedia.org/wiki/Wine_tasting_descriptors
     ['🍷', 'Wine', 'An aromatic wine, with a round taste.', '10'],
     // http://richardgpeterson.com/champagne-glossary/
-    ['🍾', 'Champagne', 'A brilliant, crisp drink. You can share your 🥂 drink with the tavern!', '20']
+    ['🍾', 'Champagne', 'A brilliant, crisp drink. Share your drink with the tavern!', '20']
 ]
 
-const normalActivity = '!buydrink | Bartender, Confidant'
+const playingActivity = '!buydrink | Bartender, Confidant';
 
 // The ready event is vital, it means that your bot will only start reacting to information
 // from Discord _after_ ready is emitted
@@ -38,7 +38,7 @@ client.on('ready', async () => {
     // You can set status to 'online', 'invisible', 'away', or 'dnd' (do not disturb)
     client.user.setStatus('online');
     // Sets your "Playing"
-    client.user.setActivity(normalActivity);
+    client.user.setActivity(playingActivity);
     console.log(`Connected! \
     \nLogged in as: ${client.user.username} - (${client.user.id})`);
 });
@@ -54,8 +54,8 @@ client.on('message', async message => {
     // Ignores ALL bot messages with exceptions
     if (message.author.bot) {
         // If bot is Mori
-        if (message.author.id === "461294299515191306") {
-            if (calcRandom.gamble(33)) {
+        if (message.author.id === process.env.MORI_ID) {
+            if (shared.utility.randomPercent(33)) {
                 var dialogOptions = [
                     'Aww, do you have to rez \'em all?',
                     'I feel like you should skip some of \'em.',
@@ -72,9 +72,9 @@ client.on('message', async message => {
                 
                 message.channel.startTyping();
                 setTimeout(() => {
-                    sendMessage(message.channel.id, "<@" + message.author.id + "> " + dialogOptions[randomNumber]);
+                    message.channel.send("<@" + message.author.id + "> " + dialogOptions[randomNumber]);
                     message.channel.stopTyping(true);
-                }, calcRandom.random(2500, 6000));
+                }, shared.utility.random(2500, 6000));
                 sentMessageFlag = true;
             }
         }
@@ -86,10 +86,10 @@ client.on('message', async message => {
     console.log("wholeMessage: " + wholeMessage + "\nWords: " + words)
     // Hearts message with "alexis" and not "date"
     if (words.includes("alexis") && !words.includes("date") && sentMessageFlag === false) {
-        if (calcRandom.gamble(33)) {
+        if (shared.utility.randomPercent(33)) {
             setTimeout(function() {
                 message.react("❤")
-            }, calcRandom.random(1500,4000));
+            }, shared.utility.random(1500,4000));
             sentMessageFlag = true;
             return;
         }
@@ -104,18 +104,18 @@ client.on('message', async message => {
     
     // Saying Alexis is your friend basically
     if (words.includes("alexis") && words.includes("friend") && !words.includes("date") && sentMessageFlag === false) {
-        if (calcRandom.gamble(45)) {
+        if (shared.utility.randomPercent(45)) {
             var dialogOptions = [
-                '<@276538857174990858> is my girl.',
-                '<@462675530928357376>\'s been out a long while, but when she gets back I hope she stops by.',
-                'Me \'n <@462675530928357376> are pretty close.',
-                'Well I can tell ya\' who\'s not my friend. <@461294299515191306>. No offense hun.',
-                'That <@163770616581718017> character is mighty strange. But <@276538857174990858> fancies him so he must be alright.',
-                'You don\'t tip enough to call me a friend sweetie.',
-                'Listen here. I\'d love to chat but <@276538857174990858> \'n <@462675530928357376> have plans in a bit.',
-                'We\'re all friends when we drink together.',
-                'Ol\' Jakey never came back. Nice guy. Probably made a nice meal for a Ravager.',
-                'There\'s friends, and then there\'s family. Me \'n <@276538857174990858> are like that.'
+                `<@276538857174990858> is my girl.`,
+                `<${process.env.REY_ID}>'s been out a long while, but when she gets back I hope she stops by.`,
+                `Me 'n <${process.env.REY_ID}> are pretty close.`,
+                `Well I can tell ya' who's not my friend. <${process.env.MORI_ID}>. No offense hun.`,
+                `That <@163770616581718017> character is mighty strange. But <@276538857174990858> fancies him so he must be alright.`,
+                `You don't tip enough to call me a friend sweetie.`,
+                `Listen here. I'd love to chat but <@276538857174990858> 'n <${process.env.REY_ID}> have plans in a bit.`,
+                `We're all friends when we drink together.`,
+                `Ol' Jakey never came back. Nice guy. Probably made a nice meal for a Ravager.`,
+                `There's friends, and then there's family. Me 'n <@276538857174990858> are like that.`
             ];
             typeRandomDialog(dialogOptions, message.channel);
             sentMessageFlag = true;
@@ -125,7 +125,7 @@ client.on('message', async message => {
     
     // Asking Alexis on a date
     if (words.includes("alexis") && words.includes("date") && sentMessageFlag === false) {
-        if (calcRandom.gamble(33)) {
+        if (shared.utility.randomPercent(33)) {
             var dialogOptions = [
                 'Honey yer a darling, but not gonna happen.',
                 'Just because yer cute doesn\'t mean you get an auto-yes.',
@@ -146,7 +146,7 @@ client.on('message', async message => {
 
     // Ravager topic
     if (words.includes("ravager") || words.includes("ravagers") && sentMessageFlag === false) {
-        if (calcRandom.gamble(33)) {
+        if (shared.utility.randomPercent(33)) {
             var dialogOptions = [
                 'never seen one in person.',
                 'Are they really big and scary? Only seen pictures on the \'net.',
@@ -167,7 +167,7 @@ client.on('message', async message => {
   
     // Bar fights
     if (words.includes("fight") || words.includes("attack") || words.includes("fighting") || words.includes("barfight") || words.includes("fite") && sentMessageFlag === false) {
-        if (calcRandom.gamble(33)) {
+        if (shared.utility.randomPercent(33)) {
             var dialogOptions = [
                 'Don\'t be startin\' no brawlers in here, ya\' hear?',
                 'Don\'t even think about it.',
@@ -188,7 +188,7 @@ client.on('message', async message => {
 
     // Good nights
     if (words.includes("gn") || words.includes("night") || words.includes("goodnight") || words.includes("sleep") && sentMessageFlag === false) {
-        if (calcRandom.gamble(33)) {
+        if (shared.utility.randomPercent(33)) {
             var dialogOptions = [
                 'Night hun.',
                 'Goodnight sweety. You comin\' back tomorrow?',
@@ -210,34 +210,29 @@ client.on('message', async message => {
     // Has to be (prefix)command
     if (message.content.indexOf(process.env.PREFIX) !== 0) return;
 
-    // "This is the best way to define args. Trust me."
-    // - Some tutorial dude on the internet
-    const args = message.content.slice(process.env.PREFIX.length).trim().split(/ +/g);
-    const command = args.shift().toLowerCase();
+    let [command, args, guild] = shared.utility.getCommandArgsGuild(client, message);
 
     switch (command) {
         case "ping":
-            if (message.author.id === '200340393596944384' || message.author.id === '163770616581718017')
+            if (shared.utility.isAdmin(message.author.id, guild))
                 message.reply("Pong!");
             break;
         case "buydrink":
-            buyDrink(message, args);
+            payDrinks(message, args[0], args);
             break;
 
         case "tip":
             if (args == "") {
-            //if (false) {
-                newMessage = `:x: I appreciate the gesture, but how much did you wanna tip, <@${message.author.id}>?`;
-                sendMessage(message.channel.id, newMessage);
+                newMessage = `:x: I appreciate the gesture, but how much did you wanna tip, ${message.author}?`;
+                message.channel.send(newMessage);
             } else {
                 var crystalCost = Math.floor(parseFloat(args));
                 if (crystalCost > 0) {
                 //if (crystalCost > -1) {
                     // Valid number
-                    var attacker = String(dataRequest.loadServerData("userStats", message.author.id));
-                    var attackerWallet = parseFloat(attacker.split(",")[6]);
-                    if (attackerWallet > crystalCost) {
-                        var upgradeResponse = dataRequest.sendServerData("buyDrink", crystalCost, message.author.id);
+                    var stats = shared.core.getStats(message.author.id);
+                    if (stats.wallet > crystalCost) {
+                        var upgradeResponse = shared.dataRequest.sendServerData("buyDrink", crystalCost, message.author.id);
                         var dialogOptions = [
                             'Well ain\'t you sweet. Much appreciated.',
                             'Awww that\'s mighty nice of ya\' :heart:',
@@ -252,8 +247,8 @@ client.on('message', async message => {
                         ];
 
                         var randomNumber = Math.floor(Math.random() * dialogOptions.length);
-                        newMessage = dialogOptions[randomNumber] + "\n<@" + message.author.id + "> <:crystals:460974340247257089> **-" + crystalCost + "**";
-                        sendMessage(message.channel.id, newMessage);
+                        newMessage = `${dialogOptions[randomNumber]}\n${message.author} ${shared.utility.getEmote(client, "crystals")} **-${crystalCost}**`;
+                        message.channel.send(newMessage);
 
                         //Send PM (defunct)
                         //if (crystalCost >= 0) {
@@ -289,33 +284,25 @@ client.on('message', async message => {
                         }
                         */
                     } else {
-                        sendMessage(message.channel.id, ":x: <@" + message.author.id + "> Looks like ya\' ain\'t got the <:crystals:460974340247257089>. Don\'t make a girl a promise that ya\' can\'t keep.");
+                        message.channel.send(`:x: ${message.author} Looks like ya' ain't got the ${shared.utility}. Don't make a girl a promise that ya' can't keep.`);
                     }
                 } else {
                     //Not a number
-                    sendMessage(message.channel.id, `:x: Doesn't seem like a tip I could use, but I appreciate the thought, <@${message.author.id}>!`);
+                    message.channel.send(`:x: Doesn't seem like a tip I could use, but I appreciate the thought, ${message.author}!`);
                 }
             }
             break;
     }
 });
 
+// Handles errors
 client.on('error', console.error);
 
-// https://stackoverflow.com/questions/3733227/javascript-seconds-to-minutes-and-seconds
-function fmtMSS(s){   // accepts seconds as Number or String. Returns m:ss
-    return( s -         // take value s and subtract (will try to convert String to Number)
-            ( s %= 60 ) // the new value of s, now holding the remainder of s divided by 60 
-                        // (will also try to convert String to Number)
-          ) / 60 + (    // and divide the resulting Number by 60 
-                        // (can never result in a fractional value = no need for rounding)
-                        // to which we concatenate a String (converts the Number to String)
-                        // who's reference is chosen by the conditional operator:
-            9 < s       // if    seconds is larger than 9
-            ? ':'       // then  we don't need to prepend a zero
-            : ':0'      // else  we do need to prepend a zero
-          ) + s ;       // and we add Number s to the string (converting it to String as well)
-}
+// Testing a bug-fix for when Discord doesn't recover Playing status
+client.on('resume', () => {
+    console.log("RESUME: setting playing activity to " + playingActivity);
+    client.user.setActivity(playingActivity);
+});
 
 function sayHey(channel, userID) {
     var dialogOptions = [
@@ -348,9 +335,9 @@ function sayHey(channel, userID) {
 
     channel.startTyping();
     setTimeout(function() {
-        sendMessage(channel.id, newMessage);
+        shared.messaging.sendMessage(client, channel, newMessage);
         channel.stopTyping(true);
-    }, calcRandom.random(2500,6000));
+    }, shared.utility.random(2500,6000));
 }
 
 function typeRandomDialog(dialogOptions, channel, playerID) {
@@ -359,37 +346,12 @@ function typeRandomDialog(dialogOptions, channel, playerID) {
     channel.startTyping();
     setTimeout(function() {
         if (playerID === undefined)
-            sendMessage(channel.id, dialogOptions[randomNumber]);
+            shared.messaging.sendMessage(client, channel, dialogOptions[randomNumber]);
         else
-            sendMessage(channel.id, "<@" + playerID + "> " + dialogOptions[randomNumber]);
+            shared.messaging.sendMessage(client, channel, "<@" + playerID + "> " + dialogOptions[randomNumber]);
         
         channel.stopTyping(true);
-    }, calcRandom.random(2500, 6000));
-}
-
-// Send message handler
-function sendMessage(userID, channelID, message) {
-    // Handle optional first argument (so much for default arugments in node)
-    if (message === undefined) {
-        message = channelID;
-        channelID = userID;
-        userID = null;
-    }
-
-    // Utility trick (@userID with an optional argument)
-    if (userID != null) {
-        message = "<@" + userID + "> " + message;
-    }
-    
-    // Sends message (needs client var, therefore I think external script won't work)
-    client.channels.get(channelID).send(message);
-}
-
-// Async Waiting
-function sleep(time) {
-    return new Promise((resolve, reject) => {
-        setTimeout(resolve, time);
-    });
+    }, shared.utility.random(2500, 6000));
 }
 
 // Buy drink
@@ -403,11 +365,11 @@ async function buyDrink(message, args) {
 
     var randomNumber = Math.floor(Math.random() * randomGreet.length);
 
+    /*
     message.channel.startTyping();
-    await sleep(1500);
+    await shared.utility.sleep(1500);
     message.channel.stopTyping(true);
-
-    const takingTooLongMessage = ":x: Sorry, hun. But the others need me and yer taking too long. Call me back once you've made yer mind up, alright " + message.author + "?";
+    */
     var footerName = message.member.displayName;
     var courtesy = "";
     var tmp = "";
@@ -415,24 +377,27 @@ async function buyDrink(message, args) {
     // Generates drink text.
     for (let index = 0; index < drinks.length; index++) {
         const element = drinks[index];
-        tmp += `${element[0]} **${element[1]} <:crystals:460974340247257089> ${element[3]}** - ${element[2]}\n`
+        tmp += `${element[0]} **${element[1]} ${shared.utility.getEmote(client, "crystals")} ${element[3]}** - ${element[2]}\n`
     }
     
     // If there is a mention
+    /*
     if (message.mentions.members.size > 0) {
         footerName = message.mentions.members.first().displayName;
         courtesy = `(Given to ${message.mentions.members.first().displayName}, Courtesy of ${message.member.displayName})`;
     }
+    */
 
     const embed = new Discord.RichEmbed()
         .setAuthor("Alexis", client.user.avatarURL)
         .setColor("#ffcc4d")
         .setTitle("Traveler's Watch Drinks " + courtesy)
         .setDescription(tmp)
-        .setFooter("We hope you enjoy your stay, " + footerName + "!")
+        .setFooter(`Hope ya' enjoy your stay, ${footerName}! Buy a drink with !buydrink [DRINK].`, message.author.avatarURL)
 
     var newMessage = await message.channel.send(randomGreet[randomNumber], {embed});
-    var emoteReaction;
+    /*
+    var emoteReaction = "";
 
     // Collects emotes and reacts upon the reaction (15 seconds)
     const collector = newMessage.createReactionCollector(
@@ -462,7 +427,6 @@ async function buyDrink(message, args) {
         // If no choose
         if (!endedOnReact) {
             newMessage.edit(newMessage.content);
-            return newMessage.channel.send(takingTooLongMessage);
         }
 
         // If cancelled
@@ -475,7 +439,7 @@ async function buyDrink(message, args) {
         var index = drinks.findIndex(drink => drink[0] === emoteReaction);
         //console.log(index + "\n" + drinks[index]);
 
-        var confirmationMessage = await message.channel.send(`${message.author} You sure you want to buy the ${drinks[index][0]} **${drinks[index][1]}** for <:crystals:460974340247257089> **${drinks[index][3]}**?`);
+        var confirmationMessage = await message.channel.send(`${message.author} You sure you want to buy the ${drinks[index][0]} **${drinks[index][1]}** for ${shared.utility.getEmote(client, "crystals")} **${drinks[index][3]}**?`);
         await confirmationMessage.react('✅');
         await confirmationMessage.react('❌');
 
@@ -498,7 +462,7 @@ async function buyDrink(message, args) {
 
             // If no choose
             if (!confirmReact) {
-                return message.channel.send(takingTooLongMessage);
+                return;
             }
 
             if (emoteReaction === "✅") { 
@@ -508,23 +472,33 @@ async function buyDrink(message, args) {
             }
         });
     });
+    */
 }
 
 // Buying drink
-function payDrinks(message, drink) {
-    //var crystalCost = 0;
-    
+function payDrinks(message, drink, args) {
+    var newDrink = false;
+    drinks.forEach(element => {
+        if (element[1].toLowerCase() === drink) newDrink = element; 
+    });
+
+    if (!newDrink) {
+        if (args[0] && message.mentions.members.size > 0) message.channel.send(`:x: ${message.author} You wanna buy ***WHO*** a ***WHAT*** now?`);
+        else buyDrink(message, args);
+        return;
+    }
+    console.log(newDrink);
+
     // A ton of variables
-    var crystalCost = parseFloat(drink[3]);
-    var emote = drink[0];
+    var crystalCost = parseFloat(newDrink[3]);
+    var emote = newDrink[0];
     var givenIsAlexis = false;
     var success = false;
-    var attacker = String(dataRequest.loadServerData("userStats", message.author.id));
-    var attackerWallet = parseFloat(attacker.split(",")[6]);
+    var stats = shared.core.getStats(message.author.id);
+    console.log("[Pay Drinks] Wallet: " + stats.wallet + " | Crystal Cost: " + crystalCost);
 
-    console.log("[Pay Drinks] Wallet: " + attackerWallet + " | Crystal Cost: " + crystalCost);
-    if (attackerWallet >= crystalCost) {
-        dataRequest.sendServerData("buyDrink", crystalCost, message.author.id);
+    if (stats.wallet >= crystalCost) {
+        shared.dataRequest.sendServerData("buyDrink", crystalCost, message.author.id);
 
         dialogOptions = [
             'Here\'s a cold one,',
@@ -545,7 +519,7 @@ function payDrinks(message, drink) {
                 var dialogOptions = [
                     `Aww, thanks! :heart:`,
                     `Thanks for the drink! Cheers!`,
-                    `Are you trying to make me drunk? Don't even TRY asking me out on a date,`
+                    `Are you trying to make me drunk? Don't even TRY asking me out on a date.`
                 ];
                 givenIsAlexis = true;
             }
@@ -557,7 +531,7 @@ function payDrinks(message, drink) {
         // Single or multiple user messages
         if (message.mentions.members.size < 1) {
             success = true;
-            newMessage = `${emote} ` + dialogOptions[randomNumber] + " <@" + message.author.id + ">! <:crystals:460974340247257089> **-" + crystalCost + "**";
+            newMessage = `${emote} ${dialogOptions[randomNumber]} ${message.author}! ${shared.utility.getEmote(client, "crystals")} **-${crystalCost}**`;
         } else {
             // Huge scope creep, but have a list of players able to be given beer instead of just one later on
             // For now, just taking the first player
@@ -568,26 +542,27 @@ function payDrinks(message, drink) {
                 if (givenIsAlexis) givePingUser = "";
                 
                 success = true;
-                newMessage = `${emote} ` + dialogOptions[randomNumber] + givePingUser + "\n\n" + "***Courtesy of *** <@" + message.author.id + ">. <:crystals:460974340247257089> **-" + crystalCost + "**";
+                newMessage = `${emote} ${dialogOptions[randomNumber]}${givePingUser}\n\n` + 
+                             `***Courtesy of*** ${message.author}. ${shared.utility.getEmote(client, "crystals")} **-${crystalCost}**`;
             } else {
-                newMessage = ":x: <@" + message.author.id + "> You wanna buy ***WHO*** a ***WHAT*** now?";
+                newMessage = `:x: ${message.author} You wanna buy ***WHO*** a ***WHAT*** now?`;
             }
         }
-        sendMessage(message.channel.id, newMessage);
+        message.channel.send(newMessage);
 
         // Does champagne sharing
-        if (success && drink[1] === "Champagne") {
-            shareDrinks(message, drink);
+        if (success && newDrink[1] === "Champagne") {
+            shareDrinks(message, newDrink);
         }
 
     } else {
-        sendMessage(message.channel.id, ":x: <@" + message.author.id + "> Looks like ya\' ain\'t got the <:crystals:460974340247257089><:crystals:460974340247257089><:crystals:460974340247257089>. I ain\'t runnin\' a charity here.");
+        message.channel.send(`:x: ${message.author} Looks like ya' ain't got the ${shared.utility.getEmote(client, "crystals")} **2**. I ain't runnin' a charity here.`);
     }
 }
 
 // Mass buying of a drink
 async function shareDrinks(message, drink) {
-    const drinkMessage = `${message.author} has bought some ${drink[0]} **${drink[1]}**! React to get your **free drink!** 🥂`;
+    const drinkMessage = `${message.author} has bought some ${drink[0]} **${drink[1]}**! Get ya' free drink!`;
     var timer = 30;     // Seconds
     var decrementTime = 10;
     var footerText = `⏰ ${timer} seconds left to get your free drink!`;
@@ -604,11 +579,7 @@ async function shareDrinks(message, drink) {
     var embedMessage = await message.channel.send(embed);
 
     // Message
-    message.channel.startTyping();
-    await sleep(1500);
     message.channel.send("Hmm... I might just take some too, if y'all don't mind. :heart:");
-    message.channel.stopTyping(true);
-    await sleep(1500);
 
     // Collects emotes and reacts upon the reaction (30 seconds)
     var users = "";
@@ -691,7 +662,7 @@ async function shareDrinks(message, drink) {
                 
                 embedMessage.edit(embed);
             } else {
-                client.user.setActivity(normalActivity)
+                client.user.setActivity(playingActivity)
             }
             
             if (timer > 0) timerFunction();
@@ -700,18 +671,6 @@ async function shareDrinks(message, drink) {
 
     timerFunction();
 }
-
-/*
-async function sendDM(userID, dialogOption, dialogOption2, dialogOption3) {
-    // Wait for 20 - 40 seconds
-    //await(sleep(calcRandom.random(120, 240) * 60 * 1000));
-    var author = client.users.get(userID);
-
-    client.send(author, dialogOption);
-    client.send(author, dialogOption2);
-    client.send(author, dialogOption3);
-}
-*/
 
 // Log our bot in
 client.login(process.env.ALEXIS_TOKEN);

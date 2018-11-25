@@ -1,6 +1,6 @@
-// @ts-nocheck
 // .env Variables
-require('dotenv').config({path: '../.env'});
+const path = require('path');
+require('dotenv').config({path: path.join(__dirname, "../.env")});
 
 // Node Modules
 const Discord = require('discord.js');

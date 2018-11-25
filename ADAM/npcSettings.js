@@ -1,5 +1,3 @@
-require('dotenv').config({path: '../.env'});
-
 module.exports = {
 	activity: "Automated Data Analysis Machine.",
 	type: "PLAYING",

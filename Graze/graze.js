@@ -1,24 +1,15 @@
 // .env Variables
-require('dotenv').config({path: '../.env'});
+const path = require('path');
+require('dotenv').config({path: path.join(__dirname, "../.env")});
 
 // Node Modules
 const Discord = require('discord.js');
 const client = new Discord.Client();
-const cron = require('node-cron');
 
-// Bot Modules (stores http requests & random functions respectively)
-const dataRequest = require('../modules/dataRequest');
-const calcRandom = require('../modules/calcRandom');
-const channelProcessor = require('../modules/channelProcessor');
+// Bot Modules
+const shared = require('../Shared/shared');
 
-// State Machine (Uncomment if needed)
-/*
-var BotEnumState = {
-    WAITING: 0,
-    ACTIVE: 1
-}
-var botState = BotEnumState.ACTIVE;
-*/
+const playingActivity = '!upgrade | Nanotech Upgrades.';
 
 // The ready event is vital, it means that your bot will only start reacting to information
 // from Discord _after_ ready is emitted
@@ -34,20 +25,17 @@ client.on('ready', async () => {
     // You can set status to 'online', 'invisible', 'away', or 'dnd' (do not disturb)
     client.user.setStatus('online');
     // Sets your "Playing"
-    client.user.setActivity('!upgrade | Nanotech Upgrades.');
+    client.user.setActivity(playingActivity);
     console.log(`Connected! \
     \nLogged in as: ${client.user.username} - (${client.user.id})`);
 });
-
-// Error handler
-client.on('error', console.error);
 
 // Create an event listener for messages
 client.on('message', async message => {
     // Ignores ALL bot messages
     if (message.author.bot) return;
     // Message has to be a bot channel (should be edited later)
-    if (!channelProcessor.isBotChannel(message.channel.id)) return;
+    if (!shared.messaging.isFactionBotspam(message.channel.id)) return;
     // Has to be (prefix)command
     if (message.content.indexOf(process.env.PREFIX) !== 0) return;
 
@@ -57,129 +45,115 @@ client.on('message', async message => {
     const command = args.shift().toLowerCase();
 
     //handle the command
-    switch(command) {
+    switch (command) {
         case "upgrade":
-        if (!args[0]) {
-            //shows upgrade menu
-            var intro = `${message.author} Hey buddy! Here's what we can upgrade ASAP!`;
-            var newMessage = "STR - <:cannister:462046687058198530> **1**\n```Permanently upgrades your Strength by 1, so you can hit them Ravagers harder.```\n"
-            newMessage += "SPD - <:cannister:462046687058198530> **1**\n```Permanently upgrades your Speed by 1, so you can get hit less in battle.```\n"
-            newMessage += "STAM - <:cannister:462046687058198530> **1**\n```Permanently upgrades your Max Stamina by 1, so you can hit more Ravagers.```\n"
-            newMessage += "HP - <:cannister:462046687058198530> **1**\n```Permanently upgrades your Max HP by 10, so you can can take those beatings like a champ.```"
-            //sendMessage(message.channel.id, newMessage);
-            
-            // Grabs all parameters from server
-            var attacker = String(dataRequest.loadServerData("userStats",message.author.id));
-            var attackerStatPoints = parseFloat(attacker.split(",")[10]); // Cannisters
-            const keepersOfTheCityColor = client.guilds.get(process.env.SANCTUM_ID).roles.find(role => role.name === "Keepers of the City").color;
-            const embed = new Discord.RichEmbed()
-                .setAuthor("Graze", client.user.avatarURL)
-                .setColor(keepersOfTheCityColor)
-                .setTitle("Nanotech Upgrades")
-				.setDescription(newMessage)
-				.setFooter(`${message.member.displayName}, you have ${attackerStatPoints} cannisters! Use !upgrade [OPTION] to upgrade that stat!`)
-				
-			message.channel.send(intro, embed);
-        } else {
-            console.log(args[0]);
-            //Upgrades stats
-            var statToUpgrade = String(args[0]);
-            var numberOfPointsToUpgrade = 1;
-            var canUpgrade = 0;
-            var suffix = "point.";
-            //var statToUpgrade = String(args.split(" ")[0]);
-            //var numberOfPointsToUpgrade = parseFloat(args.split(" ")[1]);
-			switch (statToUpgrade.toUpperCase()) {
-				case "STRENGTH":
-					statToUpgrade = "STR";
-					break;
-				case "HEALTH":
-					statToUpgrade = "HP";
-					break;
-				case "STAMINA":
-					statToUpgrade = "STAM";
-					break;
-				case "SPEED":
-					statToUpgrade = "SPD";
-					break;
-			}
-			
-            switch (statToUpgrade.toUpperCase()) {
-                case "STR":
-                    numberOfPointsToUpgrade = 1;
-                    canUpgrade = 1;
-                    suffix = "point.";
-                break;
-                case "HP":
-                    numberOfPointsToUpgrade = 10;
-                    canUpgrade = 1;
-                    suffix = "points.";
-                break;
-                case "SPD":
-                    numberOfPointsToUpgrade = 1;
-                    canUpgrade = 1;
-                    suffix = "point.";
-                break;
-                case "STAM":
-                    numberOfPointsToUpgrade = 1;
-                    canUpgrade = 1;
-                    suffix = "point.";
-                break;
-            }
-            if (canUpgrade == 0) {
-                sendMessage(message.channel.id, ":x: <@" + message.author.id + "> Believe me, I wish I could upgrade things like that.");
-                return;
-            }
+            if (!args[0]) {
+                // Shows upgrade menu
+                var intro = `${message.author} Hey buddy! Here's what we can upgrade ASAP!`;
+                var newMessage = `STR - ${shared.utility.getEmote(client, "cannister")} **1**` + "\n```Permanently upgrades your Strength by 1, so you can hit them Ravagers harder.```\n";
+                newMessage += `SPD - ${shared.utility.getEmote(client, "cannister")} **1**` + "\n```Permanently upgrades your Speed by 1, so you can get hit less in battle.```\n";
+                newMessage += `STAM - ${shared.utility.getEmote(client, "cannister")} **1**` + "\n```Permanently upgrades your Max Stamina by 1, so you can hit more Ravagers.```\n";
+                newMessage += `HP - ${shared.utility.getEmote(client, "cannister")} **1**` + "\n```Permanently upgrades your Max HP by 10, so you can can take those beatings like a champ.```";
 
-            var upgradeResponse = dataRequest.sendServerData("upgradeStats", statToUpgrade, message.author.id);
-            if (String(upgradeResponse) == "notEnoughPoints") {
-                sendMessage(message.channel.id, ":x: <@" + message.author.id + "> Hey now, you don't have that many cannisters.");
-                return;
-            }
-            if (String(upgradeResponse) == "failure") {
-                sendMessage(message.channel.id, ":x: <@" + message.author.id + "> Sorry, no can do right now. Come back later though, ok?");
-                return;
-            }
-            if (String(upgradeResponse) == "success") {
-                var skillName = "";
+                // Grabs all parameters from server
+                var stats = shared.core.getStats(message.author.id);
+                const embed = shared.utility.embedTemplate(client, client.user.id)
+                    .setTitle("Nanotech Upgrades")
+                    .setDescription(newMessage)
+                    .setFooter(`${message.member.displayName}, you have ${stats.statPoints} cannisters! Use !upgrade [OPTION] to upgrade that stat!`, message.author.avatarURL)
+                    
+                message.channel.send(intro, {embed});
+            } else {
+                console.log(args[0]);
+                //Upgrades stats
+                var statToUpgrade = String(args[0]);
+                var numberOfPointsToUpgrade = 1;
+                var canUpgrade = 0;
+                var suffix = "point.";
+                //var statToUpgrade = String(args.split(" ")[0]);
+                //var numberOfPointsToUpgrade = parseFloat(args.split(" ")[1]);
                 switch (statToUpgrade.toUpperCase()) {
-                    case "STR":
-                        skillName = "strength";
+                    case "STRENGTH":
+                        statToUpgrade = "STR";
                         break;
-                    case "HP":
-                        skillName = "health";
+                    case "HEALTH":
+                        statToUpgrade = "HP";
                         break;
-                    case "SPD":
-                        skillName = "speed";
+                    case "STAMINA":
+                        statToUpgrade = "STAM";
                         break;
-                    case "STAM":
-                        skillName = "stamina";
+                    case "SPEED":
+                        statToUpgrade = "SPD";
                         break;
                 }
-                sendMessage(message.channel.id, "<@" + message.author.id + "> Sweet! I used your Nanotech Cannister to upgrade your **" + skillName + "** by " + numberOfPointsToUpgrade + " " + suffix);
+                
+                switch (statToUpgrade.toUpperCase()) {
+                    case "STR":
+                        numberOfPointsToUpgrade = 1;
+                        canUpgrade = 1;
+                        suffix = "point.";
+                        break;
+                    case "HP":
+                        numberOfPointsToUpgrade = 10;
+                        canUpgrade = 1;
+                        suffix = "points.";
+                        break;
+                    case "SPD":
+                        numberOfPointsToUpgrade = 1;
+                        canUpgrade = 1;
+                        suffix = "point.";
+                        break;
+                    case "STAM":
+                        numberOfPointsToUpgrade = 1;
+                        canUpgrade = 1;
+                        suffix = "point.";
+                        break;
+                }
+                if (canUpgrade == 0) {
+                    message.channel.send(`:x: ${message.author} Believe me, I wish I could upgrade things like that.`);
+                    return;
+                }
+
+                var upgradeResponse = shared.dataRequest.sendServerData("upgradeStats", statToUpgrade, message.author.id);
+                if (String(upgradeResponse) == "notEnoughPoints") {
+                    message.channel.send(`:x: ${message.author} Hey now, you don't have that many cannisters.`);
+                    return;
+                }
+                if (String(upgradeResponse) == "failure") {
+                    message.channel.send(`:x: ${message.author} Sorry, no can do right now. Come back later though, ok?`);
+                    return;
+                }
+                if (String(upgradeResponse) == "success") {
+                    var skillName = "";
+                    switch (statToUpgrade.toUpperCase()) {
+                        case "STR":
+                            skillName = "strength";
+                            break;
+                        case "HP":
+                            skillName = "health";
+                            break;
+                        case "SPD":
+                            skillName = "speed";
+                            break;
+                        case "STAM":
+                            skillName = "stamina";
+                            break;
+                    }
+                    message.channel.send(`${message.author} Sweet! I used your Nanotech Cannister to upgrade your **${skillName}** by ${numberOfPointsToUpgrade} ${suffix}`);
+                }
             }
-        }
-        break;
+            break;
   };
 });
 
-// Send message handler
-function sendMessage(userID, channelID, message) {
-    // Handle optional first argument (so much for default arugments in node)
-    if (message === undefined) {
-        message = channelID;
-        channelID = userID;
-        userID = null;
-    }
+// Error handler
+client.on('error', console.error);
 
-    // Utility trick (@userID with an optional argument)
-    if (userID != null) {
-        message = "<@" + userID + "> " + message;
-    }
-    
-    // Sends message (needs client var, therefore I think external script won't work)
-    client.channels.get(channelID).send(message);
-}
+// Testing a bug-fix for when Discord doesn't recover Playing status
+client.on('resume', () => {
+    console.log("RESUME: setting playing activity to " + playingActivity);
+    client.user.setActivity(playingActivity);
+});
 
 // Log our bot in (change the token by looking into the .env file)
 client.login(process.env.GRAZE_TOKEN);

@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/TimRuswick/SANCTUM#readme",
   "dependencies": {
-    "discord.js": "^11.4.2"
+    "discord.js": "^11.4.2",
+    "node-cron": "^2.0.3"
   }
 }

@@ -1,5 +1,6 @@
 // .env Variables
-require('dotenv').config({path: '../.env'});
+const path = require('path');
+require('dotenv').config({path: path.join(__dirname, "../.env")});
 
 // Node Modules
 const Discord = require('discord.js');
@@ -10,7 +11,7 @@ const cron = require('node-cron');
 //const dataRequest = require('../modules/dataRequest');
 //const calcRandom = require('../modules/calcRandom');
 
-const playingMessage = '!join | Bot Things.';
+const playingActivity = '!join | Bot Things.';
 
 const roles = {
     "roles": [
@@ -69,31 +70,58 @@ client.on('message', async message => {
     // - Some tutorial dude on the internet
     const args = message.content.slice(process.env.PREFIX.length).trim().split(/ +/g);
     const command = args.shift().toLowerCase();
-
+    let embedImage;
     switch (command) {
         case "ping":
             if (isAdmin(message.author.id))
                 message.reply("What is your command, glorious master!");
             break;
+        case "embedthumbnail":
+            let embedThumbnail = new Discord.RichEmbed()
+                .setColor('ORANGE')
+                .setThumbnail("https://cdn.discordapp.com/attachments/509560565429960746/509572140882984970/unknown.png")
+            await message.channel.send({embed: embedThumbnail});
+            break;
+
+        case "image":
+            message.channel.send({
+                file: "https://cdn.discordapp.com/attachments/509560565429960746/509572140882984970/unknown.png" // Or replace with FileOptions object
+            })
+            break;
+        
+        case "embedimage":
+            embedImage = new Discord.RichEmbed()
+                .setColor('ORANGE')
+                .setImage("https://cdn.discordapp.com/attachments/509560565429960746/509572140882984970/unknown.png")
+            await message.channel.send({embed: embedImage});
+            break;
+        
+        case "embedimagelocal":
+            let file = new Discord.Attachment('./test.png');
+            embedImage = new Discord.RichEmbed()
+                .setColor('ORANGE')
+                .setImage('attachments://' + file)
+            break;
+        
         case "test":
             // Does image for background (& future map)
-            const imageEmbed = new Discord.RichEmbed()
+            let imageEmbed = new Discord.RichEmbed()
                 .setColor('ORANGE')
                 .setImage("https://cdn.discordapp.com/attachments/509560565429960746/509572140882984970/unknown.png")
             await message.channel.send({embed: imageEmbed});
 
             // Does text dialog
-            const textEmbed = new Discord.RichEmbed()
+            let textEmbed = new Discord.RichEmbed()
                 .setAuthor("Vivian (DAO)", client.user.avatarURL)
                 .setTitle(`Somewhere, Someplace`)
                 .setColor('ORANGE')
                 .setDescription(`Somewhere. Someplace. I dunno what to say here, it's just placeholder.\n\n` + 
                 `:arrow_up: Move up somewhere else.\n:arrow_right: Move somewhere that's not up.\n:key: Unlock the mysterious door that doesn't exist.`)
-            var newMessage = await message.channel.send({embed: textEmbed});
+            let newMessage = await message.channel.send({embed: textEmbed});
 
             // Collects emotes and reacts upon the reaction (120 seconds)
             // Directions
-            var Directions = {
+            const Directions = {
                 NORTH: 0,
                 EAST: 1,
                 SOUTH: 2,
@@ -259,6 +287,12 @@ client.on('message', async message => {
 });
 
 client.on('error', console.error);
+
+// Testing a bug-fix for when Discord doesn't recover Playing status
+client.on('resume', () => {
+    console.log("RESUME: setting playing activity to " + playingActivity);
+    client.user.setActivity(playingActivity);
+});
 
 // Minute cron
 cron.schedule('*/1 * * * *', function() {

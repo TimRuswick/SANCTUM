@@ -1,12 +1,12 @@
 {
-	"help": "*This world is strange and mysterious. And while I cannot help you on your journey or join your faction, I am here to help travelers to the best of my ability.*\n\n*Here is what I can do for you:*\n\n!checkin\n```Once per day, you may come see me for a daily sum in exchange for your help around the city.```\n!stats\n```I can share all of your stats and your crystal count information.```\n!give [AMOUNT] [@USER]\n```I can transfer some of your crystals to another traveler's account. Just make sure you have enough.```\n!help [@NAME]\n```I can tell you a little bit about some of the other people with us here on New Eden.```\nI hope this helps you on your journey, traveler.",
+	"help": "*This world is strange and mysterious. And while I cannot help you on your journey or join your faction, I am here to help travelers to the best of my ability.*\n\n*Here is what I can do for you:*\n\n!checkin\n```Once per day, you may come see me for a daily sum in exchange for your help around the city.```\n!stats\n```I can share all of your stats and your crystal count information.```\n!give [AMOUNT] [@USER]\n```I can transfer some of your crystals to another traveler's account. Just make sure you have enough.```\n!help [@USER]\n```I can tell you a little bit about some of the other people with us here on New Eden.```\nI hope this helps you on your journey, traveler.",
 
 	"helpCptMon": "TODO: Data Missing.",
 	"helpDairo": "TODO: Data Missing.",
 	"helpGhost": "TODO: Data Missing.",
 	"helpKamala": "TODO: Data Missing.",
 
-	"helpAlexis": "*Alexis is our top-of-the-line chemist who uses her talents to reward travelers with a nice and relaxing space. She'd be happy to have or provide you with some company.*\n\n!buydrink\n```In #🍺travelers-watch, this allows you to buy a drink and relax.```\n!buydrink [@NAME]\n```In #🍺travelers-watch, you can buy a drink for a friend.```\n!tip [AMOUNT]\n```In #🍺travelers-watch, you can tip her for her great service. She might just give you a tip back.```",
+	"helpAlexis": "*Alexis is our top-of-the-line chemist who uses her talents to reward travelers with a nice and relaxing space. She'd be happy to have or provide you with some company.*\n\n!buydrink [DRINK]\n```In #🍺travelers-watch, this allows you to buy a drink and relax.```\n!buydrink [DRINK] [@USER]\n```In #🍺travelers-watch, you can buy a drink for a friend.```\n!tip [AMOUNT]\n```In #🍺travelers-watch, you can tip her for her great service. She might just give you a tip back.```",
 	"helpGraze": "*Graze is our loveable augmentation expert. He can help you upgrade your skills and boost your abilities. Here's what he can do:*\n\n!upgrade\n```Shows you the available upgrades that Graze can provide with your Nanotech Cannisters.```\n!upgrade [STAT]\n```Upgrades this specific stat permanently.```",
 	"helpLibrarian": "TODO: Data Missing.",
 	"helpMori": "*Mori is our resident head of the medbay. He can tend to your wounds and get you back on your feet. Here's what he can do:*\n\n!heal\n```Shows you Mori's available procedures for healing.```\n!heal [ITEM]\n```Purchases a procedure directly from him, and with his nanotech, takes effect immediately.```",
@@ -30,25 +30,25 @@
 	"giveInvalidUser": ":x: <@{1}> I can't find that traveler. Sorry.",
 	"giveInvalidUserSelf": ":x: <@{1}> You can't send crystals to yourself. Sorry.",
 
-	"LevelUp": "You just hit **level {2}**!{1} I've added a :cannister: **Nanotech Cannister** to your inventory so that you can upgrade your skills. You now have **{3}** total (you can check this any time with !stats).",
+	"levelUp": "You just hit **{1} {2}**! {3}\n\nI've added a {4} **Nanotech Cannister** to you so that you can upgrade your skills. You now have {4} **{5}** total, which you can check this at any time with **!stats**.",
 	"levelUpRemark": [
-		" I appreciate all of your help.",
-		" Thank you for doing so much for the city.",
-		" The other travelers are very grateful for your help.",
-		" Your assistance is very much appreciated.",
-		" Together we've taken out most of the threats to city.",
-		" The citizens of The Sanctum are most grateful.",
-		" I cannot thank you enough for your help defending the city."
+		"I appreciate all of your help.",
+		"Thank you for doing so much for the city.",
+		"The other travelers are very grateful for your help.",
+		"Your assistance is very much appreciated.",
+		"Together we've taken out most of the threats to city.",
+		"The citizens of The Sanctum are most grateful.",
+		"I cannot thank you enough for your help defending the city."
 	],
-	"levelUpCap": "You're currently at **level {2}** which is the current level cap!{1} I've added a :cyphercrate: **Cypher Crate** to your inventory. Hopefully it contains something useful for you on your journey. You now have **{3}** total (you can check this any time with !stats). Good luck.",
+	"levelUpCap": "You're currently at **{1} {2}**, which is the current level cap! {3}\n\nI've added a {4} **Cypher Crate**. Hopefully it contains something useful for you on your journey. You now have **{4} {5}** total, which you can check this at any time with **!stats**. Good luck.",
 	"levelUpCapRemark": [
-		" I appreciate all of your help.",
-		" Thank you for doing so much for the city.",
-		" The other travelers are very grateful for your help.",
-		" Your assistance is very much appreciated.",
-		" Together, we've taken out most of the threats to city.",
-		" The citizens of The Sanctum are most grateful.",
-		" I cannot thank you enough for your help defending the city."
+		"I appreciate all of your help.",
+		"Thank you for doing so much for the city.",
+		"The other travelers are very grateful for your help.",
+		"Your assistance is very much appreciated.",
+		"Together, we've taken out most of the threats to city.",
+		"The citizens of The Sanctum are most grateful.",
+		"I cannot thank you enough for your help defending the city."
 	],
 
 	"accountCheck": "<@{1}> you currently have {2} crystals in your account.",
@@ -66,16 +66,16 @@
 	"joinHand": "You may now spread the word of the Hand. May the gods look favourably upon you.",
 
 	"newUserPublicMessage": "Welcome to {1}. If you need me for anything, you can contact me via this secure channel. Just use **!help** for a list of things I can do for you.\n\nAnd don't forget to say hello to your fellow travelers in <#{2}>.",
-	"newUserPrivateMessage": "*Traveler, welcome to The Sanctum.*\n\n{1}\n\nI'll get you patched up and give you access to our team to upgrade skills and meet the others. There's just a few things I need you to take care of around the city:\n\n**!checkin** with me daily.\n```Once a day I'll give you your daily allotment of crystals in exchange for some help around the city.```\n**!attack** any Ravagers in #the-deadlands.\n```With the constant bombardment from the enemies of the city, It's hard to keep us safe. I need your help```\n\n*Good luck. I'll be around if you need me.*",
+	"newUserPrivateMessage": "*Traveler, welcome to The Sanctum.*\n\n{1}\n\nI'll get you patched up and give you access to our team to upgrade skills and meet the others. There's just a few things I need you to take care of around the city:\n\n**!checkin** with me daily.\n```Once a day I'll give you your daily allotment of crystals in exchange for some help around the city.```\n**!attack** any Ravagers in <#{2}>.\n```With the constant bombardment from the enemies of the city, It's hard to keep us safe. I need your help```\n\n*Good luck. I'll be around if you need me.*",
 
 	"newUserPrivateMessageRemarkObsidian": "I see that you've joined **Obsidian Technologies**. While they are the most chaotic of the 3 factions, I can see why you'd pick them. The Codex is a very powerful book, and should you be victorious, everyone will have equal access to it's secrets. TODO",
 	"newUserPrivateMessageRemarkGenesis": "I see that you've joined **Genesis Command**. The least reckless of the 3 factions, I can see why you'd pick them. You clearly understand that The Codex is a very powerful book, and should you be victorious, no one will have access to it's secrets. TODO",
 	"newUserPrivateMessageRemarkHand": "I see that you've joined **The Hand**. While they are certainly the most suspicious of the 3 factions, I can see why you'd pick them. The Codex is a very powerful book, and should you be victorious, it is your job to guide the rest of the city using it's secrets. TODO",
 
 	"intro": "*Hello weary traveler.*\n\n*My name is A.D.A.M. and I would like to offer you the amenities of The Sanctum. However, I cannot come to your aid until you choose a faction. I am dearly sorry to be so blunt and put trivial human rules in place over your sustenance and safety, but this is the only way to protect The Codex. But the Codex no longer exists since the Librarian destroyed it, so make something up, player. TODO*\n\n*Your choices are as follows:*",
-	"introObsidian": "<@&{1}> !obsidian\n```Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum eu aliquet mauris, id congue nisi. Integer et lobortis tellus. Sed bibendum a metus quis volutpat. Mauris faucibus quam at euismod scelerisque. Vestibulum a elit auctor, venenatis augue in, rhoncus nisi. Mauris sagittis sit amet ante eget luctus. Maecenas id malesuada elit. Vestibulum nec ante nec justo venenatis tincidunt.```",
-	"introGenesis": "<@&{1}> !genesis\n```Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum eu aliquet mauris, id congue nisi. Integer et lobortis tellus. Sed bibendum a metus quis volutpat. Mauris faucibus quam at euismod scelerisque. Vestibulum a elit auctor, venenatis augue in, rhoncus nisi. Mauris sagittis sit amet ante eget luctus. Maecenas id malesuada elit. Vestibulum nec ante nec justo venenatis tincidunt.```",
-	"introHand": "<@&{1}> !hand\n```Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum eu aliquet mauris, id congue nisi. Integer et lobortis tellus. Sed bibendum a metus quis volutpat. Mauris faucibus quam at euismod scelerisque. Vestibulum a elit auctor, venenatis augue in, rhoncus nisi. Mauris sagittis sit amet ante eget luctus. Maecenas id malesuada elit. Vestibulum nec ante nec justo venenatis tincidunt.```",
+	"introObsidian": "<@&{1}> !obsidian\n```Obsidian Technologies funded The Genesis and its mission to reach the super earth in hopes of saving the human race. We believe the Codex is the key to unlocking the city’s technology and restoring The Genesis so the original mission can be completed. The mission is all that matters!```",
+	"introGenesis": "<@&{1}> !genesis\n```Associates of Genesis Command believe that The Sanctum is humanity’s last hope. The knowledge in The Codex must be used to ensure its resources are utilized to further mankind’s survival. We believe in order and control. We believe Genesis Command will lead others to a bright future!```",
+	"introHand": "<@&{1}> !hand\n```Brethren of The Hand believe that not all can wield the power of The Codex, a tome from a supreme being, and so the chosen ones must take on this burden. Knowledge in the wrong hands can be chaos, but knowledge used for good can be greatly beneficial. The Hand believes that only the prophets should have access to the secrets of The Codex.```",
 	"introEnd": "*Choose wisely.*",
 
 	"LVL 1+": "Congratulations {1}, you have reached **{2}**! Travelers defend the city from Ravagers here, and you can earn some crystals.",

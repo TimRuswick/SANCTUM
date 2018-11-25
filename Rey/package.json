@@ -1,5 +1,5 @@
 {
-  "name": "sanctum-deploypackage",
+  "name": "sanctum-rey",
   "version": "1.0.1",
   "description": "Universal package for all SANCTUM bots, using pm2.",
   "main": "rey.js",
@@ -16,8 +16,8 @@
     "rey": "pm2 start rey.js -i max --watch",
     "troll": "pm2 start troll.js -i max --watch"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Sanctum Developers",
+  "license": "MIT",
   "dependencies": {
     "discord.js": "^11.4.2",
     "dotenv": "^6.0.0",
