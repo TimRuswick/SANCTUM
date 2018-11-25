@@ -43,9 +43,15 @@ GROUP_A_NAME="Obsidian Technologies"
 GROUP_B_NAME="Genesis Command"
 GROUP_C_NAME="The Hand"
 
+# Bot channels
 GROUP_A_CHANNEL_ID="493972208616603658"
 GROUP_B_CHANNEL_ID="493972336190685185"
 GROUP_C_CHANNEL_ID="493972354137849856"
+
+# Faction chat channels
+GROUP_A_CHAT_ID=""
+GROUP_B_CHAT_ID=""
+GROUP_C_CHAT_ID=""
 
 GROUP_A_LEADER_NAME="Kamala, Obsidian Vice President"
 GROUP_B_LEADER_NAME="Captain Montgomery"
@@ -111,5 +117,5 @@ RANK_2_THRESHOLD=15
 RANK_3_THRESHOLD=30
 
 # Server
-SERVER_ADDRESS="http://skullboxstudios.com"
-SERVER_PASS_KEY=""
+SERVER_ADDRESS="http://localhost"
+SERVER_PASS_KEY="<REDACTED>"
