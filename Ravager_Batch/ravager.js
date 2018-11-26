@@ -124,7 +124,7 @@ async function newRavagerSequence(instant) {
         console.log('Baddie will be created in ' + shared.utility.formatMSS(creationTime) + " min. (" + creationTime + " sec)");
         await shared.utility.sleep(creationTime * 1000);
         ravagerTurnOnline(process.env.DEADLANDS_CHANNEL_ID);
-        await shared.utility.sleep(30 * 1000);
+        if (!instant) await shared.utility.sleep(30 * 1000);
     }
 
     // Appearance
