@@ -149,7 +149,7 @@ async function reySpawnTimer(channel, bypassStartTimer) {
 
         const embed = shared.utility.embedTemplate(client, client.user.id)
             .setTitle("Scavenging")
-            .setDescription(`Spend ${crystals} **3** and \`1 STAM\`, y'all might find some cool things!`)
+            .setDescription(`Y'all need ${crystals} **3** and \`1 STAM\`, if you wanna not go hungry and put in the effort.`)
             .setFooter(`Use !scavenge to start digging.`)
         client.channels.get(channel).send(dialog, {embed});
     }
@@ -216,7 +216,7 @@ function scavenge(userID, channelID) {
                 message += `\n***${dialogOptions[randomNumber]}***`;
                 shared.messaging.sendMessage(client, channelID, message);
             } else {
-                shared.messaging.sendMessage(client, channelID, `:x: <@${userID}> You don't have enough crystals to sustain you while you're out. Bad idea.`);
+                shared.messaging.sendMessage(client, channelID, `:x: <@${userID}> You don't have enough crystals to sustain yourself while you're out. Bad idea.`);
             }
         } else {
             shared.messaging.sendMessage(client, channelID, `:x: <@${userID}> You don't have enough stamina for that right now. You should probably get some rest.`);
