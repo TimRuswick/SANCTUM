@@ -111,7 +111,7 @@ cron.schedule('*/15 * * * *', () => {
         newRavagerSequence();
     } else {
         spawnPercentage += 10;
-        console.log("Didn't create one... adding 10% more chance of spawning.");
+        console.log(`Didn't create one... adding 10% more (now ${spawnPercentage}%) chance of spawning.`);
     }
 });
 
