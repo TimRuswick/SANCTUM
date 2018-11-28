@@ -63,5 +63,9 @@ typings/
 # Private build tool
 buildanddeploy.py
 
-#annoying
+# Package lock
 **package-lock.json
+
+# Solely management sake for uploading to skullboxstudios.com site
+functions.1.php
+PHPBotServer.zip
