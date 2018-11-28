@@ -53,7 +53,7 @@ client.on('ready', async () => {
     // You can set status to 'online', 'invisible', 'away', or 'dnd' (do not disturb)
     client.user.setStatus('online');
     // Sets your "Playing"
-    client.user.setActivity(playingMessage);
+    client.user.setActivity(playingActivity);
     console.log(`Connected! \
     \nLogged in as: ${client.user.username} - (${client.user.id})`);
 });
@@ -297,7 +297,7 @@ client.on('resume', () => {
 // Minute cron
 cron.schedule('*/1 * * * *', function() {
     // Sets your "Playing"
-    client.user.setActivity(playingMessage);
+    client.user.setActivity(playingActivity);
 });
 
 // Async Waiting
