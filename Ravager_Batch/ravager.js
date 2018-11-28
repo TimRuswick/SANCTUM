@@ -341,8 +341,6 @@ function sendAttacks() {
         if (results !== '[]') console.log("RESULTS: " + results)
         var attackResults = JSON.parse(results);
         attackQueue = [];
-        var lastHealth = 0;
-        var lastMaxHealth = 0;
 
         for (var i = 0; i < attackResults.length; i++) {
             //document.write("<br><br>array index: " + i);
@@ -463,6 +461,8 @@ function embedDetails(channelID, addCrystals) {
     var hostileInfo = dataRequest.sendServerData("getDamageDistribution", hostile, undefined, addCrystals);
     if (hostileInfo == "fled") {
         client.channels.get(channelID).send("***THE ENEMY RAVAGER FLED. NO KILL WAS MADE.***" );
+    } else if (hostileInfo == "0") {
+        client.channels.get(channelID).send(`***THE ENEMY RAVAGER IS STILL ALIVE.***`);
     } else {
         // Message variables
         let userTag = "";
