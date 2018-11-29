@@ -47,9 +47,9 @@ client.on('ready', async () => {
 client.on('message', async message => {
     // Ignores ALL bot messages
     if (message.author.bot) return;
-    // Message has to be in Outskirts (should be edited later)
-    //if (!(message.channel.id === process.env.TAVERN_CHANNEL_ID
-    //    || message.channel.id === process.env.TEST_CHANNEL_ID)) return;
+    // Message has to be in the deadlands
+    if (!(message.channel.id === process.env.DEADLANDS_CHANNEL_ID
+        || message.channel.id === process.env.TEST_CHANNEL_ID)) return;
     // Has to be (prefix)command
     if (message.content.indexOf(process.env.PREFIX) !== 0) return;
 

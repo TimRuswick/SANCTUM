@@ -41,11 +41,11 @@ switch ($dataType) {
 											$userMaxHealth=stripslashes($a['maxHealth']);
 											$userSpeed=stripslashes($a['speed']);
 											$userStrength=stripslashes($a['strength']);
-											$attackerStats[] = array('id'=>$discordUserID, 'maxHealth'=>$userHealth, 'health'=>$userHealth, 'speed'=>$userSpeed, 'strength'=>$userStrength, 'hitback'=>'');
+											$attackerStats[] = array('id'=>$discordUserID, 'maxHealth'=>$userMaxHealth, 'health'=>$userHealth, 'speed'=>$userSpeed, 'strength'=>$userStrength, 'hitback'=>'');
 									}
 								}
 								//Get enemy data
-								$q = "SELECT hostiles.health,hostiles.maxHealth,hostiles.speed,hostiles.strength,hostiles.alive,hostiles.fled FROM hostiles WHERE hostileType = '$hostileType' ORDER BY id DESC LIMIT 1;";
+								$q = "SELECT hostiles.health,hostiles.maxHealth,hostiles.speed,hostiles.strength,hostiles.alive,hostiles.fled,hostiles.id FROM hostiles WHERE hostileType = '$hostileType' ORDER BY id DESC LIMIT 1;";
 								$r2 = mysqli_query($con,$q);
 								if ( $r2 !== false && mysqli_num_rows($r2) > 0 ) {
 									while ( $a = mysqli_fetch_assoc($r2) ) {
@@ -55,7 +55,7 @@ switch ($dataType) {
 											$hostileStrength=stripslashes($a['strength']);
 											$hostileAlive=stripslashes($a['alive']);
 											$hostileFled=stripslashes($a['fled']);
-						$hostileID=stripslashes($a['id']);
+											$hostileID=stripslashes($a['id']);
 									}
 								}
 
@@ -63,33 +63,51 @@ switch ($dataType) {
 								$totalDamage = 0;
 								$returnInfo= array();
 								$query = "UPDATE users SET health = CASE discordUserID ";
-								$queryIDs = "";
+								$queryIDs = "";					
+								$isDead = FALSE;
+
 								for ($i=0;$i<count($attackerStats);$i++){
 									//$message += $attackerStats[$i][0];
-									//If bad guy is still alive, carry on.
-									if($hostileHealth > $attackerStats[$i]['strength']){
-												$totalDamage = $totalDamage + $attackerStats[$i]['strength'];
-												$hitAmount = getEnemyDamage($hostileSpeed,$attackerStats[$i]['speed'],$hostileStrength);
-												if($hitAmount > 0){
-														if ($hitAmount >= $attackerStats[$i]['health']){$hitAmount = $attackerStats[$i]['health'];};
-														$attackerStats[$i]['health'] = $attackerStats[$i]['health'] - $hitAmount;
-														$attackerStats[$i]['hitback'] = $hitAmount;
-												}
-												$query .= " WHEN ".$attackerStats[$i]['id']." THEN ".$attackerStats[$i]['health'];
-												$queryIDs .= $attackerStats[$i]['id'].",";
-												$hhealth = $hostileHealth-$totalDamage;
-												$returnInfo[] = array('hostileHealth'=>$hhealth.'|'.$hostileMaxHealth, 'atkDamage'=>$attackerStats[$i]['strength'], 'id'=>$attackerStats[$i]['id'], 'hitback'=>$hitAmount, 'userHealth'=>$attackerStats[$i]['health']."|".$attackerStats[$i]['maxHealth']);
-									}else{
+									// Attack
+									$attack = $attackerStats[$i]['strength'];
+									$totalDamage = $totalDamage + $attack;
+									$hitAmount = getEnemyDamage($hostileSpeed,$attackerStats[$i]['speed'],$hostileStrength);
+									if($hitAmount > 0){
+											if ($hitAmount >= $attackerStats[$i]['health']){$hitAmount = $attackerStats[$i]['health'];};
+											$attackerStats[$i]['health'] = $attackerStats[$i]['health'] - $hitAmount;
+											$attackerStats[$i]['hitback'] = $hitAmount;
+									}
+									$query .= " WHEN ".$attackerStats[$i]['id']." THEN ".$attackerStats[$i]['health'];
+									$queryIDs .= $attackerStats[$i]['id'].",";
+									$hhealth = $hostileHealth-$totalDamage;
+
+									// Attack log
+									$newDiscordUserID = $attackerStats[$i]['id'];
+									$q = "INSERT INTO attackLog (discordUserID, hostileID, damage) VALUES ('$newDiscordUserID','$hostileID','$attack');";
+									$r2 = mysqli_query($con,$q);
+									
+									// Stamina
+									$q = "UPDATE users SET stamina = stamina - 1 WHERE discordUserID = '$newDiscordUserID' LIMIT 1";
+									$r2 = mysqli_query($con,$q);
+
+									// If bad guy is dead
+									if($hhealth <= 0){
 										//If the bad guy is not alive, finish up.
-															$q = "UPDATE hostiles SET health = 0 WHERE hostileType = '$hostileType' ORDER BY id DESC LIMIT 1";
-															$r2 = mysqli_query($con,$q);
-															$query .= " END
-						             			WHERE discordUserID IN (".substr($queryIDs, 0, -1).");";
-															$r2 = mysqli_query($con,$query);
-															echo json_encode($returnInfo);
-															exit;
+										/*
+										$q = "UPDATE hostiles SET health = 0 WHERE hostileType = '$hostileType' ORDER BY id DESC LIMIT 1";
+										$r2 = mysqli_query($con,$q);
+										$query .= " END
+										WHERE discordUserID IN (".substr($queryIDs, 0, -1).");";
+										$r2 = mysqli_query($con,$query);
+										echo json_encode($returnInfo);
+										exit;
+										*/
+										$isDead = TRUE;
 									}
 
+									// Returns info
+									$returnInfo[] = array('hostileHealth'=>$hhealth.'|'.$hostileMaxHealth, 'atkDamage'=>$attackerStats[$i]['strength'], 'id'=>$attackerStats[$i]['id'], 'hitback'=>$hitAmount, 'userHealth'=>$attackerStats[$i]['health']."|".$attackerStats[$i]['maxHealth'], 'dead'=>$isDead);
+								}
 								// Changes dead values for Ravager
 								if ($isDead) {
 									$q = "UPDATE hostiles SET alive = 0 WHERE id = '$hostileID' LIMIT 1";
@@ -104,15 +122,15 @@ switch ($dataType) {
 								$r2 = mysqli_query($con,$query);
 								$q = "UPDATE hostiles SET health = health - $totalDamage WHERE hostileType = '$hostileType' ORDER BY id DESC LIMIT 1";
 								$r2 = mysqli_query($con,$q);
-									echo json_encode($returnInfo);
-									exit;
+								echo json_encode($returnInfo);
+								exit;
 
 
 
-			}else{
-					echo "notArray";
-					exit;
-			}
+				} else{
+						echo "notArray";
+						exit;
+				}
 
 		break;
 
@@ -276,49 +294,6 @@ switch ($dataType) {
 						echo $stash.",".$claimID;
 					}
 					exit;
-		break;
-
-		case "getDamageDistribution":
-				//Gets base stats for enemy
-				$q = "SELECT stash,maxHealth,fled FROM hostiles WHERE id = '$dataToSend' LIMIT 1;";
-				$r2 = mysqli_query($con,$q);
-				$a = mysqli_fetch_assoc($r2);
-				$stash=stripslashes($a['stash']);
-				$maxHealth=stripslashes($a['maxHealth']);
-				$fled=stripslashes($a['fled']);
-				$totalCrystalsInStash = 0;
-
-				if($fled == 1){
-							echo "fled";
-				}else{
-							//gets all dammage from users
-							$damageDistribution = array();
-							$q = "SELECT discordUserID,SUM(damage) totalDamage FROM attackLog WHERE hostileID = $dataToSend GROUP BY discordUserID;";
-							//$q = "SELECT attackLog.damage,attackLog.discordUserID,hostiles.stash,hostiles.maxHealth FROM attackLog WHERE hostiles.id = attackLog.hostileID AND attackLog.hostileID = '$dataToSend';";
-							$r2 = mysqli_query($con,$q);
-							if ( $r2 !== false && mysqli_num_rows($r2) > 0 ) {
-								while ( $a = mysqli_fetch_assoc($r2) ) {
-										$damage=stripslashes($a['totalDamage']);
-										$discordUserID=stripslashes($a['discordUserID']);
-										$damagePercent = round(( $damage / $maxHealth ) * 100);
-										$percentStashAmount = round($stash * ($damagePercent/100));
-										$totalCrystalsInStash += $percentStashAmount;
-										// you can add single array values too
-										$damageDistribution[] = array('id'=>$discordUserID, 'totalDamage'=>$damage, 'damagePercent'=>$damagePercent, 'crystalsReceived'=>$percentStashAmount);
-										if($dataToSend2 == 1){
-											//Flag to actually distribute crystals
-											$q2 = "UPDATE users SET wallet = wallet + $percentStashAmount WHERE discordUserID = '$discordUserID' LIMIT 1";
-											$r3 = mysqli_query($con,$q2);
-										}
-
-								}
-								echo json_encode($damageDistribution);
-							} else{
-								echo 0;
-							}
-							exit;
-				}
-
 		break;
 }
 

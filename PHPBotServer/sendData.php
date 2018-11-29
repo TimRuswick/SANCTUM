@@ -333,39 +333,48 @@ switch ($dataType) {
 				$maxHealth=stripslashes($a['maxHealth']);
 				$fled=stripslashes($a['fled']);
 				$totalCrystalsInStash = 0;
-
+				
 				if($fled == 1){
-							echo "fled";
+						echo "fled";
 				}else{
-							//gets all dammage from users
-							$damageDistribution = array();
-							$q = "SELECT discordUserID,SUM(damage) totalDamage FROM attackLog WHERE hostileID = $dataToSend GROUP BY discordUserID;";
-							//$q = "SELECT attackLog.damage,attackLog.discordUserID,hostiles.stash,hostiles.maxHealth FROM attackLog WHERE hostiles.id = attackLog.hostileID AND attackLog.hostileID = '$dataToSend';";
-							$r2 = mysqli_query($con,$q);
-							if ( $r2 !== false && mysqli_num_rows($r2) > 0 ) {
-								while ( $a = mysqli_fetch_assoc($r2) ) {
-										$damage=stripslashes($a['totalDamage']);
-										$discordUserID=stripslashes($a['discordUserID']);
-										$damagePercent = round(( $damage / $maxHealth ) * 100);
-										$percentStashAmount = round($stash * ($damagePercent/100));
-										$totalCrystalsInStash += $percentStashAmount;
-										// you can add single array values too
-										$damageDistribution[] = array('id'=>$discordUserID, 'totalDamage'=>$damage, 'damagePercent'=>$damagePercent, 'crystalsReceived'=>$percentStashAmount);
-										if($dataToSend2 == 1){
-											//Flag to actually distribute crystals
-											$q2 = "UPDATE users SET wallet = wallet + $percentStashAmount WHERE discordUserID = '$discordUserID' LIMIT 1";
-											$r3 = mysqli_query($con,$q2);
-										}
+						//gets all dammage from users
+						$damageDistribution = array();
+						$q = "SELECT discordUserID,SUM(damage) totalDamage FROM attackLog WHERE hostileID = $dataToSend GROUP BY discordUserID;";
+						//$q = "SELECT attackLog.damage,attackLog.discordUserID,hostiles.stash,hostiles.maxHealth FROM attackLog WHERE hostiles.id = attackLog.hostileID AND attackLog.hostileID = '$dataToSend';";
+						$r2 = mysqli_query($con,$q);
+						
+						// Gets everyone's overall damage
+						$damageq = "SELECT SUM(damage) FROM attackLog WHERE hostileID = $dataToSend;";
+						$damager2 = mysqli_query($con,$damageq);
+						$damagea = mysqli_fetch_assoc($damager2);
+						$allUsersTotalDamage = round(stripslashes($damagea['SUM(damage)']));
+							
+						if ( $r2 !== false && mysqli_num_rows($r2) > 0 ) {
+							while ( $a = mysqli_fetch_assoc($r2) ) {	
+									//echo '<pre>'; print_r($a); echo '</pre>';	
+									$damage=stripslashes($a['totalDamage']);
+									$discordUserID=stripslashes($a['discordUserID']);
+									$damagePercent = round(( $damage / $allUsersTotalDamage ) * 100);
+									$percentStashAmount = round($stash * ($damagePercent/100));
+									$totalCrystalsInStash += $percentStashAmount;
+									
+									// you can add single array values too
+									$damageDistribution[] = array('id'=>$discordUserID, 'totalDamage'=>$damage, 'damagePercent'=>$damagePercent, 'crystalsReceived'=>$percentStashAmount, 'allUsersTotalDamage'=>$allUsersTotalDamage);
+									if($dataToSend2 == 1){
+										//Flag to actually distribute crystals
+										$q2 = "UPDATE users SET wallet = wallet + $percentStashAmount WHERE discordUserID = '$discordUserID' LIMIT 1";
+										$r3 = mysqli_query($con,$q2);
+									}
 
-								}
-								echo json_encode($damageDistribution);
-							} else{
-								echo 0;
 							}
-							exit;
-				}
+							echo json_encode($damageDistribution);
+						} else{
+							echo 0;
+						}
+						exit;
+			}
 
-		break;
+break;
 
 
 		case "updateStamina":

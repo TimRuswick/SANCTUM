@@ -2,7 +2,7 @@
 ini_set('display_errors', 'On');
 
 function privateKey(){
-		return "<REDACTED>";
+		return "InsertKeyHere";
 }
 
 function throwError($errorName){
@@ -111,6 +111,7 @@ function addXp($uid,$xpamount){
 		$con = mysqlConnect();
 		$q = "UPDATE users SET xp=(xp + $xpamount) WHERE discordUserID = '$uid'";
 		$r = mysqli_query($con,$q);
+		echo $xpamount;
 }
 function getLevelBase(){
 		return 1.2;
