@@ -104,7 +104,9 @@ function processBasicCommands(client, message) {
 				message.reply("Pong!");
 			}
 			return true;
+
 		case npcSettings.factionShorthand.toLowerCase():
+			if (message.channel.type === 'dm') return;
 			// Failsafe in case the user leaves the server and joins again
 			// This will bypass the faction join cooldown, so they can join a faction again once they leave
 			// TODO: Read faction alliances and re-join them back in there possibly

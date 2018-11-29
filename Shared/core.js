@@ -14,7 +14,7 @@ const commandArray = ['!checkin', '!stats', '!give', '!upgrade', '!heal'];
  */
 exports.processGameplayCommands = function(client, message, dialog) {
 	let [command, args, guild] = shared.utility.getCommandArgsGuild(client, message);
-
+	if (!exports.userExisted(client, shared.utility.getMember(client, message.author.id))) return;
 	switch (command) {
 		case "checkin":
 			let checkinAmount = shared.utility.random(4, 9);
@@ -293,7 +293,7 @@ exports.handleLevelUp = function(client, member, channel, dialog) {
 
 	// Sees if the user is supposed to level up
 	let [levelUpResponse, level, statPoints, chests, addedChest] = shared.progression.checkLevel(client, member);
-	
+
 	// Handle levelling up
 	if (levelUpResponse === "levelUp" || levelUpResponse === "RankUp") {
 		if (level >= process.env.RANK_3_THRESHOLD && addedChest === 'addedChest') {
