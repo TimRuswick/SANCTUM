@@ -20,7 +20,7 @@ exports.checkLevel = function(client, member) {
 	// Makes sure member is an object
 	member = shared.utility.getMember(client, member);
 
-	let response = String(shared.dataRequest.sendServerData("getLevelUp", null, member.user.id));
+	let response = String(shared.dataRequest.sendServerData("getLevelUp", null, member.id));
 	let responseArray = response.split(",");
 
 	let responseMessage = responseArray[0];

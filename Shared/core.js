@@ -22,7 +22,7 @@ exports.processGameplayCommands = function(client, message, dialog) {
 			if (checkInResponse === "1") {
 				message.channel.send(message.author + " " + dialog("checkin", checkinAmount));
 				shared.progression.addXP(message.author.id, 1); //1XP
-				exports.handleLevelUp(client, message.member, message.channel, dialog);
+				exports.handleLevelUp(client, message.author.id, message.channel, dialog);
 			} else {
 				message.channel.send(dialog("checkinLocked", message.author.id, checkInResponse));
 			}
