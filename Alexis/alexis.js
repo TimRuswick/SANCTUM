@@ -174,7 +174,7 @@ client.on('message', async message => {
                 'Don\'t make me give _Ghost_ a ping on the com.',
                 'In here is drinkin\' time. Out there in the deadlands is fightin\' time. Learn the difference.',
                 'You forget the rules or somethin\'?',
-                'Honey, just because I\'m sweet doesnt mean I can\'t kick your ass out the door.',
+                'Honey, just because I\'m sweet doesn\'t mean I can\'t kick your ass out the door.',
                 'You fight in here, you drink somewhere else.',
                 'Whatever pissing contest you\'re try\'na win, win it elsewhere.',
                 'Don\'t be actin\' all tuff here. Everybody knows what happened with you and that _Ravager_.',
