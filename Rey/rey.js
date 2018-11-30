@@ -132,7 +132,7 @@ async function reySpawnTimer(channel, bypassStartTimer) {
     // Random from 6 sec up to 15 min
     if (!bypassStartTimer) {
         var startTime = shared.utility.random(6000, 20 * 60 * 1000);
-        console.log(`Waiting for ${shared.utility.formatMSS(Math.trunc(startTime / 1000))} min. for summon.`);
+        console.log(`[${new Date().toTimeString()}] Waiting for ${shared.utility.formatMSS(Math.trunc(startTime / 1000))} min. for summon.`);
         await shared.utility.sleep(startTime);
     }
     client.user.setStatus('online');

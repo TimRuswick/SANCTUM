@@ -121,7 +121,7 @@ async function newRavagerSequence(instant) {
     async function prowling() {
         let creationTime = Math.round(shared.utility.random(35 * 1000, 54 * 10000) / 1000);
         if (instant) creationTime = 0; 
-        console.log('Baddie will be created in ' + shared.utility.formatMSS(creationTime) + " min. (" + creationTime + " sec)");
+        console.log(`[${new Date().toTimeString()}] Baddie will be created in ${shared.utility.formatMSS(creationTime)} min. (${creationTime} sec)`);
         await shared.utility.sleep(creationTime * 1000);
         ravagerTurnOnline(process.env.DEADLANDS_CHANNEL_ID);
         if (!instant) await shared.utility.sleep(30 * 1000);
@@ -156,7 +156,7 @@ async function newRavagerSequence(instant) {
 
         // Between 3 and 6 minutes, Ravager attempts to flee
         var fleeTime = Math.round(shared.utility.random(3 * 60 * 1000, 6 * 60 * 1000) / 1000);
-        console.log('Baddie will flee in ' + shared.utility.formatMSS(fleeTime) + " min. (" + fleeTime + " sec)");
+        console.log(`[${new Date().toTimeString()}] Baddie will flee in ${shared.utility.formatMSS(fleeTime)} min. (${fleeTime} sec)`);
         await shared.utility.sleep(fleeTime * 1000);
     }
 
