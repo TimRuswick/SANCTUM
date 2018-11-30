@@ -70,8 +70,9 @@ switch ($dataType) {
 									//$message += $attackerStats[$i][0];
 									// Attack
 									$attack = $attackerStats[$i]['strength'];
+									$attack = $attack + rand(-$attack / 2, $attack / 2);
 									$totalDamage = $totalDamage + $attack;
-									$hitAmount = getEnemyDamage($hostileSpeed,$attackerStats[$i]['speed'],$hostileStrength);
+									$hitAmount = getEnemyDamage($hostileSpeed,$attackerStats[$i]['speed'],$attack);
 									if($hitAmount > 0){
 											if ($hitAmount >= $attackerStats[$i]['health']){$hitAmount = $attackerStats[$i]['health'];};
 											$attackerStats[$i]['health'] = $attackerStats[$i]['health'] - $hitAmount;
@@ -106,7 +107,7 @@ switch ($dataType) {
 									}
 
 									// Returns info
-									$returnInfo[] = array('hostileHealth'=>$hhealth.'|'.$hostileMaxHealth, 'atkDamage'=>$attackerStats[$i]['strength'], 'id'=>$attackerStats[$i]['id'], 'hitback'=>$hitAmount, 'userHealth'=>$attackerStats[$i]['health']."|".$attackerStats[$i]['maxHealth'], 'dead'=>$isDead);
+									$returnInfo[] = array('hostileHealth'=>$hhealth.'|'.$hostileMaxHealth, 'atkDamage'=>$attack, 'id'=>$attackerStats[$i]['id'], 'hitback'=>$hitAmount, 'userHealth'=>$attackerStats[$i]['health']."|".$attackerStats[$i]['maxHealth'], 'dead'=>$isDead);
 								}
 								// Changes dead values for Ravager
 								if ($isDead) {
