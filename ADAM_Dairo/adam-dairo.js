@@ -119,8 +119,8 @@ function processBasicCommands(client, message) {
 		
 		// ADAM and the faction leaders print the intros in the gate
 		case `intro${npcSettings.factionShorthand.toLowerCase()}`:
-			if (shared.utility.isAdmin(message.author.id, guild) && message.channel.id == process.env.GATE_CHANNEL_ID) {
-				client.channels.get(process.env.GATE_CHANNEL_ID).send(dialog(`intro${npcSettings.factionShorthand}`, npcSettings.role));
+			if (shared.utility.isAdmin(message.author.id, guild)) {
+				message.channel.send(dialog(`intro${npcSettings.factionShorthand}`, npcSettings.role));
 				message.delete(1000);
 			}
 			return true;
