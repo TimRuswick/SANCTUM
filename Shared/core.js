@@ -115,11 +115,13 @@ exports.processFactionChangeAttempt = function(client, message, factionRole, dia
 					break;
 				case "joined":
 					let factionChannelID = shared.factions.getFactionChannel(factionRole, true);
-					shared.utility.getChannel(client, factionChannelID).send(message.author + " " + dialog("join" + factionShorthand))
+					shared.utility.getChannel(client, factionChannelID).send(message.author + " " + dialog("join" + factionShorthand));
+					/*
 					.then(msg => {
 						if (message.channel.id === process.env.GATE_CHANNEL_ID)
 							msg.delete(10000)
 					});
+					*/
 					break;
 				default:
 					//DEBUGGING
