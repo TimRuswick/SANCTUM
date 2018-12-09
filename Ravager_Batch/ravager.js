@@ -302,6 +302,8 @@ function sendAttacks() {
 
     attackQueue = shared.utility.removeDuplicates(attackQueue);
 
+    // CODE REPLACED THRU PHP
+    /*
     // Adds to failedVar message if attack wasn't valid
     attackQueue.forEach(element => {
         console.log(`[Processing] ${element}`);
@@ -324,6 +326,7 @@ function sendAttacks() {
             console.log("[Removed] " + attackQueue.splice(attackQueue.findIndex(uID => uID === element), 1))
         }
     });
+    */
 
     // Performs attack & parses them to readable info
     if (attackQueue.length > 0) {
@@ -331,7 +334,6 @@ function sendAttacks() {
         var playerIDs = "";
 
         attackQueue.forEach(element => {
-            console.log("[AddXP] " + shared.progression.addXP(element, 1));
             playerIDs += element + "|";
         });
         
@@ -345,42 +347,46 @@ function sendAttacks() {
         for (var i = 0; i < attackResults.length; i++) {
             //document.write("<br><br>array index: " + i);
             var obj = attackResults[i];
-            for (var key in obj) {
-                var value = obj[key];
-                //document.write("<br> - " + key + ": " + value);
-                //testVar += key + ": " + value + "\n";
-
-                switch(key) {
-                    case "hostileHealth":
-                        var enemyHealth = Math.floor(value.split("|")[0]);
-                        var enemyMaxHealth = Math.floor(value.split("|")[1]);
-                        //testVar += healthbar2(enemyHealth,enemyMaxHealth) + "\n";
+            if (!attackResults[i]['failed']) {
+                for (var key in obj) {
+                    var value = obj[key];
+                    //document.write("<br> - " + key + ": " + value);
+                    //testVar += key + ": " + value + "\n";
+    
+                    switch(key) {
+                        case "hostileHealth":
+                            var enemyHealth = Math.floor(value.split("|")[0]);
+                            var enemyMaxHealth = Math.floor(value.split("|")[1]);
+                            //testVar += healthbar2(enemyHealth,enemyMaxHealth) + "\n";
+                            break;
+                        case "atkDamage":
+                            attacksInfoVar += ":crossed_swords: ***" + value + "*** DAM ";
                         break;
-                    case "atkDamage":
-                        attacksInfoVar += ":crossed_swords: ***" + value + "*** DAM ";
-                    break;
-                    case "id":
-                        attacksInfoVar += "<@" + value + "> | ";
-                        break;
-                    case "hitback":
-                        const hitback = client.emojis.find(emoji => emoji.name === "hitback");
-                        if (value > 0) {
-                            attacksInfoVar += `${hitback} ***` + value + "*** DAM ";
-                        } else {
-                            attacksInfoVar += `${hitback} ***MISS*** `;
-                        }
-                        break;
-                    case "userHealth":
-                        var userHealth = Math.floor(value.split("|")[0]);
-                        var userMaxHealth = Math.floor(value.split("|")[1]);
-                        attacksInfoVar += "(" + userHealth + "/" + userMaxHealth + ") ";
-                        break;
-                    case "dead":
-                        if (value) {
-                            isDead = true;
-                        }
-                        break;
+                        case "id":
+                            attacksInfoVar += "<@" + value + "> | ";
+                            break;
+                        case "hitback":
+                            const hitback = client.emojis.find(emoji => emoji.name === "hitback");
+                            if (value > 0) {
+                                attacksInfoVar += `${hitback} ***` + value + "*** DAM ";
+                            } else {
+                                attacksInfoVar += `${hitback} ***MISS*** `;
+                            }
+                            break;
+                        case "userHealth":
+                            var userHealth = Math.floor(value.split("|")[0]);
+                            var userMaxHealth = Math.floor(value.split("|")[1]);
+                            attacksInfoVar += "(" + userHealth + "/" + userMaxHealth + ") ";
+                            break;
+                        case "dead":
+                            if (value) {
+                                isDead = true;
+                            }
+                            break;
+                    }
                 }
+            } else {
+                console.log(JSON.stringify(obj, null, 4) + "\n\n");
             }
             attacksInfoVar += "\n";
         }

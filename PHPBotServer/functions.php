@@ -113,6 +113,13 @@ function addXp($uid,$xpamount){
 		$r = mysqli_query($con,$q);
 		echo $xpamount;
 }
+
+function addXpSilent($uid,$xpamount){
+	$con = mysqlConnect();
+	$q = "UPDATE users SET xp=(xp + $xpamount) WHERE discordUserID = '$uid'";
+	$r = mysqli_query($con,$q);
+}
+
 function getLevelBase(){
 		return 1.2;
 }
