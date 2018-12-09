@@ -75,7 +75,7 @@ switch ($dataType) {
 									$failedMessage = "";
 									if ($attackerStats[$i]['health'] <= 0) {
 										$isFailed = TRUE;
-										$failedMessage = "isDead";
+										$failedMessage = "noUserHealth";
 									} else if ($attackerStats[$i]['stamina'] <= 0) {
 										$isFailed = TRUE;
 										$failedMessage = "noStamina";
@@ -127,7 +127,7 @@ switch ($dataType) {
 										$returnInfo[] = array('hostileHealth'=>$hhealth.'|'.$hostileMaxHealth, 'atkDamage'=>$attack, 'id'=>$attackerStats[$i]['id'], 'hitback'=>$hitAmount, 'userHealth'=>$attackerStats[$i]['health']."|".$attackerStats[$i]['maxHealth'], 'dead'=>$isDead);
 									} else {
 										// Returns info
-										$returnInfo[] = array('failed'=>$isFailed, 'failedMessage'=>$failedMessage);
+										$returnInfo[] = array('hostileHealth'=>$hostileHealth.'|'.$hostileMaxHealth, 'failed'=>$isFailed, 'failedMessage'=>$failedMessage, 'id'=>$attackerStats[$i]['id']);
 										
 									}
 								}

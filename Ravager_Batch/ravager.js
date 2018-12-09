@@ -347,7 +347,7 @@ function sendAttacks() {
         for (var i = 0; i < attackResults.length; i++) {
             //document.write("<br><br>array index: " + i);
             var obj = attackResults[i];
-            if (!attackResults[i]['failed']) {
+            if (!obj['failed']) {
                 for (var key in obj) {
                     var value = obj[key];
                     //document.write("<br> - " + key + ": " + value);
@@ -386,7 +386,23 @@ function sendAttacks() {
                     }
                 }
             } else {
-                console.log(JSON.stringify(obj, null, 4) + "\n\n");
+                for (var key in obj) {
+                    var value = obj[key];
+                    switch(key) {
+                        case "hostileHealth":
+                            var enemyHealth = Math.floor(value.split("|")[0]);
+                            var enemyMaxHealth = Math.floor(value.split("|")[1]);
+                            break;
+                    }
+                }
+                console.log("FAILED: " + JSON.stringify(obj, null, 4) + "\n\n");
+                if (obj['failedMessage'] == 'noUserHealth') {
+                    console.log(`[HP <= 0] ${obj['id']}`)
+                    failedVar += `:x: <@${obj['id']}> ***YOU ARE DYING. YOU DO NOT BELONG IN THIS FIGHT.***`;
+                } else if (obj['failedMessage'] == 'noStamina') {
+                    console.log(`[STAM <= 0] ${obj['id']}`)
+                    failedVar += `:x: <@${obj['id']}> ***HA! PUNY TRAVELER DOESN'T HAVE ENOUGH STAMINA.***`;    
+                }
             }
             attacksInfoVar += "\n";
         }
