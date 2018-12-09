@@ -15,6 +15,7 @@ const playingActivity = '!heal | BioMed Specialist.';
 var medItems = [0, 1, 2];
 var availableTreatments = [];
 var itemCount = 3;
+
 const treatments = [
     // Name | Crystals | HP | Description
     /*
@@ -23,11 +24,11 @@ const treatments = [
     */
     ['PATCH','5','50','Heals 50HP immediately. Must have more than 0HP.'],
     ['PATCHV2','8','%50','Heals to 50% HP immediately. Must have more than 0HP.'],
-    ['REGEN','10','100','Heals 100HP immediately. Must have more than 0HP.'],
-    ['REGENV2','13','%100','Heals all HP to maximum immediately. Must have more than 0HP.'],
-    ['REVIVE','15','25','Brings a traveler back from a KO (0HP) to 25HP immediately.'],
-    ['REVIVEV2','18','%50','Brings a traveler back from a KO (0HP) to 50% HP immediately.'],
-    ['REVIVEV3','20','%100','Brings a traveler back from a KO (0HP) to 100% HP immediately.']
+    ['REGEN','15','100','Heals 100HP immediately. Must have more than 0HP.'],
+    ['REGENV2','20','%100','Heals all HP to maximum immediately. Must have more than 0HP.'],
+    ['REVIVE','25','25','Brings a traveler back from a KO (0HP) to 25HP immediately.'],
+    ['REVIVEV2','30','%50','Brings a traveler back from a KO (0HP) to 50% HP immediately.'],
+    ['REVIVEV3','35','%100','Brings a traveler back from a KO (0HP) to 100% HP immediately.']
 ];
 
 // The ready event is vital, it means that your bot will only start reacting to information
@@ -58,7 +59,7 @@ cron.schedule('0 7 * * *', function() {
   
     var dialogOptions = [
       'Ahhh. Just finished reviving all of our fellow travelers.',
-      'Rezing travelers is hard work. <@462708244171718656> How was your night?',
+      `Rezing travelers is hard work. <@${process.env.ALEXIS_ID}> How was your night?`,
       'Finished up bringing everybody back from the dead. I swear I\'m a magician sometimes.',
       'Another day. More lives saved. No thanks from anybody. Good times.',
       'Hello everybody. I see you\'re alive and well. Because of me, but no biggie.',
@@ -172,9 +173,13 @@ client.on('message', async message => {
 client.on('error', console.error);
 
 // Testing a bug-fix for when Discord doesn't recover Playing status
-client.on('resume', () => {
-    console.log("RESUME: setting playing activity to " + playingActivity);
-    client.user.setActivity(playingActivity);
+client.on('presenceUpdate', (oldMember, newMember) => {
+    if (oldMember.id !== client.user.id) return;
+    console.log(`Detected a presence update from "${oldMember.presence.game.name}" to "${newMember.presence.game.name}".`);
+    if (newMember.presence.game.name !== playingActivity) {
+        console.log("presenceUpdate: setting playing activity to " + playingActivity);
+        client.user.setActivity(playingActivity);   
+    }
 });
 
 function resetInventory(itemCount) {
@@ -188,6 +193,10 @@ function resetInventory(itemCount) {
     //itemCount = treatments.length;
 
     // Chooses random numbers, in order to pick random heal packs
+    var patches = treatments.includes(treatment => treatments[treatment][0].includes("PATCH"));
+    var regens = treatments.includes(treatment => treatments[treatment][0].includes("REGEN"));
+    var revives = treatments.includes(treatment => treatments[treatment][0].includes("REVIVE"));
+
     do {
         tempnum = Math.floor(Math.random() * treatments.length);
         if (!medItems.includes(tempnum)) {
@@ -215,7 +224,7 @@ function resetInventory(itemCount) {
         }
 
         // Specifically for Treat
-        availableTreatments[i][1] += shared.utility.random(-1, 2);
+        availableTreatments[i][1] += shared.utility.random(-1, 1);
 
         console.log(availableTreatments[i][0] + " | Base Cost: " + tempnum + " | HP: " + availableTreatments[i][2] + " | Modifier: " + multiple + " | Final: " + availableTreatments[i][1]);
     }
