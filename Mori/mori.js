@@ -17,19 +17,21 @@ var availableTreatments = [];
 var itemCount = 3;
 
 const treatments = [
-    // Name | Crystals | HP | Description
+    // Name | Type | Crystals | HP | Description
     /*
     ['TREAT','5','15','Heals 15HP immediately. Must have more than 0HP.'],
     ['TREATV2','7','%15','Heals to 15% HP immediately. Must have more than 0HP.'],
     */
-    ['PATCH','5','50','Heals 50HP immediately. Must have more than 0HP.'],
-    ['PATCHV2','8','%50','Heals to 50% HP immediately. Must have more than 0HP.'],
-    ['REGEN','15','100','Heals 100HP immediately. Must have more than 0HP.'],
-    ['REGENV2','20','%100','Heals all HP to maximum immediately. Must have more than 0HP.'],
-    ['REVIVE','25','25','Brings a traveler back from a KO (0HP) to 25HP immediately.'],
-    ['REVIVEV2','30','%50','Brings a traveler back from a KO (0HP) to 50% HP immediately.'],
-    ['REVIVEV3','35','%100','Brings a traveler back from a KO (0HP) to 100% HP immediately.']
+    ['PATCH','3','50','Heals 50HP immediately. Must have more than 0HP.'],
+    ['PATCHV2','5','%50','Heals to 50% HP immediately. Must have more than 0HP.'],
+    ['REGEN','7','100','Heals 100HP immediately. Must have more than 0HP.'],
+    ['REGENV2','9','%100','Heals all HP to maximum immediately. Must have more than 0HP.'],
+    ['REVIVE','10','25','Brings a traveler back from a KO (0HP) to 25HP immediately.'],
+    ['REVIVEV2','18','%50','Brings a traveler back from a KO (0HP) to 50% HP immediately.'],
+    ['REVIVEV3','23','%100','Brings a traveler back from a KO (0HP) to 100% HP immediately.']
 ];
+
+resetInventory(itemCount);
 
 // The ready event is vital, it means that your bot will only start reacting to information
 // from Discord _after_ ready is emitted
@@ -48,8 +50,6 @@ client.on('ready', async () => {
     client.user.setActivity(playingActivity);
     console.log(`Connected! \
     \nLogged in as: ${client.user.username} - (${client.user.id})`);
-
-    resetInventory(itemCount);
 });
 
 //Revives everyone every morning at 7am PST (server time dependant).
@@ -193,19 +193,29 @@ function resetInventory(itemCount) {
     //itemCount = treatments.length;
 
     // Chooses random numbers, in order to pick random heal packs
-    var patches = treatments.includes(treatment => treatments[treatment][0].includes("PATCH"));
-    var regens = treatments.includes(treatment => treatments[treatment][0].includes("REGEN"));
-    var revives = treatments.includes(treatment => treatments[treatment][0].includes("REVIVE"));
+    var patches = treatments.filter(treatment => treatment[0].includes("PATCH"));
+    var regens = treatments.filter(treatment => treatment[0].includes("REGEN"));
+    var revives = treatments.filter(treatment => treatment[0].includes("REVIVE"));
+    var healTypes = [patches, regens, revives];
 
+    healTypes.forEach(element => {
+        tempnum = Math.floor(Math.random() * element.length);
+        //console.log("ELEMENT " + element + "\n");
+        //console.log("New Object " + element[tempnum] + "\n" + treatments.indexOf(element) + "\n");
+        medItems.push(treatments.indexOf(element[tempnum]));
+    });
+    
+    /*
     do {
         tempnum = Math.floor(Math.random() * treatments.length);
         if (!medItems.includes(tempnum)) {
             medItems.push(tempnum);
         }
         i++;
+        console.log(tempnum);
     }
     while (medItems.length < itemCount);
-  
+    */
     medItems.sort(sortNumber);
     message = "";
     var list2 = new Array();
@@ -217,16 +227,21 @@ function resetInventory(itemCount) {
         //console.log(">>> MedItems: " + treatments[medItems[i]] + "");
         // Older Calculations
         var multiple = parseFloat(Math.floor(tempnum / 6));
-        if (shared.utility.randomPercent(50)) {
-            availableTreatments[i][1] = tempnum + multiple;
-        } else {
-            availableTreatments[i][1] = tempnum - multiple;
-        }
+        var randomized = shared.utility.random(-multiple, multiple);
+        availableTreatments[i][1] = tempnum + randomized;
 
         // Specifically for Treat
-        availableTreatments[i][1] += shared.utility.random(-1, 1);
+        //availableTreatments[i][1] += 
 
-        console.log(availableTreatments[i][0] + " | Base Cost: " + tempnum + " | HP: " + availableTreatments[i][2] + " | Modifier: " + multiple + " | Final: " + availableTreatments[i][1]);
+        var hp = availableTreatments[i][2];
+        var baseHP = 180;
+        if (hp.includes('%')) {
+            hp = hp.replace('%', '');
+            hp = Math.round(hp / 100 * baseHP);
+            console.log(`> ${hp} / ${baseHP} HP (BASE HP ${baseHP})`);
+        }
+        var healthPerCrystal = (hp / availableTreatments[i][1]).toFixed(2);
+        console.log(`${availableTreatments[i][0]} | Cost: ${tempnum} += ${randomized} = ${availableTreatments[i][1]} | HP: ${availableTreatments[i][2]} | HP/C ${healthPerCrystal}`);
     }
 }
   
