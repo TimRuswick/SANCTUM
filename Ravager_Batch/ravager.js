@@ -21,8 +21,10 @@ var hostileCycle = 0;
 var spawnPercentage = 50;
 var hostileLevel = 1;
 var hostileType = "ravager";
-var sendAttacksEverySec;
+var sendAttacksInterval;
+var sendNoRavagerInterval;
 var attackQueue = [];
+var hiddenQueue = [];
 
 // The ready event is vital, it means that your bot will only start reacting to information
 // from Discord _after_ ready is emitted
@@ -41,6 +43,9 @@ client.on('ready', async () => {
     client.user.setActivity(playingMessage);
     console.log(`Connected! \
     \nLogged in as: ${client.user.username} - (${client.user.id})`);
+
+    clearInterval(sendNoRavagerInterval);
+    sendNoRavagerInterval = setInterval(sendHiddenError, 2000);
 });
 
 // Create an event listener for messages
@@ -62,8 +67,6 @@ client.on('message', async message => {
         case "ping":
             if (shared.utility.isAdmin(message.author.id, message.guild))
                 message.reply("Pong!");
-                let array = [1, 2, 3];
-                console.log(shared.utility.cloneArray(array));
             break;
         case "hp":
             if (shared.utility.isAdmin(message.author.id, message.guild)) {
@@ -77,7 +80,7 @@ client.on('message', async message => {
         case "r":
             if (shared.utility.isAdmin(message.author.id, message.guild)) {
                 switch (args[0]) {
-                    case "summon":
+                    case "summonil":
                     case "sil":
                         console.log("Summon the bot!");
                         newRavagerSequence(true, args[1]);
@@ -86,8 +89,8 @@ client.on('message', async message => {
                     case "sl":
                         newRavagerSequence(false, args[1]);
                         break;
-                    case "summoni":
-                    case "si":
+                    case "summon":
+                    case "s":
                         newRavagerSequence(true);
                         break;
                     case "summonn":
@@ -105,7 +108,6 @@ client.on('message', async message => {
         case "attack":
         case "atk":
         case "a":
-            if (ravagerState !== RavagerEnumState.ACTIVE) message.channel.send(`${message.author} ***THERE IS NO RAVAGER TO ATTACK.***`)
             logAttack(message.author.id);
             break;
         case "details":
@@ -167,7 +169,7 @@ async function newRavagerSequence(instant, level) {
         // Increases level on the next spawn
         hostileLevel++;
 
-        sendAttacksEverySec = setInterval(sendAttacks, 2000);
+        sendAttacksInterval = setInterval(sendAttacks, 2000);
 
         // Between 3 and 6 minutes, Ravager attempts to flee
         var fleeTime = Math.round(shared.utility.random(3 * 60 * 1000, 6 * 60 * 1000) / 1000);
@@ -293,7 +295,7 @@ function ravagerTurnOffline(channel) {
         }
     }
 
-    clearInterval(sendAttacksEverySec);
+    clearInterval(sendAttacksInterval);
     ravagerState = RavagerEnumState.WAITING;
     client.user.setStatus('invisible');
     client.user.setActivity('');
@@ -301,14 +303,40 @@ function ravagerTurnOffline(channel) {
 
 // Adds attack to array
 function logAttack(userID) {
-    if (ravagerState === RavagerEnumState.WAITING) return;
+    // Ravager doesn't exist yet
+    if (ravagerState === RavagerEnumState.WAITING) {
+        // Limits message to be only 1
+        if (hiddenQueue.findIndex(uID => uID === userID) < 0) {
+            console.log("[Logged hidden] " + userID + " | " + hiddenQueue);
+            hiddenQueue.push(userID);
+        } 
+    // Ravager exists and is getting attacked
+    } else if (ravagerState === RavagerEnumState.ACTIVE) {
+        // Limits attacks to be only 1
+        if (attackQueue.findIndex(uID => uID === userID) < 0) {
+            console.log("[Logged hidden] " + userID + " | " + attackQueue);
+            attackQueue.push(userID);
+        }
+    }
+}
 
-    // Limits attacks to be only 1
-    if (attackQueue.findIndex(uID => uID === userID)) {
-        console.log("[Logged attack] " + userID + " | " + attackQueue);
-        attackQueue.push(userID);
-    } else {
+// Sends the failed messages
+function sendHiddenError() {
+    // Just in case
+    hiddenQueue = shared.utility.removeDuplicates(hiddenQueue);
+    var messageText = "";
 
+    // Gets all users and then puts them in a message
+    for (let index = 0; index < hiddenQueue.length; index++) {
+        const element = hiddenQueue[index];
+        messageText += `<@${element}> ***THERE IS NO RAVAGER TO ATTACK.***\n`;
+    }
+    
+    // If message text has a length, send msg
+    if (messageText.length > 0) {
+        console.log(messageText.length + " " + messageText);
+        client.channels.get(process.env.DEADLANDS_CHANNEL_ID).send(messageText);
+        hiddenQueue = [];
     }
 }
 
@@ -319,6 +347,7 @@ function sendAttacks() {
     var failedVar = "";
     var finalVar = "";
 
+    // Just in case
     attackQueue = shared.utility.removeDuplicates(attackQueue);
 
     // CODE REPLACED THRU PHP
@@ -396,6 +425,9 @@ function sendAttacks() {
                             var userHealth = Math.floor(value.split("|")[0]);
                             var userMaxHealth = Math.floor(value.split("|")[1]);
                             attacksInfoVar += "(" + userHealth + "/" + userMaxHealth + ") ";
+                            if (userHealth <= 0) {
+                                attacksInfoVar += "***:skull: KNOCKED OUT*** ";
+                            }
                             break;
                         case "dead":
                             if (value) {
@@ -404,6 +436,7 @@ function sendAttacks() {
                             break;
                     }
                 }
+                attacksInfoVar += "\n";
             } else {
                 for (var key in obj) {
                     var value = obj[key];
@@ -414,28 +447,24 @@ function sendAttacks() {
                             break;
                     }
                 }
-                console.log("FAILED: " + JSON.stringify(obj, null, 4) + "\n\n");
+                //console.log("FAILED: " + JSON.stringify(obj, null, 4) + "\n\n");
                 if (obj['failedMessage'] == 'noUserHealth') {
-                    console.log(`[HP <= 0] ${obj['id']}`)
+                    //console.log(`[HP <= 0] ${obj['id']}`)
                     failedVar += `:x: <@${obj['id']}> ***YOU ARE DYING. YOU DO NOT BELONG IN THIS FIGHT.***`;
                 } else if (obj['failedMessage'] == 'noStamina') {
-                    console.log(`[STAM <= 0] ${obj['id']}`)
+                    //console.log(`[STAM <= 0] ${obj['id']}`)
                     failedVar += `:x: <@${obj['id']}> ***HA! PUNY TRAVELER DOESN'T HAVE ENOUGH STAMINA.***`;    
                 }
+                failedVar += "\n";
             }
-            attacksInfoVar += "\n";
+
         }
     }
 
     // Displays attack if there's any results
     if (failedVar.length > 0 || attacksInfoVar.length > 0) {
-        // Adds failed
-        finalVar += failedVar;
-
-        // Adds attack info along with HP bar if exists
-        if (attacksInfoVar.length > 0)
-            finalVar += attacksInfoVar + healthbar2(enemyHealth, enemyMaxHealth) + "\n"; 
-
+        // Combines everything into one
+        finalVar += failedVar + attacksInfoVar + healthbar2(enemyHealth, enemyMaxHealth) + "\n"; 
         shared.messaging.sendMessage(client, process.env.DEADLANDS_CHANNEL_ID, finalVar);
     }
 
