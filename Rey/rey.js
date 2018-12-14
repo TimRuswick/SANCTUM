@@ -68,6 +68,7 @@ client.on('message', async message => {
             }
             break;
         case "scavenge":
+        case "scav":
         case "s":
             scavengeMessage(message);
             break;
@@ -210,8 +211,8 @@ function scavenge(userID, channelID) {
                 message += `${shared.utility.getEmote(client, "crystals")} **-${crystalCost}**\t\t`
                 if (scrap > 0) { message += `${shared.utility.getEmote(client, "mscrap")} **+${scrap}**\t\t`; }
                 if (common > 0) { message += `${shared.utility.getEmote(client, "mcloth")} **+${common}**\t\t`; }
-                if (uncommon > 0) { message += `${shared.utility.getEmote(client, "melectronics")} **+${uncommon}**\t\t`; }
-                if (rare > 0) { message += `${shared.utility.getEmote(client, "mmetal")} **+${rare}**\t\t`; }
+                if (uncommon > 0) { message += `${shared.utility.getEmote(client, "mmetal")} **+${uncommon}**\t\t`; }
+                if (rare > 0) { message += `${shared.utility.getEmote(client, "melectronics")} **+${rare}**\t\t`; }
                 if (ultrarare > 0) { message += `${shared.utility.getEmote(client, "mgem")} **+${ultrarare}**\t\t`; }
                 message += `\n***${dialogOptions[randomNumber]}***`;
                 shared.messaging.sendMessage(client, channelID, message);

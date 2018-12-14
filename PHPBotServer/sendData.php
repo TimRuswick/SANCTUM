@@ -588,7 +588,7 @@ break;
 
 
 		case "scavenge":
-				$random = floor(rand(0,101));
+				$random = floor(rand(0,100));
 				$ultrarare = 0;$rare = 0; $uncommon = 0; $common = 0; $scrap = 0;
 				if($random <= 0.5){
 						$ultrarare = 1;
