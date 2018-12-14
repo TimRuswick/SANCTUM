@@ -84,9 +84,9 @@ switch ($dataType) {
 									if (!$isFailed){
 										// Attack
 										$attack = $attackerStats[$i]['strength'];
-										$attack = $attack + rand(-$attack / 2, $attack / 2);
+										$attack = $attack + rand(-$attack / 5, $attack / 5);
 										$totalDamage = $totalDamage + $attack;
-										$hitAmount = getEnemyDamage($hostileSpeed,$attackerStats[$i]['speed'],$attack);
+										$hitAmount = getEnemyDamage($hostileSpeed,$attackerStats[$i]['speed'],$hostileStrength);
 										if($hitAmount > 0){
 												if ($hitAmount >= $attackerStats[$i]['health']){$hitAmount = $attackerStats[$i]['health'];};
 												$attackerStats[$i]['health'] = $attackerStats[$i]['health'] - $hitAmount;

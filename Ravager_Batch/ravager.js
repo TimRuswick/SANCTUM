@@ -78,9 +78,21 @@ client.on('message', async message => {
             if (shared.utility.isAdmin(message.author.id, message.guild)) {
                 switch (args[0]) {
                     case "summon":
-                    case "s":
+                    case "sil":
                         console.log("Summon the bot!");
+                        newRavagerSequence(true, args[1]);
+                        break;
+                    case "summonl":
+                    case "sl":
+                        newRavagerSequence(false, args[1]);
+                        break;
+                    case "summoni":
+                    case "si":
                         newRavagerSequence(true);
+                        break;
+                    case "summonn":
+                    case "sn":
+                        newRavagerSequence();
                         break;
                     case "vanish":
                     case "v":
@@ -91,6 +103,9 @@ client.on('message', async message => {
             }
             break;
         case "attack":
+        case "atk":
+        case "a":
+            if (ravagerState !== RavagerEnumState.ACTIVE) message.channel.send(`${message.author} ***THERE IS NO RAVAGER TO ATTACK.***`)
             logAttack(message.author.id);
             break;
         case "details":
@@ -116,7 +131,7 @@ cron.schedule('*/15 * * * *', () => {
 });
 
 // Creates new Ravager
-async function newRavagerSequence(instant) {
+async function newRavagerSequence(instant, level) {
     // Prowling
     async function prowling() {
         let creationTime = Math.round(shared.utility.random(35 * 1000, 54 * 10000) / 1000);
@@ -184,6 +199,10 @@ async function newRavagerSequence(instant) {
     var hostile = String(dataRequest.loadServerData("hostileActive", 0));
     console.log(`Baddies: ${hostile}`);
     if (hostile === '0') {
+        if (level) {
+            if (!shared.utility.parsePageNumFromArgs(level)) return;
+            hostileLevel = shared.utility.parsePageNumFromArgs(level);
+        }
         attackQueue = [];
         await prowling();
         await appearance();
@@ -243,7 +262,7 @@ function healthbar2(health, maxHealth) {
         //console.log(":black_heart: Minus " + tempHealth)
     }
   
-    printString += " (" + health + "/" + maxHealth + ")";
+    printString += " (" + Math.max(health, 0) + "/" + maxHealth + ")";
     return printString;
   //custom emojis <:heartfull:460903750916112414>
 }
